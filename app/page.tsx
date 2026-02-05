@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { functions, recipes, categories, FunctionItem } from "@/lib/data";
+import { functions, recipes, queryRecipesRecords, queryRecipesEntity, categories, FunctionItem } from "@/lib/data";
 
 function FunctionCard({ fn }: { fn: FunctionItem }) {
   const [expanded, setExpanded] = useState(false);
@@ -57,7 +57,15 @@ function FunctionCard({ fn }: { fn: FunctionItem }) {
   );
 }
 
-function RecipeCard({ recipe }: { recipe: typeof recipes[0] }) {
+interface RecipeItem {
+  title: string;
+  description: string;
+  code: string;
+  category?: string;
+  docUrl?: string;
+}
+
+function RecipeCard({ recipe }: { recipe: RecipeItem }) {
   const [copied, setCopied] = useState(false);
   
   const copyCode = () => {
@@ -70,9 +78,11 @@ function RecipeCard({ recipe }: { recipe: typeof recipes[0] }) {
     <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-4">
       <div className="flex items-start justify-between gap-2 mb-2">
         <h3 className="text-sm font-semibold text-gray-200">{recipe.title}</h3>
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400">
-          {recipe.category}
-        </span>
+        {recipe.category && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 whitespace-nowrap">
+            {recipe.category}
+          </span>
+        )}
       </div>
       <p className="text-xs text-gray-400 mb-3">{recipe.description}</p>
       <div className="relative">
@@ -86,6 +96,16 @@ function RecipeCard({ recipe }: { recipe: typeof recipes[0] }) {
           {copied ? "✓ Copied" : "Copy"}
         </button>
       </div>
+      {recipe.docUrl && (
+        <a
+          href={recipe.docUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block text-[11px] text-blue-400 hover:text-blue-300 mt-2"
+        >
+          📖 Appian Docs →
+        </a>
+      )}
     </div>
   );
 }
@@ -93,7 +113,7 @@ function RecipeCard({ recipe }: { recipe: typeof recipes[0] }) {
 export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState<"functions" | "recipes">("functions");
+  const [activeTab, setActiveTab] = useState<"functions" | "functionRecipes" | "queryRecipes">("functions");
 
   const filteredFunctions = useMemo(() => {
     return functions.filter((fn) => {
@@ -116,6 +136,26 @@ export default function Home() {
       return matchesSearch && matchesCategory;
     });
   }, [search, selectedCategory]);
+
+  const filteredQueryRecipesRecords = useMemo(() => {
+    return queryRecipesRecords.filter((r) => {
+      return !search ||
+        r.title.toLowerCase().includes(search.toLowerCase()) ||
+        r.description.toLowerCase().includes(search.toLowerCase()) ||
+        r.code.toLowerCase().includes(search.toLowerCase());
+    });
+  }, [search]);
+
+  const filteredQueryRecipesEntity = useMemo(() => {
+    return queryRecipesEntity.filter((r) => {
+      return !search ||
+        r.title.toLowerCase().includes(search.toLowerCase()) ||
+        r.description.toLowerCase().includes(search.toLowerCase()) ||
+        r.code.toLowerCase().includes(search.toLowerCase());
+    });
+  }, [search]);
+
+  const totalQueryRecipes = filteredQueryRecipesRecords.length + filteredQueryRecipesEntity.length;
 
   const groupedFunctions = useMemo(() => {
     const groups: Record<string, FunctionItem[]> = {};
@@ -156,7 +196,7 @@ export default function Home() {
           
           {/* Tabs & Filter */}
           <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
-            <div className="flex gap-1">
+            <div className="flex gap-1 flex-wrap">
               <button
                 onClick={() => setActiveTab("functions")}
                 className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${
@@ -168,27 +208,39 @@ export default function Home() {
                 Functions ({filteredFunctions.length})
               </button>
               <button
-                onClick={() => setActiveTab("recipes")}
+                onClick={() => setActiveTab("functionRecipes")}
                 className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${
-                  activeTab === "recipes"
+                  activeTab === "functionRecipes"
                     ? "bg-blue-600 text-white"
                     : "text-gray-400 hover:text-white hover:bg-gray-800"
                 }`}
               >
-                Recipes ({filteredRecipes.length})
+                Function Recipes ({filteredRecipes.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("queryRecipes")}
+                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${
+                  activeTab === "queryRecipes"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                }`}
+              >
+                Query Recipes ({totalQueryRecipes})
               </button>
             </div>
             
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-gray-800/60 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:border-blue-500/50"
-            >
-              <option value="all">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+            {activeTab !== "queryRecipes" && (
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="bg-gray-800/60 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:border-blue-500/50"
+              >
+                <option value="all">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            )}
           </div>
         </div>
       </header>
@@ -218,7 +270,7 @@ export default function Home() {
               </div>
             )}
           </div>
-        ) : (
+        ) : activeTab === "functionRecipes" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredRecipes.map((recipe, i) => (
               <RecipeCard key={i} recipe={recipe} />
@@ -227,6 +279,59 @@ export default function Home() {
               <div className="col-span-2 text-center py-16 text-gray-500">
                 <div className="text-4xl mb-3">🔍</div>
                 <p>No recipes found matching your search.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {/* Records Section */}
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Querying Records
+                <span className="text-xs text-gray-500 font-normal">a!queryRecordType / a!queryRecordByIdentifier</span>
+              </h2>
+              <p className="text-xs text-gray-500 mb-4">
+                Use these recipes for querying record types directly. Recommended for most use cases.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredQueryRecipesRecords.map((recipe, i) => (
+                  <RecipeCard key={`rec-${i}`} recipe={recipe} />
+                ))}
+              </div>
+              {filteredQueryRecipesRecords.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No record query recipes found.</p>
+                </div>
+              )}
+            </section>
+
+            {/* Entity Section */}
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Querying Entities
+                <span className="text-xs text-gray-500 font-normal">a!queryEntity</span>
+              </h2>
+              <p className="text-xs text-gray-500 mb-4">
+                Use these recipes for querying data store entities directly. Useful for legacy patterns or specific needs.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredQueryRecipesEntity.map((recipe, i) => (
+                  <RecipeCard key={`ent-${i}`} recipe={recipe} />
+                ))}
+              </div>
+              {filteredQueryRecipesEntity.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No entity query recipes found.</p>
+                </div>
+              )}
+            </section>
+
+            {totalQueryRecipes === 0 && (
+              <div className="text-center py-16 text-gray-500">
+                <div className="text-4xl mb-3">🔍</div>
+                <p>No query recipes found matching your search.</p>
               </div>
             )}
           </div>
