@@ -11,6 +11,7 @@ export interface FunctionItem {
 // Sorted alphabetically
 export const categories = [
   "Array",
+  "Base Conversion",
   "Conversion",
   "Data & Query",
   "Date & Time",
@@ -27,6 +28,7 @@ export const categories = [
   "Scripting",
   "System",
   "Text",
+  "Trigonometry",
 ];
 
 export const functions: FunctionItem[] = [
@@ -166,6 +168,104 @@ export const functions: FunctionItem[] = [
     example: 'sublist({1,2,3,4,5}, 2, 3) → {2,3,4}',
     category: "Array",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_array_sublist.html"
+  },
+
+  // ==================== BASE CONVERSION ====================
+  {
+    name: "dec2hex",
+    syntax: "dec2hex(number, [places])",
+    description: "Converts a decimal number to hexadecimal.",
+    example: 'dec2hex(255) → "FF"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_dec2hex.html"
+  },
+  {
+    name: "hex2dec",
+    syntax: "hex2dec(hexText)",
+    description: "Converts a hexadecimal text to decimal number.",
+    example: 'hex2dec("FF") → 255',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_hex2dec.html"
+  },
+  {
+    name: "dec2bin",
+    syntax: "dec2bin(number, [places])",
+    description: "Converts a decimal number to binary.",
+    example: 'dec2bin(10) → "1010"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_dec2bin.html"
+  },
+  {
+    name: "bin2dec",
+    syntax: "bin2dec(binaryText)",
+    description: "Converts a binary text to decimal number.",
+    example: 'bin2dec("1010") → 10',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_bin2dec.html"
+  },
+  {
+    name: "dec2oct",
+    syntax: "dec2oct(number, [places])",
+    description: "Converts a decimal number to octal.",
+    example: 'dec2oct(64) → "100"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_dec2oct.html"
+  },
+  {
+    name: "oct2dec",
+    syntax: "oct2dec(octalText)",
+    description: "Converts an octal text to decimal number.",
+    example: 'oct2dec("100") → 64',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_oct2dec.html"
+  },
+  {
+    name: "bin2hex",
+    syntax: "bin2hex(binaryText, [places])",
+    description: "Converts binary text to hexadecimal.",
+    example: 'bin2hex("11111111") → "FF"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_bin2hex.html"
+  },
+  {
+    name: "hex2bin",
+    syntax: "hex2bin(hexText, [places])",
+    description: "Converts hexadecimal text to binary.",
+    example: 'hex2bin("FF") → "11111111"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_hex2bin.html"
+  },
+  {
+    name: "bin2oct",
+    syntax: "bin2oct(binaryText, [places])",
+    description: "Converts binary text to octal.",
+    example: 'bin2oct("111") → "7"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_bin2oct.html"
+  },
+  {
+    name: "oct2bin",
+    syntax: "oct2bin(octalText, [places])",
+    description: "Converts octal text to binary.",
+    example: 'oct2bin("7") → "111"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_oct2bin.html"
+  },
+  {
+    name: "hex2oct",
+    syntax: "hex2oct(hexText, [places])",
+    description: "Converts hexadecimal text to octal.",
+    example: 'hex2oct("1F") → "37"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_hex2oct.html"
+  },
+  {
+    name: "oct2hex",
+    syntax: "oct2hex(octalText, [places])",
+    description: "Converts octal text to hexadecimal.",
+    example: 'oct2hex("37") → "1F"',
+    category: "Base Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_base_conversion_oct2hex.html"
   },
 
   // ==================== CONVERSION ====================
@@ -1514,6 +1614,112 @@ export const functions: FunctionItem[] = [
     example: 'padright("Hi", 5, ".") → "Hi..."',
     category: "Text",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_text_padright.html"
+  },
+
+  // ==================== TRIGONOMETRY ====================
+  {
+    name: "sin",
+    syntax: "sin(angle)",
+    description: "Returns the sine of an angle (in radians).",
+    example: "sin(0) → 0",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_sin.html"
+  },
+  {
+    name: "cos",
+    syntax: "cos(angle)",
+    description: "Returns the cosine of an angle (in radians).",
+    example: "cos(0) → 1",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_cos.html"
+  },
+  {
+    name: "tan",
+    syntax: "tan(angle)",
+    description: "Returns the tangent of an angle (in radians).",
+    example: "tan(0) → 0",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_tan.html"
+  },
+  {
+    name: "asin",
+    syntax: "asin(value)",
+    description: "Returns the arcsine (inverse sine) in radians.",
+    example: "asin(0) → 0",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_asin.html"
+  },
+  {
+    name: "acos",
+    syntax: "acos(value)",
+    description: "Returns the arccosine (inverse cosine) in radians.",
+    example: "acos(1) → 0",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_acos.html"
+  },
+  {
+    name: "atan",
+    syntax: "atan(value)",
+    description: "Returns the arctangent (inverse tangent) in radians.",
+    example: "atan(0) → 0",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_atan.html"
+  },
+  {
+    name: "atan2",
+    syntax: "atan2(y, x)",
+    description: "Returns the arctangent of y/x, using signs to determine quadrant.",
+    example: "atan2(1, 1) → 0.785... (π/4)",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_atan2.html"
+  },
+  {
+    name: "sinh",
+    syntax: "sinh(value)",
+    description: "Returns the hyperbolic sine.",
+    example: "sinh(0) → 0",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_sinh.html"
+  },
+  {
+    name: "cosh",
+    syntax: "cosh(value)",
+    description: "Returns the hyperbolic cosine.",
+    example: "cosh(0) → 1",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_cosh.html"
+  },
+  {
+    name: "tanh",
+    syntax: "tanh(value)",
+    description: "Returns the hyperbolic tangent.",
+    example: "tanh(0) → 0",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_tanh.html"
+  },
+  {
+    name: "radians",
+    syntax: "radians(degrees)",
+    description: "Converts degrees to radians.",
+    example: "radians(180) → 3.14159...",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_radians.html"
+  },
+  {
+    name: "degrees",
+    syntax: "degrees(radians)",
+    description: "Converts radians to degrees.",
+    example: "degrees(pi()) → 180",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_degrees.html"
+  },
+  {
+    name: "pi",
+    syntax: "pi()",
+    description: "Returns the value of π (3.14159...).",
+    example: "pi() → 3.14159265358979",
+    category: "Trigonometry",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_pi.html"
   },
 ];
 
