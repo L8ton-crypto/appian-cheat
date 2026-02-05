@@ -359,6 +359,110 @@ export const functions: FunctionItem[] = [
     category: "Conversion",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_torecord.html"
   },
+  {
+    name: "cast",
+    syntax: "cast(type, value)",
+    description: "Casts a value to the specified type.",
+    example: 'cast(type!Employee, local!data)',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_cast.html"
+  },
+  {
+    name: "externalize",
+    syntax: "externalize(value)",
+    description: "Converts a value to a string for external storage.",
+    example: 'externalize(local!user) → "..."',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_externalize.html"
+  },
+  {
+    name: "internalize",
+    syntax: "internalize(externalizedText, default)",
+    description: "Converts an externalized string back to the original value.",
+    example: 'internalize(local!storedValue, null)',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_internalize.html"
+  },
+  {
+    name: "todocument",
+    syntax: "todocument(value)",
+    description: "Converts a value to a Document data type.",
+    example: 'todocument(123)',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_todocument.html"
+  },
+  {
+    name: "tofolder",
+    syntax: "tofolder(value)",
+    description: "Converts a value to a Folder data type.",
+    example: 'tofolder(456)',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_tofolder.html"
+  },
+  {
+    name: "toknowledgecenter",
+    syntax: "toknowledgecenter(value)",
+    description: "Converts a value to a Knowledge Center data type.",
+    example: 'toknowledgecenter(789)',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_toknowledgecenter.html"
+  },
+  {
+    name: "tocommunity",
+    syntax: "tocommunity(value)",
+    description: "Converts a value to a Community data type.",
+    example: 'tocommunity(101)',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_tocommunity.html"
+  },
+  {
+    name: "tointervalds",
+    syntax: "tointervalds(value)",
+    description: "Converts a value to Interval (Day to Second).",
+    example: 'tointervalds("11h 10m 30s")',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_tointervalds.html"
+  },
+  {
+    name: "toemailaddress",
+    syntax: "toemailaddress(value)",
+    description: "Converts a value to an Email Address data type.",
+    example: 'toemailaddress("user@example.com")',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_toemailaddress.html"
+  },
+  {
+    name: "toemailrecipient",
+    syntax: "toemailrecipient(value)",
+    description: "Converts a value to an Email Recipient data type.",
+    example: 'toemailrecipient(local!user)',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_toemailrecipient.html"
+  },
+  {
+    name: "touniformstring",
+    syntax: "touniformstring(value)",
+    description: "Converts a value to a uniform string (removes accents, lowercases).",
+    example: 'touniformstring("Café") → "cafe"',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_touniformstring.html"
+  },
+  {
+    name: "topeople",
+    syntax: "topeople(value)",
+    description: "Converts users and groups to a People list.",
+    example: 'topeople({local!user, local!group})',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_topeople.html"
+  },
+  {
+    name: "toprocessmodel",
+    syntax: "toprocessmodel(value)",
+    description: "Converts a value to a Process Model data type.",
+    example: 'toprocessmodel(123)',
+    category: "Conversion",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_toprocessmodel.html"
+  },
 
   // ==================== DATA & QUERY ====================
   {
@@ -1142,6 +1246,62 @@ export const functions: FunctionItem[] = [
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_min.html"
   },
   {
+    name: "median",
+    syntax: "median(value1, value2, ...)",
+    description: "Returns the median (middle value) of all values.",
+    example: "median(1, 2, 3, 4, 5) → 3",
+    category: "Statistical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_median.html"
+  },
+  {
+    name: "mode",
+    syntax: "mode(value1, value2, ...)",
+    description: "Returns the most frequently occurring value.",
+    example: "mode(1, 2, 2, 3) → 2",
+    category: "Statistical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_mode.html"
+  },
+  {
+    name: "stdev",
+    syntax: "stdev(value1, value2, ...)",
+    description: "Returns the sample standard deviation.",
+    example: "stdev(2, 4, 6, 8) → 2.58...",
+    category: "Statistical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_stdev.html"
+  },
+  {
+    name: "stdevp",
+    syntax: "stdevp(value1, value2, ...)",
+    description: "Returns the population standard deviation.",
+    example: "stdevp(2, 4, 6, 8) → 2.24...",
+    category: "Statistical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_stdevp.html"
+  },
+  {
+    name: "var",
+    syntax: "var(value1, value2, ...)",
+    description: "Returns the sample variance.",
+    example: "var(2, 4, 6, 8) → 6.67",
+    category: "Statistical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_var.html"
+  },
+  {
+    name: "varp",
+    syntax: "varp(value1, value2, ...)",
+    description: "Returns the population variance.",
+    example: "varp(2, 4, 6, 8) → 5",
+    category: "Statistical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_varp.html"
+  },
+  {
+    name: "product",
+    syntax: "product(value1, value2, ...)",
+    description: "Returns the product of all values multiplied together.",
+    example: "product(2, 3, 4) → 24",
+    category: "Statistical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_product.html"
+  },
+  {
     name: "round",
     syntax: "round(number, [decimals])",
     description: "Rounds a number to the specified decimal places.",
@@ -1204,6 +1364,102 @@ export const functions: FunctionItem[] = [
     example: "rand() → 0.7234...",
     category: "Mathematical",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_rand.html"
+  },
+  {
+    name: "ln",
+    syntax: "ln(number)",
+    description: "Returns the natural logarithm (base e).",
+    example: "ln(2.718) → 1",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_ln.html"
+  },
+  {
+    name: "log",
+    syntax: "log(number, [base])",
+    description: "Returns the logarithm (default base 10).",
+    example: "log(100) → 2",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_log.html"
+  },
+  {
+    name: "exp",
+    syntax: "exp(number)",
+    description: "Returns e raised to the power of number.",
+    example: "exp(1) → 2.718...",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_exp.html"
+  },
+  {
+    name: "fact",
+    syntax: "fact(number)",
+    description: "Returns the factorial of a number.",
+    example: "fact(5) → 120",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_fact.html"
+  },
+  {
+    name: "sign",
+    syntax: "sign(number)",
+    description: "Returns 1 if positive, -1 if negative, 0 if zero.",
+    example: "sign(-5) → -1",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_sign.html"
+  },
+  {
+    name: "trunc",
+    syntax: "trunc(number, [decimals])",
+    description: "Truncates a number to the specified decimal places.",
+    example: "trunc(3.789, 1) → 3.7",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_trunc.html"
+  },
+  {
+    name: "even",
+    syntax: "even(number)",
+    description: "Rounds up to the nearest even integer.",
+    example: "even(3) → 4",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_even.html"
+  },
+  {
+    name: "odd",
+    syntax: "odd(number)",
+    description: "Rounds up to the nearest odd integer.",
+    example: "odd(2) → 3",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_odd.html"
+  },
+  {
+    name: "gcd",
+    syntax: "gcd(value1, value2, ...)",
+    description: "Returns the greatest common divisor.",
+    example: "gcd(12, 18) → 6",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_gcd.html"
+  },
+  {
+    name: "lcm",
+    syntax: "lcm(value1, value2, ...)",
+    description: "Returns the least common multiple.",
+    example: "lcm(4, 6) → 12",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_lcm.html"
+  },
+  {
+    name: "combin",
+    syntax: "combin(n, k)",
+    description: "Returns the number of combinations (n choose k).",
+    example: "combin(5, 2) → 10",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_combin.html"
+  },
+  {
+    name: "quotient",
+    syntax: "quotient(numerator, denominator)",
+    description: "Returns the integer portion of a division.",
+    example: "quotient(10, 3) → 3",
+    category: "Mathematical",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_quotient.html"
   },
   {
     name: "count",
