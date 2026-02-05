@@ -26,6 +26,8 @@ export const categories = [
   "Process",
   "Records",
   "Scripting",
+  "Set",
+  "Statistical",
   "System",
   "Text",
   "Trigonometry",
@@ -70,7 +72,7 @@ export const functions: FunctionItem[] = [
     syntax: "contains(array, value)",
     description: "Returns true if the array contains the value.",
     example: 'contains({1, 2, 3}, 2) → true',
-    category: "Array",
+    category: "Set",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_contains.html"
   },
   {
@@ -78,7 +80,7 @@ export const functions: FunctionItem[] = [
     syntax: "wherecontains(value, array)",
     description: "Returns indices where value appears in array.",
     example: 'wherecontains("b", {"a", "b", "c"}) → 2',
-    category: "Array",
+    category: "Set",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_wherecontains.html"
   },
   {
@@ -86,7 +88,7 @@ export const functions: FunctionItem[] = [
     syntax: "union(array1, array2)",
     description: "Returns combined unique values from both arrays.",
     example: 'union({1, 2}, {2, 3}) → {1, 2, 3}',
-    category: "Array",
+    category: "Set",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_union.html"
   },
   {
@@ -94,7 +96,7 @@ export const functions: FunctionItem[] = [
     syntax: "intersection(array1, array2)",
     description: "Returns values that exist in both arrays.",
     example: 'intersection({1, 2, 3}, {2, 3, 4}) → {2, 3}',
-    category: "Array",
+    category: "Set",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_intersection.html"
   },
   {
@@ -102,7 +104,7 @@ export const functions: FunctionItem[] = [
     syntax: "difference(array1, array2)",
     description: "Returns values in array1 that are not in array2.",
     example: 'difference({1, 2, 3}, {2}) → {1, 3}',
-    category: "Array",
+    category: "Set",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_difference.html"
   },
   {
@@ -110,7 +112,7 @@ export const functions: FunctionItem[] = [
     syntax: "distinct(array)",
     description: "Returns unique values from the array.",
     example: 'distinct({1, 2, 2, 3}) → {1, 2, 3}',
-    category: "Array",
+    category: "Set",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_distinct.html"
   },
   {
@@ -1112,7 +1114,7 @@ export const functions: FunctionItem[] = [
     syntax: "sum(value1, value2, ...)",
     description: "Returns the sum of all values.",
     example: "sum(1, 2, 3, 4, 5) → 15",
-    category: "Mathematical",
+    category: "Statistical",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_sum.html"
   },
   {
@@ -1120,7 +1122,7 @@ export const functions: FunctionItem[] = [
     syntax: "average(value1, value2, ...)",
     description: "Returns the average of all values.",
     example: "average(10, 20, 30) → 20",
-    category: "Mathematical",
+    category: "Statistical",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_average.html"
   },
   {
@@ -1128,7 +1130,7 @@ export const functions: FunctionItem[] = [
     syntax: "max(value1, value2, ...)",
     description: "Returns the maximum value.",
     example: "max(5, 10, 3) → 10",
-    category: "Mathematical",
+    category: "Statistical",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_max.html"
   },
   {
@@ -1136,7 +1138,7 @@ export const functions: FunctionItem[] = [
     syntax: "min(value1, value2, ...)",
     description: "Returns the minimum value.",
     example: "min(5, 10, 3) → 3",
-    category: "Mathematical",
+    category: "Statistical",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_min.html"
   },
   {
@@ -1208,7 +1210,7 @@ export const functions: FunctionItem[] = [
     syntax: "count(array)",
     description: "Returns the number of items in an array.",
     example: 'count({"a", "b", "c"}) → 3',
-    category: "Mathematical",
+    category: "Statistical",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_count.html"
   },
   {
