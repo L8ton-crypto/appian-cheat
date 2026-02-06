@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { functions, recipes, queryRecipesRecords, queryRecipesEntity, categories, FunctionItem } from "@/lib/data";
+import { functions, recipes, queryRecipesRecords, queryRecipesEntity, connectedSystems, categories, FunctionItem, ConnectedSystem } from "@/lib/data";
 
 function FunctionCard({ fn }: { fn: FunctionItem }) {
   const [expanded, setExpanded] = useState(false);
@@ -110,10 +110,42 @@ function RecipeCard({ recipe }: { recipe: RecipeItem }) {
   );
 }
 
+function ConnectedSystemCard({ cs }: { cs: ConnectedSystem }) {
+  return (
+    <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-4 hover:bg-gray-800 hover:border-gray-600/50 transition-colors">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <h3 className="text-sm font-semibold text-blue-400">{cs.name}</h3>
+      </div>
+      <p className="text-xs text-gray-400 mb-3">{cs.description}</p>
+      <div className="mb-3">
+        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">Authentication Types</p>
+        <div className="flex flex-wrap gap-1">
+          {cs.authTypes.map((auth, i) => (
+            <span 
+              key={i} 
+              className="text-[10px] px-2 py-0.5 rounded-full bg-gray-700/80 text-gray-300"
+            >
+              {auth}
+            </span>
+          ))}
+        </div>
+      </div>
+      <a
+        href={cs.docUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block text-[11px] text-blue-400 hover:text-blue-300"
+      >
+        📖 Appian Docs →
+      </a>
+    </div>
+  );
+}
+
 export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState<"functions" | "functionRecipes" | "queryRecipes">("functions");
+  const [activeTab, setActiveTab] = useState<"functions" | "functionRecipes" | "queryRecipes" | "connectedSystems">("functions");
 
   const filteredFunctions = useMemo(() => {
     return functions.filter((fn) => {
@@ -156,6 +188,22 @@ export default function Home() {
   }, [search]);
 
   const totalQueryRecipes = filteredQueryRecipesRecords.length + filteredQueryRecipesEntity.length;
+
+  const filteredConnectedSystems = useMemo(() => {
+    return connectedSystems.filter((cs) => {
+      return !search ||
+        cs.name.toLowerCase().includes(search.toLowerCase()) ||
+        cs.description.toLowerCase().includes(search.toLowerCase()) ||
+        cs.authTypes.some(auth => auth.toLowerCase().includes(search.toLowerCase()));
+    });
+  }, [search]);
+
+  const groupedConnectedSystems = useMemo(() => {
+    const integration = filteredConnectedSystems.filter(cs => cs.category === "integration");
+    const database = filteredConnectedSystems.filter(cs => cs.category === "database");
+    const prebuilt = filteredConnectedSystems.filter(cs => cs.category === "prebuilt");
+    return { integration, database, prebuilt };
+  }, [filteredConnectedSystems]);
 
   const groupedFunctions = useMemo(() => {
     const groups: Record<string, FunctionItem[]> = {};
@@ -227,9 +275,19 @@ export default function Home() {
               >
                 Query Recipes ({totalQueryRecipes})
               </button>
+              <button
+                onClick={() => setActiveTab("connectedSystems")}
+                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${
+                  activeTab === "connectedSystems"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                }`}
+              >
+                Connected Systems ({filteredConnectedSystems.length})
+              </button>
             </div>
             
-            {activeTab !== "queryRecipes" && (
+            {(activeTab === "functions" || activeTab === "functionRecipes") && (
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -282,7 +340,7 @@ export default function Home() {
               </div>
             )}
           </div>
-        ) : (
+        ) : activeTab === "queryRecipes" ? (
           <div className="space-y-8">
             {/* Records Section */}
             <section>
@@ -332,6 +390,69 @@ export default function Home() {
               <div className="text-center py-16 text-gray-500">
                 <div className="text-4xl mb-3">🔍</div>
                 <p>No query recipes found matching your search.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {/* Integration Connected Systems */}
+            {groupedConnectedSystems.integration.length > 0 && (
+              <section>
+                <h2 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                  Integration Connected Systems
+                </h2>
+                <p className="text-xs text-gray-500 mb-4">
+                  Generic connected systems for REST APIs, OpenAPI, and JDBC connections.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {groupedConnectedSystems.integration.map((cs) => (
+                    <ConnectedSystemCard key={cs.name} cs={cs} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Database Connected Systems */}
+            {groupedConnectedSystems.database.length > 0 && (
+              <section>
+                <h2 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Data Source Connected Systems
+                </h2>
+                <p className="text-xs text-gray-500 mb-4">
+                  Connect to Appian-supported databases (MariaDB, MySQL, PostgreSQL, Oracle, SQL Server, DB2, Aurora).
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {groupedConnectedSystems.database.map((cs) => (
+                    <ConnectedSystemCard key={cs.name} cs={cs} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Pre-built Connected Systems */}
+            {groupedConnectedSystems.prebuilt.length > 0 && (
+              <section>
+                <h2 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                  Pre-Built Connected Systems
+                </h2>
+                <p className="text-xs text-gray-500 mb-4">
+                  Ready-to-use integrations for popular third-party services.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {groupedConnectedSystems.prebuilt.map((cs) => (
+                    <ConnectedSystemCard key={cs.name} cs={cs} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {filteredConnectedSystems.length === 0 && (
+              <div className="text-center py-16 text-gray-500">
+                <div className="text-4xl mb-3">🔍</div>
+                <p>No connected systems found matching your search.</p>
               </div>
             )}
           </div>

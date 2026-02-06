@@ -2699,3 +2699,250 @@ export const queryRecipesEntity = [
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryentity.html"
   },
 ];
+
+// ==================== CONNECTED SYSTEMS ====================
+export interface ConnectedSystem {
+  name: string;
+  description: string;
+  authTypes: string[];
+  category: "integration" | "database" | "prebuilt";
+  docUrl: string;
+}
+
+export const connectedSystems: ConnectedSystem[] = [
+  // Integration Connected Systems
+  {
+    name: "HTTP",
+    description: "Generic HTTP connected system for REST APIs. Share base URL and authentication across multiple integrations.",
+    authTypes: [
+      "None",
+      "API Key",
+      "AWS Signature Version 4",
+      "Basic Authentication",
+      "Google Service Account",
+      "OAuth 2.0: Authorization Code Grant",
+      "OAuth 2.0: Client Credentials Grant",
+      "OpenID Connect"
+    ],
+    category: "integration",
+    docUrl: "https://docs.appian.com/suite/help/25.4/http-connected-system.html"
+  },
+  {
+    name: "OpenAPI",
+    description: "HTTP connected system that uses an OpenAPI/Swagger document to inherit base URL, authentication, and auto-generate integrations.",
+    authTypes: [
+      "None",
+      "API Key",
+      "AWS Signature Version 4",
+      "Basic Authentication",
+      "Google Service Account",
+      "OAuth 2.0: Authorization Code Grant",
+      "OAuth 2.0: Client Credentials Grant",
+      "OAuth 2.0: SAML Bearer Assertion Flow"
+    ],
+    category: "integration",
+    docUrl: "https://docs.appian.com/suite/help/25.4/openapi-connected-system.html"
+  },
+  {
+    name: "Custom JDBC",
+    description: "Connect to databases not supported as business data sources using the JDBC protocol.",
+    authTypes: [
+      "Basic Authentication (Username/Password)"
+    ],
+    category: "integration",
+    docUrl: "https://docs.appian.com/suite/help/25.4/custom-jdbc-connected-system.html"
+  },
+
+  // Database Connected Systems
+  {
+    name: "MariaDB Data Source",
+    description: "Connect to MariaDB databases including Appian Cloud database.",
+    authTypes: [
+      "Basic Authentication (Username/Password)",
+      "OAuth 2.0: Client Credentials Grant"
+    ],
+    category: "database",
+    docUrl: "https://docs.appian.com/suite/help/25.4/data-source-connected-systems.html"
+  },
+  {
+    name: "MySQL Data Source",
+    description: "Connect to MySQL databases.",
+    authTypes: [
+      "Basic Authentication (Username/Password)"
+    ],
+    category: "database",
+    docUrl: "https://docs.appian.com/suite/help/25.4/data-source-connected-systems.html"
+  },
+  {
+    name: "PostgreSQL Data Source",
+    description: "Connect to PostgreSQL databases.",
+    authTypes: [
+      "Basic Authentication (Username/Password)"
+    ],
+    category: "database",
+    docUrl: "https://docs.appian.com/suite/help/25.4/data-source-connected-systems.html"
+  },
+  {
+    name: "Oracle Data Source",
+    description: "Connect to Oracle databases.",
+    authTypes: [
+      "Basic Authentication (Username/Password)",
+      "OAuth 2.0: Client Credentials Grant"
+    ],
+    category: "database",
+    docUrl: "https://docs.appian.com/suite/help/25.4/data-source-connected-systems.html"
+  },
+  {
+    name: "SQL Server Data Source",
+    description: "Connect to Microsoft SQL Server databases.",
+    authTypes: [
+      "Basic Authentication (Username/Password)",
+      "OAuth 2.0: Client Credentials Grant"
+    ],
+    category: "database",
+    docUrl: "https://docs.appian.com/suite/help/25.4/data-source-connected-systems.html"
+  },
+  {
+    name: "DB2 Data Source",
+    description: "Connect to IBM DB2 databases.",
+    authTypes: [
+      "Basic Authentication (Username/Password)"
+    ],
+    category: "database",
+    docUrl: "https://docs.appian.com/suite/help/25.4/data-source-connected-systems.html"
+  },
+  {
+    name: "Aurora MySQL Data Source",
+    description: "Connect to Amazon Aurora MySQL databases.",
+    authTypes: [
+      "Basic Authentication (Username/Password)"
+    ],
+    category: "database",
+    docUrl: "https://docs.appian.com/suite/help/25.4/data-source-connected-systems.html"
+  },
+  {
+    name: "Aurora PostgreSQL Data Source",
+    description: "Connect to Amazon Aurora PostgreSQL databases.",
+    authTypes: [
+      "Basic Authentication (Username/Password)"
+    ],
+    category: "database",
+    docUrl: "https://docs.appian.com/suite/help/25.4/data-source-connected-systems.html"
+  },
+
+  // Pre-built Connected Systems
+  {
+    name: "Salesforce",
+    description: "Manage customer information. Find, update, create, or delete records within your Salesforce instance.",
+    authTypes: [
+      "Web Server OAuth (per user)",
+      "Username-Password OAuth (single system)"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/salesforce-connected-system.html"
+  },
+  {
+    name: "DocuSign",
+    description: "Create, manage, and send eSignatures. Manage envelopes, documents, and recipient info.",
+    authTypes: [
+      "Authorization Code Grant (per user)",
+      "JWT Grant (single system)",
+      "Basic Authentication (deprecated)"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/docusign-connected-system.html"
+  },
+  {
+    name: "Google Drive",
+    description: "Manage files and folders in Google Drive. Upload, download, create, copy, and search files.",
+    authTypes: [
+      "OAuth 2.0: Authorization Code Grant (per user)"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/google-drive-connected-system.html"
+  },
+  {
+    name: "SharePoint",
+    description: "Manage documents and folders in Microsoft SharePoint. Upload, download, and search files.",
+    authTypes: [
+      "Authorization Code (per user)",
+      "Client Credentials - Azure ACS (single system)",
+      "Client Credentials - Entra ID (single system)"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/sharepoint-connected-system.html"
+  },
+  {
+    name: "Microsoft Dynamics 365",
+    description: "Connect to Microsoft Dynamics 365 CRM for customer relationship management.",
+    authTypes: [
+      "Authorization Code (per user)",
+      "Client Credentials (single system)"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/microsoft-dynamics-365-crm-connected-system.html"
+  },
+  {
+    name: "Google Cloud Vision",
+    description: "Analyze images using Google Cloud Vision AI. Detect labels, text, faces, and more.",
+    authTypes: [
+      "Google Service Account"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/google-cloud-vision.html"
+  },
+  {
+    name: "Google Cloud Translation",
+    description: "Translate text between languages using Google Cloud Translation API.",
+    authTypes: [
+      "Google Service Account"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/google-cloud-translate.html"
+  },
+  {
+    name: "Google Cloud Natural Language",
+    description: "Analyze text for sentiment, entities, and syntax using Google Cloud NLP.",
+    authTypes: [
+      "Google Service Account"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/google-cloud-natural-language.html"
+  },
+  {
+    name: "Amazon Machine Learning",
+    description: "Get predictions from Amazon Machine Learning models.",
+    authTypes: [
+      "AWS Signature Version 4"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/amazon-machine-learning.html"
+  },
+  {
+    name: "Microsoft Azure LUIS",
+    description: "Natural language understanding using Microsoft Azure Language Understanding (LUIS).",
+    authTypes: [
+      "API Key"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/microsoft-azure-luis-connected-system.html"
+  },
+  {
+    name: "Blue Prism",
+    description: "Connect to Blue Prism for robotic process automation (RPA).",
+    authTypes: [
+      "Client Credentials"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/blue-prism-connected-system.html"
+  },
+  {
+    name: "Google reCAPTCHA",
+    description: "Protect forms from spam and abuse using Google reCAPTCHA.",
+    authTypes: [
+      "API Key (Site Key + Secret Key)"
+    ],
+    category: "prebuilt",
+    docUrl: "https://docs.appian.com/suite/help/25.4/google_reCAPTCHA.html"
+  },
+];
