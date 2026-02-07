@@ -1711,6 +1711,214 @@ export const functions: FunctionItem[] = [
     category: "System",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_httpresponse.html"
   },
+  {
+    name: "a!map",
+    syntax: "a!map(key1: value1, key2: value2, ...)",
+    description: "Creates a map (dictionary) with key-value pairs.",
+    example: 'a!map(name: "John", age: 30)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_map.html"
+  },
+  {
+    name: "a!fromJson",
+    syntax: "a!fromJson(jsonText)",
+    description: "Parses a JSON string into Appian values.",
+    example: 'a!fromJson("{\"name\": \"John\"}") → [name: John]',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_fromjson.html"
+  },
+  {
+    name: "a!toJson",
+    syntax: "a!toJson(value)",
+    description: "Converts an Appian value to a JSON string.",
+    example: 'a!toJson(a!map(name: "John")) → "{\"name\":\"John\"}"',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_tojson.html"
+  },
+  {
+    name: "a!startsWith",
+    syntax: "a!startsWith(text, prefix)",
+    description: "Checks if text starts with the given prefix (case-insensitive).",
+    example: 'a!startsWith("Appian", "App") → true',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_startsWith.html"
+  },
+  {
+    name: "a!endsWith",
+    syntax: "a!endsWith(text, suffix)",
+    description: "Checks if text ends with the given suffix (case-insensitive).",
+    example: 'a!endsWith("Appian", "ian") → true',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_endsWith.html"
+  },
+  {
+    name: "a!isBetween",
+    syntax: "a!isBetween(value, lowerBound, upperBound)",
+    description: "Checks if a value is between two bounds (inclusive).",
+    example: 'a!isBetween(5, 1, 10) → true',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_isBetween.html"
+  },
+  {
+    name: "a!isInText",
+    syntax: "a!isInText(text, searchFor)",
+    description: "Checks if a value exists in a text string (case-insensitive).",
+    example: 'a!isInText("Hello World", "world") → true',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_isInText.html"
+  },
+  {
+    name: "a!pagingInfo",
+    syntax: "a!pagingInfo(startIndex, batchSize, sort)",
+    description: "Creates a paging configuration for queries.",
+    example: 'a!pagingInfo(startIndex: 1, batchSize: 50)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_paginginfo.html"
+  },
+  {
+    name: "a!sortInfo",
+    syntax: "a!sortInfo(field, ascending)",
+    description: "Creates a sort configuration for queries.",
+    example: 'a!sortInfo(field: "name", ascending: true)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_sortinfo.html"
+  },
+  {
+    name: "a!queryFilter",
+    syntax: "a!queryFilter(field, operator, value)",
+    description: "Creates a filter condition for queries.",
+    example: 'a!queryFilter(field: "status", operator: "=", value: "Active")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryfilter.html"
+  },
+  {
+    name: "a!queryLogicalExpression",
+    syntax: "a!queryLogicalExpression(operator, filters, ignoreFiltersWithEmptyValues)",
+    description: "Combines multiple filters with AND/OR logic.",
+    example: 'a!queryLogicalExpression(operator: "AND", filters: {...})',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_querylogicalexpression.html"
+  },
+  {
+    name: "a!queryRecordType",
+    syntax: "a!queryRecordType(recordType, fields, filters, pagingInfo)",
+    description: "Queries a record type and returns matching records.",
+    example: 'a!queryRecordType(recordType: recordType!Customer, pagingInfo: a!pagingInfo(1, 100))',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_queryrecordtype.html"
+  },
+  {
+    name: "a!queryEntity",
+    syntax: "a!queryEntity(entity, query, fetchTotalCount)",
+    description: "Queries a data store entity directly.",
+    example: 'a!queryEntity(entity: cons!DS_ENTITY, query: local!query)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryentity.html"
+  },
+  {
+    name: "a!dataSubset",
+    syntax: "a!dataSubset(startIndex, batchSize, sort, totalCount, data, identifiers)",
+    description: "Creates a data subset for paged data display.",
+    example: 'a!dataSubset(data: local!items, totalCount: count(local!items))',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_datasubset.html"
+  },
+  {
+    name: "a!recordData",
+    syntax: "a!recordData(recordType, filters)",
+    description: "Creates a record data source for grids/charts.",
+    example: 'a!recordData(recordType: recordType!Customer)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_recorddata.html"
+  },
+  {
+    name: "a!relatedRecordData",
+    syntax: "a!relatedRecordData(relationship, limit, sort, filters)",
+    description: "References related record data via a relationship.",
+    example: 'a!relatedRecordData(relationship: recordType!Order.relationships.customer)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_relatedrecorddata.html"
+  },
+  {
+    name: "a!queryRecordByIdentifier",
+    syntax: "a!queryRecordByIdentifier(recordType, identifier, fields)",
+    description: "Fetches a single record by its identifier.",
+    example: 'a!queryRecordByIdentifier(recordType: recordType!Customer, identifier: 123)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryrecordbyidentifier.html"
+  },
+  {
+    name: "a!aggregationFields",
+    syntax: "a!aggregationFields(groupings, measures)",
+    description: "Defines groupings and measures for record aggregation.",
+    example: 'a!aggregationFields(groupings: a!grouping(field: ...), measures: a!measure(...))',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_aggregationfields.html"
+  },
+  {
+    name: "a!grouping",
+    syntax: "a!grouping(field, alias, interval)",
+    description: "Defines a grouping field for aggregation.",
+    example: 'a!grouping(field: recordType!Order.fields.status, alias: "orderStatus")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_grouping.html"
+  },
+  {
+    name: "a!measure",
+    syntax: "a!measure(field, function, alias, filters)",
+    description: "Defines a measure (SUM, COUNT, AVG, etc.) for aggregation.",
+    example: 'a!measure(field: recordType!Order.fields.total, function: "SUM", alias: "totalSales")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_measure.html"
+  },
+  {
+    name: "a!jsonPath",
+    syntax: "a!jsonPath(value, expression)",
+    description: "Extracts values from JSON using JSONPath expressions.",
+    example: 'a!jsonPath(local!json, "$.store.book[0].title")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_jsonpath.html"
+  },
+  {
+    name: "a!applyComponents",
+    syntax: "a!applyComponents(components)",
+    description: "Applies component configurations dynamically.",
+    example: 'a!applyComponents(local!dynamicComponents)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_applycomponents.html"
+  },
+  {
+    name: "a!doesUserHaveAccess",
+    syntax: "a!doesUserHaveAccess(target, permission, user)",
+    description: "Checks if a user has a specific permission on an object.",
+    example: 'a!doesUserHaveAccess(target: local!folder, permission: "WRITE")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_doesUserHaveAccess.html"
+  },
+  {
+    name: "a!callLanguageModel",
+    syntax: "a!callLanguageModel(prompt, messages, model, maxTokens)",
+    description: "Calls an AI language model with a prompt.",
+    example: 'a!callLanguageModel(prompt: "Summarize this text: " & local!text)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_call_language_model.html"
+  },
+  {
+    name: "a!genAiModels",
+    syntax: "a!genAiModels()",
+    description: "Returns available generative AI models.",
+    example: 'a!genAiModels()',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_genaimodels.html"
+  },
+  {
+    name: "a!sentimentScore",
+    syntax: "a!sentimentScore(text)",
+    description: "Analyzes sentiment of text, returns score from -1 to 1.",
+    example: 'a!sentimentScore(local!customerFeedback)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_sentimentscore.html"
+  },
 
   // ==================== TEXT ====================
   {
