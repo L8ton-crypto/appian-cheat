@@ -474,78 +474,6 @@ export const functions: FunctionItem[] = [
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_localvariables.html"
   },
   {
-    name: "a!queryRecordType",
-    syntax: "a!queryRecordType(recordType, fields, filters, pagingInfo)",
-    description: "Queries a record type with filtering, sorting, and paging.",
-    example: "a!queryRecordType(recordType: recordType!Employee, pagingInfo: a!pagingInfo(1, 100))",
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_queryrecordtype.html"
-  },
-  {
-    name: "a!queryEntity",
-    syntax: "a!queryEntity(entity, query, fetchTotalCount)",
-    description: "Queries a data store entity.",
-    example: "a!queryEntity(entity: cons!DS_ENTITY, query: a!query(...))",
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryentity.html"
-  },
-  {
-    name: "a!pagingInfo",
-    syntax: "a!pagingInfo(startIndex, batchSize, sort)",
-    description: "Defines paging for queries.",
-    example: 'a!pagingInfo(startIndex: 1, batchSize: 50, sort: a!sortInfo(field: "name", ascending: true))',
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_paginginfo.html"
-  },
-  {
-    name: "a!sortInfo",
-    syntax: "a!sortInfo(field, ascending)",
-    description: "Defines sort order for queries.",
-    example: 'a!sortInfo(field: "createdDate", ascending: false)',
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_sortinfo.html"
-  },
-  {
-    name: "a!queryFilter",
-    syntax: "a!queryFilter(field, operator, value)",
-    description: "Defines a filter condition for queries.",
-    example: 'a!queryFilter(field: "status", operator: "=", value: "Active")',
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryfilter.html"
-  },
-  {
-    name: "a!queryLogicalExpression",
-    syntax: "a!queryLogicalExpression(operator, filters, ignoreFiltersWithEmptyValues)",
-    description: "Combines multiple filters with AND/OR logic.",
-    example: 'a!queryLogicalExpression(operator: "AND", filters: {...})',
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_querylogicalexpression.html"
-  },
-  {
-    name: "a!aggregationFields",
-    syntax: "a!aggregationFields(groupings, measures)",
-    description: "Defines groupings and measures for aggregation queries.",
-    example: 'a!aggregationFields(groupings: a!grouping(field: "department"), measures: a!measure(field: "salary", function: "SUM"))',
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_a_aggregationfields.html"
-  },
-  {
-    name: "a!grouping",
-    syntax: "a!grouping(field, alias, interval)",
-    description: "Defines a grouping field for aggregation.",
-    example: 'a!grouping(field: "department", alias: "dept")',
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Grouping_Component.html"
-  },
-  {
-    name: "a!measure",
-    syntax: "a!measure(field, function, alias)",
-    description: "Defines a measure (SUM, COUNT, AVG, etc.) for aggregation.",
-    example: 'a!measure(field: "amount", function: "SUM", alias: "total")',
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Measure_Component.html"
-  },
-  {
     name: "todatasubset",
     syntax: "todatasubset(data, pagingInfo)",
     description: "Converts data to a DataSubset with paging.",
@@ -740,14 +668,6 @@ export const functions: FunctionItem[] = [
     example: 'folder(456, "name") → "Reports"',
     category: "Document",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_folder.html"
-  },
-  {
-    name: "a!iconNewsEvent",
-    syntax: "a!iconNewsEvent(icon, timestamp, ...)",
-    description: "Creates a news event with an icon.",
-    example: 'a!iconNewsEvent(icon: "paper-plane", timestamp: now())',
-    category: "Document",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_iconnewsevent.html"
   },
   {
     name: "a!documentImage",
@@ -1578,22 +1498,6 @@ export const functions: FunctionItem[] = [
     example: 'recordType!Employee',
     category: "Records",
     docUrl: "https://docs.appian.com/suite/help/25.4/record-type-object.html"
-  },
-  {
-    name: "a!recordData",
-    syntax: "a!recordData(recordType, filters)",
-    description: "Creates record data for grids and charts.",
-    example: 'a!recordData(recordType: recordType!Employee, filters: a!queryLogicalExpression(...))',
-    category: "Records",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Picker_Component.html"
-  },
-  {
-    name: "a!relatedRecordData",
-    syntax: "a!relatedRecordData(relationship, filters)",
-    description: "Filters related record data.",
-    example: 'a!relatedRecordData(relationship: recordType!Employee.relationships.department)',
-    category: "Records",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Picker_Component.html"
   },
   {
     name: "a!recordLink",
