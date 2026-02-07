@@ -81,7 +81,7 @@ export const functions: FunctionItem[] = [
     description: "Returns indices where value appears in array.",
     example: 'wherecontains("b", {"a", "b", "c"}) → 2',
     category: "Set",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_wherecontains.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_array_wherecontains.html"
   },
   {
     name: "union",
@@ -113,7 +113,7 @@ export const functions: FunctionItem[] = [
     description: "Returns unique values from the array.",
     example: 'distinct({1, 2, 2, 3}) → {1, 2, 3}',
     category: "Set",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_distinct.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_set_union.html"
   },
   {
     name: "reverse",
@@ -145,7 +145,7 @@ export const functions: FunctionItem[] = [
     description: "Joins array elements into a string with separator.",
     example: 'joinarray({"a", "b", "c"}, ",") → "a,b,c"',
     category: "Array",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_text_joinarray.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_array_joinarray.html"
   },
   {
     name: "merge",
@@ -153,7 +153,7 @@ export const functions: FunctionItem[] = [
     description: "Merges multiple arrays into an array of arrays.",
     example: 'merge({1,2}, {"a","b"}) → {{1,"a"}, {2,"b"}}',
     category: "Array",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_array_merge.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_looping_merge.html"
   },
   {
     name: "length",
@@ -169,7 +169,7 @@ export const functions: FunctionItem[] = [
     description: "Returns a portion of an array.",
     example: 'sublist({1,2,3,4,5}, 2, 3) → {2,3,4}',
     category: "Array",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_array_sublist.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_looping_sublist.html"
   },
 
   // ==================== BASE CONVERSION ====================
@@ -341,7 +341,7 @@ export const functions: FunctionItem[] = [
     description: "Converts a username string to a User data type.",
     example: 'touser("john.doe")',
     category: "Conversion",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_touser.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_people_touser.html"
   },
   {
     name: "togroup",
@@ -349,7 +349,7 @@ export const functions: FunctionItem[] = [
     description: "Converts a group ID to a Group data type.",
     example: 'togroup(123)',
     category: "Conversion",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_togroup.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_people_togroup.html"
   },
   {
     name: "torecord",
@@ -357,7 +357,7 @@ export const functions: FunctionItem[] = [
     description: "Converts a value to a record reference.",
     example: 'torecord(recordType!Employee, 123)',
     category: "Conversion",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_torecord.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_records_torecord.html"
   },
   {
     name: "cast",
@@ -365,7 +365,7 @@ export const functions: FunctionItem[] = [
     description: "Casts a value to the specified type.",
     example: 'cast(type!Employee, local!data)',
     category: "Conversion",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_cast.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Cast_Function.html"
   },
   {
     name: "externalize",
@@ -453,7 +453,7 @@ export const functions: FunctionItem[] = [
     description: "Converts users and groups to a People list.",
     example: 'topeople({local!user, local!group})',
     category: "Conversion",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_topeople.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_people_topeople.html"
   },
   {
     name: "toprocessmodel",
@@ -461,7 +461,7 @@ export const functions: FunctionItem[] = [
     description: "Converts a value to a Process Model data type.",
     example: 'toprocessmodel(123)',
     category: "Conversion",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_conversion_toprocessmodel.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_process_toprocessmodel.html"
   },
 
   // ==================== DATA & QUERY ====================
@@ -479,7 +479,7 @@ export const functions: FunctionItem[] = [
     description: "Queries a record type with filtering, sorting, and paging.",
     example: "a!queryRecordType(recordType: recordType!Employee, pagingInfo: a!pagingInfo(1, 100))",
     category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_records_a_queryrecordtype.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_queryrecordtype.html"
   },
   {
     name: "a!queryEntity",
@@ -527,7 +527,7 @@ export const functions: FunctionItem[] = [
     description: "Defines groupings and measures for aggregation queries.",
     example: 'a!aggregationFields(groupings: a!grouping(field: "department"), measures: a!measure(field: "salary", function: "SUM"))',
     category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_aggregationfields.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_a_aggregationfields.html"
   },
   {
     name: "a!grouping",
@@ -535,7 +535,7 @@ export const functions: FunctionItem[] = [
     description: "Defines a grouping field for aggregation.",
     example: 'a!grouping(field: "department", alias: "dept")',
     category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_grouping.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Grouping_Component.html"
   },
   {
     name: "a!measure",
@@ -543,7 +543,7 @@ export const functions: FunctionItem[] = [
     description: "Defines a measure (SUM, COUNT, AVG, etc.) for aggregation.",
     example: 'a!measure(field: "amount", function: "SUM", alias: "total")',
     category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_measure.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Measure_Component.html"
   },
   {
     name: "todatasubset",
@@ -721,7 +721,7 @@ export const functions: FunctionItem[] = [
     description: "Formats a date as text using a pattern.",
     example: 'datetext(today(), "yyyy-MM-dd") → "2026-02-05"',
     category: "Date & Time",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_date_and_time_datetext.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_text_datetext.html"
   },
 
   // ==================== DOCUMENT ====================
@@ -755,7 +755,7 @@ export const functions: FunctionItem[] = [
     description: "Creates an image from a document.",
     example: 'a!documentImage(document: cons!LOGO_DOC)',
     category: "Document",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_documentimage.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Document_Image.html"
   },
   {
     name: "a!documentDownloadLink",
@@ -763,7 +763,7 @@ export const functions: FunctionItem[] = [
     description: "Creates a download link for a document.",
     example: 'a!documentDownloadLink(label: "Download", document: local!doc)',
     category: "Document",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_documentdownloadlink.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Document_Download_Link_Component.html"
   },
 
   // ==================== INFORMATIONAL ====================
@@ -781,7 +781,7 @@ export const functions: FunctionItem[] = [
     description: "Returns true if value is null, empty string, or empty list.",
     example: 'a!isNullOrEmpty("") → true',
     category: "Informational",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_isnullorempty.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_isnullorempty.html"
   },
   {
     name: "a!isNotNullOrEmpty",
@@ -789,7 +789,7 @@ export const functions: FunctionItem[] = [
     description: "Returns true if value is NOT null, empty string, or empty list.",
     example: 'a!isNotNullOrEmpty("test") → true',
     category: "Informational",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_isnotnullorempty.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_isnotnullorempty.html"
   },
   {
     name: "typeof",
@@ -805,7 +805,7 @@ export const functions: FunctionItem[] = [
     description: "Returns indices where the array values are true.",
     example: "which({false, true, true}) → {2, 3}",
     category: "Informational",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_informational_which.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_logical_which.html"
   },
   {
     name: "property",
@@ -813,7 +813,7 @@ export const functions: FunctionItem[] = [
     description: "Gets a property from a CDT or map.",
     example: 'property(local!user, "firstName", "Unknown")',
     category: "Informational",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_informational_property.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_property.html"
   },
   {
     name: "a!defaultValue",
@@ -821,7 +821,7 @@ export const functions: FunctionItem[] = [
     description: "Returns default if value is null/empty.",
     example: 'a!defaultValue(null, "N/A") → "N/A"',
     category: "Informational",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_defaultvalue.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_defaultvalue.html"
   },
 
   // ==================== INTERFACE COMPONENTS ====================
@@ -877,7 +877,7 @@ export const functions: FunctionItem[] = [
     example: 'a!dateTimeField(label: "Meeting Time", value: local!meetingTime, saveInto: local!meetingTime)',
     category: "Interface Components",
     subcategory: "Input",
-    docUrl: "https://docs.appian.com/suite/help/25.4/DateTime_Component.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Date_and_Time_Component.html"
   },
   {
     name: "a!dropdownField",
@@ -1037,7 +1037,7 @@ export const functions: FunctionItem[] = [
     description: "Displays content in a card with optional styling.",
     example: 'a!cardLayout(contents: {...}, style: "ACCENT")',
     category: "Layout Components",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Card_Layout.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/card_layout.html"
   },
   {
     name: "a!sideBySideLayout",
@@ -1127,7 +1127,7 @@ export const functions: FunctionItem[] = [
     description: "Pattern matching - returns result for first match.",
     example: 'a!match(local!status, equals: "A", then: "Active", equals: "I", then: "Inactive", default: "Unknown")',
     category: "Logical",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_match.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_logical_a_match.html"
   },
 
   // ==================== LOOPING ====================
@@ -1209,7 +1209,7 @@ export const functions: FunctionItem[] = [
     description: "Creates a sequence of integers from start to end.",
     example: "enumerate(1, 5) → {1, 2, 3, 4, 5}",
     category: "Looping",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_enumerate.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_looping_enumerate.html"
   },
 
   // ==================== MATHEMATICAL ====================
@@ -1219,7 +1219,7 @@ export const functions: FunctionItem[] = [
     description: "Returns the sum of all values.",
     example: "sum(1, 2, 3, 4, 5) → 15",
     category: "Statistical",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_sum.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_looping_sum.html"
   },
   {
     name: "average",
@@ -1299,7 +1299,7 @@ export const functions: FunctionItem[] = [
     description: "Returns the product of all values multiplied together.",
     example: "product(2, 3, 4) → 24",
     category: "Statistical",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_product.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_looping_product.html"
   },
   {
     name: "round",
@@ -1435,7 +1435,7 @@ export const functions: FunctionItem[] = [
     description: "Returns the greatest common divisor.",
     example: "gcd(12, 18) → 6",
     category: "Mathematical",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_gcd.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_gcd.html"
   },
   {
     name: "lcm",
@@ -1443,7 +1443,7 @@ export const functions: FunctionItem[] = [
     description: "Returns the least common multiple.",
     example: "lcm(4, 6) → 12",
     category: "Mathematical",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_lcm.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_statistical_lcm.html"
   },
   {
     name: "combin",
@@ -1475,7 +1475,7 @@ export const functions: FunctionItem[] = [
     description: "Formats a number with fixed decimal places.",
     example: 'fixed(1234.567, 2) → "1,234.57"',
     category: "Mathematical",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_fixed.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_text_fixed.html"
   },
 
   // ==================== PEOPLE ====================
@@ -1509,7 +1509,7 @@ export const functions: FunctionItem[] = [
     description: "Checks if a user is a member of a group.",
     example: 'isUserMemberOfGroup(loggedInUser(), cons!ADMIN_GROUP)',
     category: "People",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_people_isusermemberofgroup.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_people_isusermemberofgroups.html"
   },
   {
     name: "getDistinctUsers",
@@ -1525,7 +1525,7 @@ export const functions: FunctionItem[] = [
     description: "Creates a link to a user's record.",
     example: 'a!userRecordLink(user: loggedInUser())',
     category: "People",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_userrecordlink.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/User_Record_Link_Component.html"
   },
   {
     name: "supervisor",
@@ -1543,7 +1543,7 @@ export const functions: FunctionItem[] = [
     description: "Starts a process model from an interface.",
     example: 'a!startProcess(processModel: cons!MY_PROCESS, processParameters: {param1: local!value})',
     category: "Process",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_startprocess.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Start_Process_Link_Component.html"
   },
   {
     name: "pp!",
@@ -1559,7 +1559,7 @@ export const functions: FunctionItem[] = [
     description: "Process variable reference.",
     example: 'pv!customerId → 123',
     category: "Process",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Process_Variables.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Process_Variable_Configuration.html"
   },
   {
     name: "ac!",
@@ -1567,7 +1567,7 @@ export const functions: FunctionItem[] = [
     description: "Activity class output reference.",
     example: 'ac!result',
     category: "Process",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Activity_Classes.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Activity_Class_Parameters.html"
   },
 
   // ==================== RECORDS ====================
@@ -1585,7 +1585,7 @@ export const functions: FunctionItem[] = [
     description: "Creates record data for grids and charts.",
     example: 'a!recordData(recordType: recordType!Employee, filters: a!queryLogicalExpression(...))',
     category: "Records",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_recorddata.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Data_Component.html"
   },
   {
     name: "a!relatedRecordData",
@@ -1593,7 +1593,7 @@ export const functions: FunctionItem[] = [
     description: "Filters related record data.",
     example: 'a!relatedRecordData(relationship: recordType!Employee.relationships.department)',
     category: "Records",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_relatedrecorddata.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Related_Record_Data_Component.html"
   },
   {
     name: "a!recordLink",
@@ -1601,7 +1601,7 @@ export const functions: FunctionItem[] = [
     description: "Creates a link to a record.",
     example: 'a!recordLink(recordType: recordType!Employee, identifier: 123, label: "View")',
     category: "Records",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_recordlink.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Link_Component.html"
   },
   {
     name: "a!recordActionField",
@@ -1609,7 +1609,7 @@ export const functions: FunctionItem[] = [
     description: "Displays record actions as buttons.",
     example: 'a!recordActionField(actions: recordType!Employee.actions)',
     category: "Records",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Action_Field.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Action_Component.html"
   },
 
   // ==================== SCRIPTING ====================
@@ -1619,7 +1619,7 @@ export const functions: FunctionItem[] = [
     description: "Saves a value to a variable (use in saveInto).",
     example: 'a!save(local!items, append(local!items, local!newItem))',
     category: "Scripting",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_save.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_save.html"
   },
   {
     name: "a!refreshVariable",
@@ -1627,7 +1627,7 @@ export const functions: FunctionItem[] = [
     description: "Creates a variable that refreshes automatically.",
     example: 'a!refreshVariable(value: rule!getData(), refreshOnInterval: 60)',
     category: "Scripting",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Auto-Refresh_Variables.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Auto_Refresh_on_Interval.html"
   },
   {
     name: "load",
@@ -1635,7 +1635,7 @@ export const functions: FunctionItem[] = [
     description: "Legacy - defines local variables. Use a!localVariables instead.",
     example: 'load(local!x: 10, local!x * 2)',
     category: "Scripting",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_load.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_load.html"
   },
   {
     name: "with",
@@ -1643,7 +1643,7 @@ export const functions: FunctionItem[] = [
     description: "Legacy - defines local variables. Use a!localVariables instead.",
     example: 'with(local!x: 10, local!x * 2)',
     category: "Scripting",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_with.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_with.html"
   },
   {
     name: "error",
@@ -1651,7 +1651,7 @@ export const functions: FunctionItem[] = [
     description: "Throws an error with a message.",
     example: 'error("Value cannot be negative")',
     category: "Scripting",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_error.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_error.html"
   },
 
   // ==================== SYSTEM ====================
@@ -1709,7 +1709,7 @@ export const functions: FunctionItem[] = [
     description: "Creates an HTTP response for web APIs.",
     example: 'a!httpResponse(statusCode: 200, body: local!data)',
     category: "System",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_httpresponse.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_a_httpresponse.html"
   },
 
   // ==================== TEXT ====================
@@ -1929,7 +1929,7 @@ export const functions: FunctionItem[] = [
     description: "Returns the arctangent of y/x, using signs to determine quadrant.",
     example: "atan2(1, 1) → 0.785... (π/4)",
     category: "Trigonometry",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_atan2.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_atan.html"
   },
   {
     name: "sinh",
@@ -1977,7 +1977,7 @@ export const functions: FunctionItem[] = [
     description: "Returns the value of π (3.14159...).",
     example: "pi() → 3.14159265358979",
     category: "Trigonometry",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_trigonometry_pi.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_pi.html"
   },
 ];
 
