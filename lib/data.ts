@@ -1919,6 +1919,254 @@ export const functions: FunctionItem[] = [
     category: "System",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_sentimentscore.html"
   },
+  {
+    name: "a!applyValidations",
+    syntax: "a!applyValidations(validations, removeHiddenFields)",
+    description: "Applies validation rules to interface components.",
+    example: 'a!applyValidations(validations: local!validationRules)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_applyValidations.html"
+  },
+  {
+    name: "a!query",
+    syntax: "a!query(selection, aggregation, logicalExpression, filter, pagingInfo)",
+    description: "Creates a query object for use with a!queryEntity.",
+    example: 'a!query(pagingInfo: a!pagingInfo(1, 50))',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_query.html"
+  },
+  {
+    name: "a!queryColumn",
+    syntax: "a!queryColumn(field, alias, visible)",
+    description: "Defines a column to return in query results.",
+    example: 'a!queryColumn(field: "name", alias: "customerName")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_querycolumn.html"
+  },
+  {
+    name: "a!querySelection",
+    syntax: "a!querySelection(columns)",
+    description: "Defines which columns to include in query results.",
+    example: 'a!querySelection(columns: {a!queryColumn(field: "name")})',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryselection.html"
+  },
+  {
+    name: "a!queryAggregation",
+    syntax: "a!queryAggregation(aggregationColumns)",
+    description: "Defines aggregation for entity queries.",
+    example: 'a!queryAggregation(aggregationColumns: {...})',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryaggregation.html"
+  },
+  {
+    name: "a!queryAggregationColumn",
+    syntax: "a!queryAggregationColumn(field, isGrouping, aggregationFunction, alias)",
+    description: "Defines an aggregation column for entity queries.",
+    example: 'a!queryAggregationColumn(field: "amount", aggregationFunction: "SUM")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryaggregationcolumn.html"
+  },
+  {
+    name: "a!queryProcessAnalytics",
+    syntax: "a!queryProcessAnalytics(report, query, contextGroups, contextProcessIds)",
+    description: "Executes process reports and returns the resulting data.",
+    example: 'a!queryProcessAnalytics(report: cons!PROCESS_REPORT)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_queryprocessanalytics.html"
+  },
+  {
+    name: "a!entityData",
+    syntax: "a!entityData(entity, query, fetchTotalCount)",
+    description: "Creates an entity data source for grids.",
+    example: 'a!entityData(entity: cons!DS_ENTITY, query: local!query)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_entitydata.html"
+  },
+  {
+    name: "a!entityDataIdentifiers",
+    syntax: "a!entityDataIdentifiers(entity, identifiers)",
+    description: "Creates entity data with specific record identifiers.",
+    example: 'a!entityDataIdentifiers(entity: cons!DS_ENTITY, identifiers: {1, 2, 3})',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_entitydataidentifiers.html"
+  },
+  {
+    name: "a!recordFilterList",
+    syntax: "a!recordFilterList(name, options, defaultOption, isVisible)",
+    description: "Creates a user filter list for record views.",
+    example: 'a!recordFilterList(name: "Status", options: local!statusOptions)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_recordfilterlist.html"
+  },
+  {
+    name: "a!recordFilterListOption",
+    syntax: "a!recordFilterListOption(id, name, filter)",
+    description: "Creates an option for a record filter list.",
+    example: 'a!recordFilterListOption(id: 1, name: "Active", filter: a!queryFilter(...))',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_recordfilterlistoption.html"
+  },
+  {
+    name: "a!recordFilterDateRange",
+    syntax: "a!recordFilterDateRange(name, field, defaultFrom, defaultTo)",
+    description: "Creates a date range filter for record views.",
+    example: 'a!recordFilterDateRange(name: "Created", field: recordType!Order.fields.createdOn)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_recordfilterdaterange.html"
+  },
+  {
+    name: "a!recordFilterChoices",
+    syntax: "a!recordFilterChoices(name, field, options, isVisible)",
+    description: "Creates a choice-based filter for record views.",
+    example: 'a!recordFilterChoices(name: "Priority", field: recordType!Task.fields.priority)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_recordfilterchoices.html"
+  },
+  {
+    name: "a!userRecordFilterList",
+    syntax: "a!userRecordFilterList(name, options, defaultOption, isVisible)",
+    description: "Creates a user-based filter list for record views.",
+    example: 'a!userRecordFilterList(name: "Assigned To")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_userrecordfilterlist.html"
+  },
+  {
+    name: "a!listViewItem",
+    syntax: "a!listViewItem(image, title, details, timestamp)",
+    description: "Creates a list view item for record lists.",
+    example: 'a!listViewItem(title: fv!record[recordType!Customer.fields.name])',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_listviewitem.html"
+  },
+  {
+    name: "a!userRecordListViewItem",
+    syntax: "a!userRecordListViewItem(user, details, timestamp)",
+    description: "Creates a list view item that displays user info.",
+    example: 'a!userRecordListViewItem(user: fv!record[recordType!Task.fields.assignee])',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_userrecordlistviewitem.html"
+  },
+  {
+    name: "a!toRecordIdentifier",
+    syntax: "a!toRecordIdentifier(recordType, identifier)",
+    description: "Creates a record identifier from a record type and ID.",
+    example: 'a!toRecordIdentifier(recordType: recordType!Customer, identifier: 123)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_torecordidentifier.html"
+  },
+  {
+    name: "a!userRecordIdentifier",
+    syntax: "a!userRecordIdentifier(user)",
+    description: "Creates a record identifier for a user record.",
+    example: 'a!userRecordIdentifier(user: loggedInUser())',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_userrecordidentifier.html"
+  },
+  {
+    name: "a!integrationError",
+    syntax: "a!integrationError(title, message, detail)",
+    description: "Creates an integration error response.",
+    example: 'a!integrationError(title: "API Error", message: local!errorMsg)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_integrationerror.html"
+  },
+  {
+    name: "a!iconIndicator",
+    syntax: "a!iconIndicator(icon, color, size)",
+    description: "Creates an icon indicator for record lists.",
+    example: 'a!iconIndicator(icon: "check", color: "GREEN")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_iconindicator.html"
+  },
+  {
+    name: "a!iconNewsEvent",
+    syntax: "a!iconNewsEvent(icon, color, timestamp, user)",
+    description: "Creates a news event item with icon.",
+    example: 'a!iconNewsEvent(icon: "envelope", timestamp: now())',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_iconnewsevent.html"
+  },
+  {
+    name: "a!executeStoredProcedureForQuery",
+    syntax: "a!executeStoredProcedureForQuery(dataSource, procedureName, inputs)",
+    description: "Executes a stored procedure that returns query results.",
+    example: 'a!executeStoredProcedureForQuery(dataSource: cons!DS, procedureName: "sp_getOrders")',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_executestoredprocedureforquery.html"
+  },
+  {
+    name: "a!storedProcedureInput",
+    syntax: "a!storedProcedureInput(name, value)",
+    description: "Creates an input parameter for stored procedures.",
+    example: 'a!storedProcedureInput(name: "customerId", value: ri!id)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_storedprocedureinput.html"
+  },
+  {
+    name: "a!deployment",
+    syntax: "a!deployment()",
+    description: "Returns information about the current deployment.",
+    example: 'a!deployment().packageName',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_deployment.html"
+  },
+  {
+    name: "a!latestHealthCheck",
+    syntax: "a!latestHealthCheck()",
+    description: "Returns the results of the most recent health check.",
+    example: 'a!latestHealthCheck().overallStatus',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_latesthealthcheck.html"
+  },
+  {
+    name: "a!submitUploadedFiles",
+    syntax: "a!submitUploadedFiles(submittedFiles, folderOrKnowledgeCenter)",
+    description: "Submits uploaded files to a folder.",
+    example: 'a!submitUploadedFiles(submittedFiles: local!files, folderOrKnowledgeCenter: cons!FOLDER)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_submituploadedfiles.html"
+  },
+  {
+    name: "a!getDataSourceForPlugin",
+    syntax: "a!getDataSourceForPlugin(connectedSystem)",
+    description: "Gets the data source for a connected system plugin.",
+    example: 'a!getDataSourceForPlugin(connectedSystem: cons!MY_CS)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_getDataSourceForPlugin.html"
+  },
+  {
+    name: "a!pageResponse",
+    syntax: "a!pageResponse(body, header, title, canonicalUrl)",
+    description: "Creates a page response for portals.",
+    example: 'a!pageResponse(title: "Welcome", body: local!content)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_pageResponse.html"
+  },
+  {
+    name: "a!selectionFields",
+    syntax: "a!selectionFields(fields)",
+    description: "Defines fields to select in record queries.",
+    example: 'a!selectionFields(fields: {recordType!Customer.fields.name, recordType!Customer.fields.email})',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_selectionfields.html"
+  },
+  {
+    name: "a!documentFolderForRecordType",
+    syntax: "a!documentFolderForRecordType(recordType, record)",
+    description: "Returns the document folder associated with a record.",
+    example: 'a!documentFolderForRecordType(recordType: recordType!Customer, record: local!customer)',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_documentFolderForRecordType.html"
+  },
+  {
+    name: "a!controlPanelRecordHierarchyMetadata",
+    syntax: "a!controlPanelRecordHierarchyMetadata(hierarchies)",
+    description: "Defines record hierarchy metadata for control panels.",
+    example: 'a!controlPanelRecordHierarchyMetadata(hierarchies: {...})',
+    category: "System",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_controlPanelRecordHierarchyMetadata.html"
+  },
 
   // ==================== TEXT ====================
   {
