@@ -3,35 +3,26 @@ import { NextRequest, NextResponse } from "next/server";
 
 const COLLECTION_ID = "cb1653f2-6b08-42a0-b717-2bdb4151d7b0";
 
-// Cache pipeline in module scope
-let pipelineInstance: unknown = null;
-let pipelinePromise: Promise<unknown> | null = null;
+export const maxDuration = 30;
 
-async function getPipeline() {
-  if (pipelineInstance) return pipelineInstance;
-  if (pipelinePromise) return pipelinePromise;
+async function getEmbeddingFromHF(text: string): Promise<number[]> {
+  const res = await fetch(
+    "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inputs: text, options: { wait_for_model: true } }),
+    }
+  );
 
-  pipelinePromise = (async () => {
-    const { pipeline } = await import("@xenova/transformers");
-    pipelineInstance = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", {
-      quantized: true,
-    });
-    return pipelineInstance;
-  })();
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`HF API error: ${res.status} ${err}`);
+  }
 
-  return pipelinePromise;
+  const data = await res.json();
+  return Array.isArray(data[0]) ? data[0] : data;
 }
-
-async function generateEmbedding(text: string): Promise<number[]> {
-  const pipe = (await getPipeline()) as (
-    text: string,
-    opts: Record<string, unknown>
-  ) => Promise<{ data: Float32Array }>;
-  const output = await pipe(text, { pooling: "mean", normalize: true });
-  return Array.from(output.data);
-}
-
-export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,7 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "query string required" }, { status: 400 });
     }
 
-    const embedding = await generateEmbedding(query);
+    const embedding = await getEmbeddingFromHF(query);
     const sql = neon(process.env.DATABASE_URL!);
     const embStr = `[${embedding.join(",")}]`;
 
