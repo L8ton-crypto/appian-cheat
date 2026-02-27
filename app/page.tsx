@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef } from "react";
 import { functions, recipes, queryRecipesRecords, queryRecipesEntity, connectedSystems, categories, FunctionItem, ConnectedSystem } from "@/lib/data";
-import { getEmbedding } from "@/lib/embeddings";
+// Embedding generation now happens server-side in /api/search
 
 interface SemanticResult {
   name: string;
@@ -160,31 +160,32 @@ export default function Home() {
   const [aiModelStatus, setAiModelStatus] = useState<"idle" | "loading" | "ready">("idle");
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const doAiSearch = useCallback(async (query: string) => {
-    if (!query.trim() || query.length < 3) {
+  const doAiSearch = useCallback(async (q: string) => {
+    if (!q.trim() || q.length < 3) {
       setAiResults([]);
       return;
     }
     
     setAiLoading(true);
+    setAiModelStatus("loading");
     try {
-      if (aiModelStatus !== "ready") setAiModelStatus("loading");
-      const embedding = await getEmbedding(query);
-      setAiModelStatus("ready");
-      
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ embedding, limit: 12 }),
+        body: JSON.stringify({ query: q, limit: 12 }),
       });
       const data = await res.json();
-      setAiResults(data);
+      if (!data.error) {
+        setAiResults(data);
+        setAiModelStatus("ready");
+      }
     } catch (err) {
       console.error("AI search failed:", err);
+      setAiModelStatus("idle");
     } finally {
       setAiLoading(false);
     }
-  }, [aiModelStatus]);
+  }, []);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
