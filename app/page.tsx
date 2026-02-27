@@ -1,7 +1,15 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { functions, recipes, queryRecipesRecords, queryRecipesEntity, connectedSystems, categories, FunctionItem, ConnectedSystem } from "@/lib/data";
+import { getEmbedding } from "@/lib/embeddings";
+
+interface SemanticResult {
+  name: string;
+  category: string;
+  content: string;
+  similarity: number;
+}
 
 function FunctionCard({ fn }: { fn: FunctionItem }) {
   const [expanded, setExpanded] = useState(false);
@@ -146,6 +154,45 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<"functions" | "functionRecipes" | "queryRecipes" | "connectedSystems">("functions");
+  const [aiSearch, setAiSearch] = useState(false);
+  const [aiResults, setAiResults] = useState<SemanticResult[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiModelStatus, setAiModelStatus] = useState<"idle" | "loading" | "ready">("idle");
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const doAiSearch = useCallback(async (query: string) => {
+    if (!query.trim() || query.length < 3) {
+      setAiResults([]);
+      return;
+    }
+    
+    setAiLoading(true);
+    try {
+      if (aiModelStatus !== "ready") setAiModelStatus("loading");
+      const embedding = await getEmbedding(query);
+      setAiModelStatus("ready");
+      
+      const res = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ embedding, limit: 12 }),
+      });
+      const data = await res.json();
+      setAiResults(data);
+    } catch (err) {
+      console.error("AI search failed:", err);
+    } finally {
+      setAiLoading(false);
+    }
+  }, [aiModelStatus]);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    if (aiSearch) {
+      if (searchTimer.current) clearTimeout(searchTimer.current);
+      searchTimer.current = setTimeout(() => doAiSearch(value), 500);
+    }
+  };
 
   const filteredFunctions = useMemo(() => {
     return functions.filter((fn) => {
@@ -231,14 +278,41 @@ export default function Home() {
             </div>
             
             {/* Search */}
-            <div className="flex items-center gap-3 flex-1 max-w-md">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search functions, syntax, descriptions..."
-                className="flex-1 bg-gray-800/60 border border-gray-700/50 rounded-lg px-4 py-2 text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
-              />
+            <div className="flex items-center gap-2 flex-1 max-w-lg">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && aiSearch) doAiSearch(search); }}
+                  placeholder={aiSearch ? "Ask naturally... e.g. 'loop through a list'" : "Search functions, syntax, descriptions..."}
+                  className={`w-full bg-gray-800/60 border rounded-lg px-4 py-2 text-sm text-gray-300 placeholder-gray-500 focus:outline-none ${
+                    aiSearch ? "border-purple-500/50 focus:border-purple-400/70" : "border-gray-700/50 focus:border-blue-500/50"
+                  }`}
+                />
+                {aiLoading && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  setAiSearch(!aiSearch);
+                  setAiResults([]);
+                  if (!aiSearch && search.length >= 3) doAiSearch(search);
+                }}
+                className={`shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                  aiSearch
+                    ? "bg-purple-600 text-white"
+                    : "bg-gray-800/60 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-800"
+                }`}
+                title="Toggle AI semantic search"
+              >
+                <span className="text-sm">🧠</span>
+                AI Search
+                {aiModelStatus === "loading" && <span className="text-[10px] text-purple-300">(loading...)</span>}
+              </button>
             </div>
           </div>
           
@@ -305,6 +379,51 @@ export default function Home() {
 
       {/* Content */}
       <main className="max-w-6xl mx-auto px-4 py-6">
+        {/* AI Search Results */}
+        {aiSearch && aiResults.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-sm">🧠</span>
+              <h2 className="text-sm font-semibold text-purple-400">Semantic Results</h2>
+              <span className="text-xs text-gray-500">({aiResults.length} matches by meaning)</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {aiResults.map((result, i) => {
+                const fn = functions.find(f => f.name === result.name);
+                if (fn) {
+                  return (
+                    <div key={i} className="relative">
+                      <div className="absolute -top-1 -right-1 z-10 bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-mono">
+                        {(result.similarity * 100).toFixed(0)}%
+                      </div>
+                      <FunctionCard fn={fn} />
+                    </div>
+                  );
+                }
+                return (
+                  <div key={i} className="relative bg-gray-800/60 border border-purple-500/20 rounded-lg p-4">
+                    <div className="absolute -top-1 -right-1 z-10 bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-mono">
+                      {(result.similarity * 100).toFixed(0)}%
+                    </div>
+                    <code className="text-sm font-mono text-blue-400 font-semibold">{result.name}</code>
+                    <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-gray-700 text-gray-400">{result.category}</span>
+                    <pre className="text-xs text-gray-400 mt-2 whitespace-pre-wrap">{result.content}</pre>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 border-b border-gray-800" />
+          </div>
+        )}
+
+        {aiSearch && search.length >= 3 && aiResults.length === 0 && !aiLoading && (
+          <div className="mb-8 text-center py-8 text-gray-500">
+            <span className="text-3xl mb-2 block">🧠</span>
+            <p className="text-sm">Type a natural language query and press Enter</p>
+            <p className="text-xs text-gray-600 mt-1">e.g. &quot;loop through a list&quot; or &quot;check user permissions&quot;</p>
+          </div>
+        )}
+
         {activeTab === "functions" ? (
           <div className="space-y-8">
             {Object.entries(groupedFunctions).map(([category, fns]) => (
