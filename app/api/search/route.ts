@@ -2,18 +2,22 @@ import { neon } from "@neondatabase/serverless";
 import { NextRequest, NextResponse } from "next/server";
 
 const COLLECTION_ID = "cb1653f2-6b08-42a0-b717-2bdb4151d7b0";
+const HF_URL =
+  "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2";
 
 export const maxDuration = 30;
 
-async function getEmbeddingFromHF(text: string): Promise<number[]> {
-  const res = await fetch(
-    "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inputs: text, options: { wait_for_model: true } }),
-    }
-  );
+async function getQueryEmbedding(text: string): Promise<number[]> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (process.env.HF_TOKEN) {
+    headers["Authorization"] = `Bearer ${process.env.HF_TOKEN}`;
+  }
+
+  const res = await fetch(HF_URL, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ inputs: text, options: { wait_for_model: true } }),
+  });
 
   if (!res.ok) {
     const err = await res.text();
@@ -32,16 +36,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "query string required" }, { status: 400 });
     }
 
-    const embedding = await getEmbeddingFromHF(query);
     const sql = neon(process.env.DATABASE_URL!);
-    const embStr = `[${embedding.join(",")}]`;
 
+    // Generate embedding from the query text via HF API
+    const embedding = await getQueryEmbedding(query);
+    const embeddingStr = `[${embedding.join(",")}]`;
+
+    // Vector similarity search using cosine distance
     const results = await sql`
-      SELECT content, 1 - (embedding <=> ${embStr}::vector) as similarity
+      SELECT content, 1 - (embedding <=> ${embeddingStr}::vector) as similarity
       FROM vl_documents
       WHERE collection_id = ${COLLECTION_ID}
         AND embedding IS NOT NULL
-      ORDER BY embedding <=> ${embStr}::vector
+      ORDER BY embedding <=> ${embeddingStr}::vector
       LIMIT ${limit}
     `;
 
