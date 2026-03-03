@@ -178,6 +178,9 @@ export default function Home() {
       if (!data.error) {
         setAiResults(data);
         setAiModelStatus("ready");
+      } else {
+        console.error("Search error:", data.error);
+        setAiModelStatus("idle");
       }
     } catch (err) {
       console.error("AI search failed:", err);
