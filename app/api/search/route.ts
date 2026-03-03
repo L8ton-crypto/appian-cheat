@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const COLLECTION_ID = "7b86ae30-54ea-40bb-a7ca-df5340b9e683";
 const HF_URL =
-  "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2";
+  "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction";
 
 export const maxDuration = 30;
 
