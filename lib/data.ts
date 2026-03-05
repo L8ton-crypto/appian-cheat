@@ -704,6 +704,14 @@ export const functions: FunctionItem[] = [
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_informational_a_isnullorempty.html"
   },
   {
+    name: "a!isUserMemberOfGroup",
+    syntax: "a!isUserMemberOfGroup(username, groupId)",
+    description: "Returns true if the specified user is a member of the given group.",
+    example: 'a!isUserMemberOfGroup(username: loggedInUser(), groupId: cons!ADMINS_GROUP)',
+    category: "People",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_people_a_isusermemberofgroup.html"
+  },
+  {
     name: "a!isNotNullOrEmpty",
     syntax: "a!isNotNullOrEmpty(value)",
     description: "Returns true if value is NOT null, empty string, or empty list.",
@@ -809,6 +817,15 @@ export const functions: FunctionItem[] = [
     docUrl: "https://docs.appian.com/suite/help/25.4/Dropdown_Component.html"
   },
   {
+    name: "a!dynamicLink",
+    syntax: "a!dynamicLink(label, value, saveInto, ...)",
+    description: "Creates a link that saves a value when clicked. Commonly used for in-place navigation and toggling state.",
+    example: 'a!dynamicLink(label: "View Details", value: fv!row.id, saveInto: local!selectedId)',
+    category: "Interface Components",
+    subcategory: "Action",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Dynamic_Link.html"
+  },
+  {
     name: "a!radioButtonField",
     syntax: "a!radioButtonField(label, choiceLabels, choiceValues, value, saveInto, ...)",
     description: "Radio button selection.",
@@ -881,6 +898,24 @@ export const functions: FunctionItem[] = [
     docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Component.html"
   },
   {
+    name: "a!richTextHighlight",
+    syntax: "a!richTextHighlight(text, ...)",
+    description: "Highlights text within a rich text display field. Used for search result emphasis.",
+    example: 'a!richTextHighlight(text: "important")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Styled_Text.html"
+  },
+  {
+    name: "a!richTextIcon",
+    syntax: "a!richTextIcon(icon, color, size, ...)",
+    description: "Displays a Font Awesome icon inline within rich text.",
+    example: 'a!richTextIcon(icon: "check-circle", color: "POSITIVE", size: "MEDIUM")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Icon.html"
+  },
+  {
     name: "a!imageField",
     syntax: "a!imageField(images, ...)",
     description: "Displays one or more images.",
@@ -906,6 +941,22 @@ export const functions: FunctionItem[] = [
     category: "Interface Components",
     subcategory: "Data",
     docUrl: "https://docs.appian.com/suite/help/25.4/Grid_Column_Component.html"
+  },
+  {
+    name: "a!gridLayout",
+    syntax: "a!gridLayout(headerCells, rows, ...)",
+    description: "Fully customizable grid layout for complex table UIs. Unlike a!gridField, gives full control over cell rendering.",
+    example: 'a!gridLayout(headerCells: {a!gridLayoutHeaderCell(label: "Name")}, rows: a!forEach(items: local!data, expression: a!gridRowLayout(contents: {a!textField(value: fv!item.name)})))',
+    category: "Layout Components",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Grid_Layout.html"
+  },
+  {
+    name: "a!gridRowLayout",
+    syntax: "a!gridRowLayout(contents, id, ...)",
+    description: "Defines a single row inside a!gridLayout. Each content item maps to a column.",
+    example: 'a!gridRowLayout(contents: {a!textField(value: fv!item.name), a!integerField(value: fv!item.qty)})',
+    category: "Layout Components",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Grid_Row_Layout.html"
   },
   {
     name: "a!fileUploadField",
@@ -1584,6 +1635,22 @@ export const functions: FunctionItem[] = [
     docUrl: "https://docs.appian.com/suite/help/25.4/Expressions.html"
   },
   {
+    name: "fn!queryEntity",
+    syntax: "fn!queryEntity(entity, query)",
+    description: "Queries a data store entity directly. Legacy approach - prefer a!queryRecordType for new development.",
+    example: 'fn!queryEntity(cons!DS_ENTITY, a!query(pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 50)))',
+    category: "Data & Query",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_queryentity.html"
+  },
+  {
+    name: "fn!readExcelSheet",
+    syntax: "fn!readExcelSheet(excelDocument, sheetNumber, ...)",
+    description: "Reads data from an Excel spreadsheet document. Returns a list of dictionaries.",
+    example: 'fn!readExcelSheet(excelDocument: ri!myExcel, sheetNumber: 1, startRow: 2, numRows: 100)',
+    category: "Document",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_readexcelsheet.html"
+  },
+  {
     name: "ri!",
     syntax: "ri!ruleInputName",
     description: "References a rule input parameter.",
@@ -1958,6 +2025,14 @@ export const functions: FunctionItem[] = [
     example: 'a!toRecordIdentifier(recordType: recordType!Customer, identifier: 123)',
     category: "System",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_torecordidentifier.html"
+  },
+  {
+    name: "a!try",
+    syntax: "a!try(expression, default)",
+    description: "Evaluates an expression and returns a default value if an error occurs. Essential for error handling.",
+    example: 'a!try(expression: 1/0, default: 0) → 0',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_a_try.html"
   },
   {
     name: "a!userRecordIdentifier",
