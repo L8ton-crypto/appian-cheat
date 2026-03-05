@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef } from "react";
 import { functions, recipes, queryRecipesRecords, queryRecipesEntity, connectedSystems, categories, FunctionItem, ConnectedSystem } from "@/lib/data";
+import { patterns, patternCategories, PatternItem } from "@/lib/patterns";
 // Embedding generation now happens server-side in /api/search
 
 interface SemanticResult {
@@ -150,10 +151,87 @@ function ConnectedSystemCard({ cs }: { cs: ConnectedSystem }) {
   );
 }
 
+function PatternCard({ pattern, onTagClick }: { pattern: PatternItem; onTagClick: (tag: string) => void }) {
+  const [expanded, setExpanded] = useState(false);
+  
+  return (
+    <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-4 hover:bg-gray-800 hover:border-gray-600/50 transition-colors">
+      <div 
+        className="cursor-pointer"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+              pattern.type === "pattern" 
+                ? "bg-green-500/20 text-green-400" 
+                : "bg-red-500/20 text-red-400"
+            }`}>
+              {pattern.type === "pattern" ? "Pattern ✅" : "Anti-Pattern ❌"}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-gray-700 text-gray-400">
+              {pattern.category}
+            </span>
+          </div>
+          <span className="text-gray-600 text-xs">{expanded ? "−" : "+"}</span>
+        </div>
+        
+        <h3 className="text-sm font-semibold text-gray-200 mb-2">{pattern.title}</h3>
+        
+        <div className="text-xs text-gray-400">
+          <span className="text-orange-400 font-medium">Problem:</span>{" "}
+          {expanded ? pattern.problem : pattern.problem.split('.')[0] + '...'}
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="mt-4 space-y-3">
+          <div>
+            <p className="text-xs text-blue-400 font-medium mb-1">Solution</p>
+            <p className="text-xs text-gray-300">{pattern.solution}</p>
+          </div>
+          
+          <div>
+            <p className="text-xs text-emerald-400 font-medium mb-1">Example</p>
+            <pre className="text-xs font-mono bg-gray-900 px-3 py-2 rounded text-emerald-400 overflow-x-auto whitespace-pre-wrap">
+              {pattern.example}
+            </pre>
+          </div>
+          
+          <div>
+            <p className="text-xs text-amber-400 font-medium mb-1">Why it works</p>
+            <p className="text-xs text-gray-300">{pattern.why}</p>
+          </div>
+          
+          <div className="pt-2 border-t border-gray-700/50">
+            <div className="flex flex-wrap gap-1">
+              {pattern.tags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTagClick(tag);
+                  }}
+                  className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState<"functions" | "functionRecipes" | "queryRecipes" | "connectedSystems">("functions");
+  const [selectedPatternType, setSelectedPatternType] = useState<string>("all");
+  const [selectedPatternCategory, setSelectedPatternCategory] = useState<string>("all");
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<"functions" | "functionRecipes" | "queryRecipes" | "connectedSystems" | "patterns">("functions");
   const [aiSearch, setAiSearch] = useState(false);
   const [aiResults, setAiResults] = useState<SemanticResult[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -196,6 +274,16 @@ export default function Home() {
       if (searchTimer.current) clearTimeout(searchTimer.current);
       searchTimer.current = setTimeout(() => doAiSearch(value), 500);
     }
+  };
+
+  const handleTagClick = (tag: string) => {
+    const newTags = new Set(selectedTags);
+    if (newTags.has(tag)) {
+      newTags.delete(tag);
+    } else {
+      newTags.add(tag);
+    }
+    setSelectedTags(newTags);
   };
 
   const filteredFunctions = useMemo(() => {
@@ -255,6 +343,32 @@ export default function Home() {
     const prebuilt = filteredConnectedSystems.filter(cs => cs.category === "prebuilt");
     return { integration, database, prebuilt };
   }, [filteredConnectedSystems]);
+
+  const filteredPatterns = useMemo(() => {
+    return patterns.filter((pattern) => {
+      const matchesSearch = !search ||
+        pattern.title.toLowerCase().includes(search.toLowerCase()) ||
+        pattern.problem.toLowerCase().includes(search.toLowerCase()) ||
+        pattern.solution.toLowerCase().includes(search.toLowerCase()) ||
+        pattern.why.toLowerCase().includes(search.toLowerCase()) ||
+        pattern.example.toLowerCase().includes(search.toLowerCase()) ||
+        pattern.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()));
+      
+      const matchesType = selectedPatternType === "all" || pattern.type === selectedPatternType;
+      const matchesCategory = selectedPatternCategory === "all" || pattern.category === selectedPatternCategory;
+      const matchesTags = selectedTags.size === 0 || pattern.tags.some(tag => selectedTags.has(tag));
+      
+      return matchesSearch && matchesType && matchesCategory && matchesTags;
+    });
+  }, [search, selectedPatternType, selectedPatternCategory, selectedTags]);
+
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    patterns.forEach(pattern => {
+      pattern.tags.forEach(tag => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, []);
 
   const groupedFunctions = useMemo(() => {
     const groups: Record<string, FunctionItem[]> = {};
@@ -363,6 +477,16 @@ export default function Home() {
               >
                 Connected Systems ({filteredConnectedSystems.length})
               </button>
+              <button
+                onClick={() => setActiveTab("patterns")}
+                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${
+                  activeTab === "patterns"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                }`}
+              >
+                Patterns ({filteredPatterns.length})
+              </button>
             </div>
             
             {(activeTab === "functions" || activeTab === "functionRecipes") && (
@@ -376,6 +500,40 @@ export default function Home() {
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
+            )}
+            
+            {activeTab === "patterns" && (
+              <div className="flex gap-2 flex-wrap">
+                <select
+                  value={selectedPatternType}
+                  onChange={(e) => setSelectedPatternType(e.target.value)}
+                  className="bg-gray-800/60 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:border-blue-500/50"
+                >
+                  <option value="all">All Types</option>
+                  <option value="pattern">Patterns Only</option>
+                  <option value="anti-pattern">Anti-Patterns Only</option>
+                </select>
+                
+                <select
+                  value={selectedPatternCategory}
+                  onChange={(e) => setSelectedPatternCategory(e.target.value)}
+                  className="bg-gray-800/60 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:border-blue-500/50"
+                >
+                  <option value="all">All Categories</option>
+                  {patternCategories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+                
+                {selectedTags.size > 0 && (
+                  <button
+                    onClick={() => setSelectedTags(new Set())}
+                    className="px-3 py-1.5 rounded-lg text-sm bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                  >
+                    Clear Tags ({selectedTags.size})
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -516,7 +674,7 @@ export default function Home() {
               </div>
             )}
           </div>
-        ) : (
+        ) : activeTab === "connectedSystems" ? (
           <div className="space-y-8">
             {/* Integration Connected Systems */}
             {groupedConnectedSystems.integration.length > 0 && (
@@ -576,6 +734,35 @@ export default function Home() {
               <div className="text-center py-16 text-gray-500">
                 <div className="text-4xl mb-3">🔍</div>
                 <p>No connected systems found matching your search.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4">
+              {filteredPatterns.map((pattern) => (
+                <PatternCard key={pattern.id} pattern={pattern} onTagClick={handleTagClick} />
+              ))}
+            </div>
+            
+            {selectedTags.size > 0 && (
+              <div className="text-center py-4">
+                <div className="text-sm text-gray-400 mb-2">
+                  Filtered by tags: 
+                  {Array.from(selectedTags).map((tag, i) => (
+                    <span key={tag}>
+                      {i > 0 && ', '}
+                      <span className="text-blue-400">{tag}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {filteredPatterns.length === 0 && (
+              <div className="text-center py-16 text-gray-500">
+                <div className="text-4xl mb-3">🔍</div>
+                <p>No patterns found matching your criteria.</p>
               </div>
             )}
           </div>
