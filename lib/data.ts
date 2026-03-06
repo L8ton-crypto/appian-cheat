@@ -1599,6 +1599,342 @@ export const functions: FunctionItem[] = [
     category: "Scripting",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_error.html"
   },
+  {
+    name: "a!isNativeMobile",
+    syntax: "a!isNativeMobile()",
+    description: "Returns true if the current interface is being viewed in the Appian Mobile native app.",
+    example: 'a!isNativeMobile()',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_a_isNativeMobile.html"
+  },
+  {
+    name: "a!isPageWidth",
+    syntax: "a!isPageWidth(pageWidths)",
+    description: "Returns true if the current page width matches one of the specified widths. Used for responsive interface design.",
+    example: 'a!isPageWidth("PHONE")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_a_isPageWidth.html"
+  },
+  {
+    name: "a!portalUrlWithLocale",
+    syntax: "a!portalUrlWithLocale(locale)",
+    description: "Returns the portal URL with the specified locale parameter appended.",
+    example: 'a!portalUrlWithLocale(locale: "en_US")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_portalurlwithlocale.html"
+  },
+  {
+    name: "a!urlForPortal",
+    syntax: "a!urlForPortal(portal, page, urlParameters)",
+    description: "Returns the URL for a specified portal page. Useful for navigation between portal pages.",
+    example: 'a!urlForPortal(portal: cons!MY_PORTAL, page: "home")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_urlforportal.html"
+  },
+  {
+    name: "a!urlForRecord",
+    syntax: "a!urlForRecord(recordType, identifier, view)",
+    description: "Returns the URL for a record view. Can target summary, related actions, or news views.",
+    example: 'a!urlForRecord(recordType: recordType!Customer, identifier: 123)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_urlforrecord.html"
+  },
+  {
+    name: "a!urlForSite",
+    syntax: "a!urlForSite(site, page, urlParameters)",
+    description: "Returns the URL for a specified site page.",
+    example: 'a!urlForSite(site: cons!MY_SITE, page: "dashboard")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_urlforsite.html"
+  },
+  {
+    name: "a!urlForTask",
+    syntax: "a!urlForTask(taskIds, returnTaskPathOnly)",
+    description: "Returns the URL for a user task. Can return full URL or just the task path.",
+    example: 'a!urlForTask(taskIds: 12345, returnTaskPathOnly: false)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_a_urlfortask.html"
+  },
+  {
+    name: "averagetaskcompletiontimeforprocessmodel",
+    syntax: "averagetaskcompletiontimeforprocessmodel(processModelId)",
+    description: "Returns the average time (in days) to complete tasks for a given process model.",
+    example: 'averagetaskcompletiontimeforprocessmodel(4)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_averagetaskcompletiontimeforprocessmodel.html"
+  },
+  {
+    name: "averagetasklagtimeforprocessmodel",
+    syntax: "averagetasklagtimeforprocessmodel(processModelId)",
+    description: "Returns the average lag time (in days) for tasks in a given process model.",
+    example: 'averagetasklagtimeforprocessmodel(4)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_averagetasklagtimeforprocessmodel.html"
+  },
+  {
+    name: "averagetaskworktimeforprocessmodel",
+    syntax: "averagetaskworktimeforprocessmodel(processModelId)",
+    description: "Returns the average work time (in days) for tasks in a given process model.",
+    example: 'averagetaskworktimeforprocessmodel(4)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_averagetaskworktimeforprocessmodel.html"
+  },
+  {
+    name: "community",
+    syntax: "community(communityId, property)",
+    description: "Returns information about a community, such as name, description, or number of documents.",
+    example: 'community(1, "numberOfDocuments")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_community.html"
+  },
+  {
+    name: "isInDaylightSavingTime",
+    syntax: "isInDaylightSavingTime(date, timezone)",
+    description: "Returns true if the given date falls within daylight saving time for the specified timezone.",
+    example: 'isInDaylightSavingTime(date(2005,12,13), "America/Los_Angeles")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_isindaylightsavingtime.html"
+  },
+  {
+    name: "knowledgecenter",
+    syntax: "knowledgecenter(kcId, property)",
+    description: "Returns information about a knowledge center, such as name or description.",
+    example: 'knowledgecenter(2, "name")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_knowledgecenter.html"
+  },
+  {
+    name: "numontimeprocessesforprocessmodel",
+    syntax: "numontimeprocessesforprocessmodel(processModelId, includeSubProcesses)",
+    description: "Returns the number of on-time processes for a given process model.",
+    example: 'numontimeprocessesforprocessmodel(4, true)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_numontimeprocessesforprocessmodel.html"
+  },
+  {
+    name: "numontimetasksforprocessmodel",
+    syntax: "numontimetasksforprocessmodel(processModelId, includeSubProcesses)",
+    description: "Returns the number of on-time tasks for a given process model.",
+    example: 'numontimetasksforprocessmodel(4, true)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_numontimetasksforprocessmodel.html"
+  },
+  {
+    name: "numoverdueprocessesforprocessmodel",
+    syntax: "numoverdueprocessesforprocessmodel(processModelId)",
+    description: "Returns the number of overdue processes for a given process model.",
+    example: 'numoverdueprocessesforprocessmodel(4)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_numoverdueprocessesforprocessmodel.html"
+  },
+  {
+    name: "numoverduetasksforprocessmodel",
+    syntax: "numoverduetasksforprocessmodel(processModelId)",
+    description: "Returns the number of overdue tasks for a given process model.",
+    example: 'numoverduetasksforprocessmodel(4)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_numoverduetasksforprocessmodel.html"
+  },
+  {
+    name: "numprocessesforprocessmodelforstatus",
+    syntax: "numprocessesforprocessmodelforstatus(processModelId, status)",
+    description: "Returns the number of processes with a given status for a process model.",
+    example: 'numprocessesforprocessmodelforstatus(4, "completed")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_numprocessesforprocessmodelforstatus.html"
+  },
+  {
+    name: "numtasksforprocessmodelforstatus",
+    syntax: "numtasksforprocessmodelforstatus(processModelId, status, includeSubProcesses)",
+    description: "Returns the number of tasks with a given status for a process model.",
+    example: 'numtasksforprocessmodelforstatus(4, "completed", true)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_numtasksforprocessmodelforstatus.html"
+  },
+  {
+    name: "offsetFromGMT",
+    syntax: "offsetFromGMT(date, timezone)",
+    description: "Returns the offset in minutes from GMT for a given date and timezone.",
+    example: 'offsetFromGMT(date(2005,12,13), "America/Los_Angeles")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_offsetfromgmt.html"
+  },
+  {
+    name: "topaginginfo",
+    syntax: "topaginginfo(startIndex, batchSize, sort)",
+    description: "Creates a PagingInfo object from individual parameters. Legacy - prefer a!pagingInfo.",
+    example: 'topaginginfo(1, 25)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_topaginginfo.html"
+  },
+  {
+    name: "toxml",
+    syntax: "toxml(value, useExternalizable)",
+    description: "Converts an Appian value to an XML string representation.",
+    example: 'toxml(local!myData)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_toxml.html"
+  },
+  {
+    name: "urlwithparameters",
+    syntax: "urlwithparameters(url, paramNames, paramValues)",
+    description: "Appends query string parameters to a URL.",
+    example: 'urlwithparameters("https://example.com", {"a", "b"}, {1, 2})',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_urlwithparameters.html"
+  },
+  {
+    name: "userdate",
+    syntax: "userdate(year, month, day)",
+    description: "Creates a date value using the user's local calendar. Supports non-Gregorian calendars.",
+    example: 'userdate(1427, 8, 18)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userdate.html"
+  },
+  {
+    name: "userdatetime",
+    syntax: "userdatetime(year, month, day, hour, minute, second)",
+    description: "Creates a datetime using the user's local calendar.",
+    example: 'userdatetime(1427, 8, 18, 1, 2, 0)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userdatetime.html"
+  },
+  {
+    name: "userdatevalue",
+    syntax: "userdatevalue(dateText)",
+    description: "Converts a text string to a date using the user's local calendar format.",
+    example: 'userdatevalue("8/18/1427")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userdatevalue.html"
+  },
+  {
+    name: "userday",
+    syntax: "userday(date)",
+    description: "Returns the day of the month from a date using the user's local calendar.",
+    example: 'userday(11/31/2007)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userday.html"
+  },
+  {
+    name: "userdayofyear",
+    syntax: "userdayofyear(date)",
+    description: "Returns the day of the year from a date using the user's local calendar.",
+    example: 'userdayofyear(2/28/2006)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userdayofyear.html"
+  },
+  {
+    name: "userdaysinmonth",
+    syntax: "userdaysinmonth(month, year)",
+    description: "Returns the number of days in a month using the user's local calendar.",
+    example: 'userdaysinmonth(04, 2006)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userdaysinmonth.html"
+  },
+  {
+    name: "useredate",
+    syntax: "useredate(startDate, months)",
+    description: "Adds or subtracts months from a date using the user's local calendar.",
+    example: 'useredate(11/20/2006, -6)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_useredate.html"
+  },
+  {
+    name: "usereomonth",
+    syntax: "usereomonth(startDate, months)",
+    description: "Returns the last day of the month offset by months using the user's local calendar.",
+    example: 'usereomonth(11/27/06, -6)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_usereomonth.html"
+  },
+  {
+    name: "userisleapyear",
+    syntax: "userisleapyear(year)",
+    description: "Returns true if the given year is a leap year in the user's local calendar.",
+    example: 'userisleapyear(2021)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userisleapyear.html"
+  },
+  {
+    name: "userlocale",
+    syntax: "userlocale(username)",
+    description: "Returns the locale setting for a specified user.",
+    example: 'userlocale("john.doe")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userlocale.html"
+  },
+  {
+    name: "usermonth",
+    syntax: "usermonth(date)",
+    description: "Returns the month from a date using the user's local calendar.",
+    example: 'usermonth(11/20/2006)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_usermonth.html"
+  },
+  {
+    name: "usertimezone",
+    syntax: "usertimezone(username)",
+    description: "Returns the timezone setting for a specified user.",
+    example: 'usertimezone(loggedinuser())',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_usertimezone.html"
+  },
+  {
+    name: "userweekday",
+    syntax: "userweekday(date, returnType)",
+    description: "Returns the day of the week from a date using the user's local calendar.",
+    example: 'userweekday(07/10/2006, 1)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userweekday.html"
+  },
+  {
+    name: "userweeknum",
+    syntax: "userweeknum(date, returnType)",
+    description: "Returns the week number from a date using the user's local calendar.",
+    example: 'userweeknum(02/06/2018, 1)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_userweeknum.html"
+  },
+  {
+    name: "useryear",
+    syntax: "useryear(date)",
+    description: "Returns the year from a date using the user's local calendar.",
+    example: 'useryear(11/20/2018)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_useryear.html"
+  },
+  {
+    name: "webservicequery",
+    syntax: "webservicequery(wsdlUrl, service, port, operation, parameters, ...)",
+    description: "Executes a web service query operation and returns the result.",
+    example: 'webservicequery(cons!WSDL_URL, cons!SERVICE, cons!PORT, cons!OP, local!params)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_webservicequery.html"
+  },
+  {
+    name: "webservicewrite",
+    syntax: "webservicewrite(wsdlUrl, service, port, operation, parameters, ...)",
+    description: "Executes a web service write operation.",
+    example: 'webservicewrite(cons!WSDL_URL, cons!SERVICE, cons!PORT, cons!OP, local!params)',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_webservicewrite.html"
+  },
+  {
+    name: "xpathdocument",
+    syntax: "xpathdocument(document, expression)",
+    description: "Evaluates an XPath expression against an XML document stored in Appian.",
+    example: 'xpathdocument(cons!my_xml_document, "//temp/text()")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_xpathdocument.html"
+  },
+  {
+    name: "xpathsnippet",
+    syntax: "xpathsnippet(xmlText, expression)",
+    description: "Evaluates an XPath expression against an XML text string.",
+    example: 'xpathsnippet("<weather><temp>72.3</temp></weather>", "//temp/text()")',
+    category: "Scripting",
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_xpathsnippet.html"
+  },
 
   // ==================== SYSTEM ====================
   {
