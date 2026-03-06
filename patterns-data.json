@@ -8,7 +8,11 @@
     "solution": "Use a!localVariables() at the top of your interface to declare all state in one place. Chain dependent variables using earlier ones in the sequence.",
     "example": "a!localVariables(\n  local!selectedDept: null,\n  local!employees: if(\n    isnull(local!selectedDept),\n    {},\n    a!queryRecordType(\n      recordType: 'recordType!Employee',\n      filters: a!queryFilter(\"department\", \"=\", local!selectedDept)\n    ).data\n  ),\n  /* UI components here */\n)",
     "why": "Keeps all state visible at the top of the expression. Dependent variables auto-refresh when their dependencies change. No need for separate load() or rule inputs for intermediate state.",
-    "tags": ["interface", "variables", "state-management"]
+    "tags": [
+      "interface",
+      "variables",
+      "state-management"
+    ]
   },
   {
     "id": "p2",
@@ -19,7 +23,12 @@
     "solution": "Use a!forEach with append/remove on the underlying list. Never manipulate grid indices directly. Use a unique identifier (not array index) for each row.",
     "example": "a!localVariables(\n  local!items: {a!map(id: 1, name: \"\", qty: 0)},\n  {\n    a!gridLayout(\n      headerCells: {\"Name\", \"Qty\", \"\"},\n      rows: a!forEach(\n        items: local!items,\n        expression: a!gridRowLayout(\n          contents: {\n            a!textField(value: fv!item.name,\n              saveInto: a!save(local!items[fv!index].name, save!value)),\n            a!integerField(value: fv!item.qty,\n              saveInto: a!save(local!items[fv!index].qty, save!value)),\n            a!richTextDisplayField(value: a!richTextIcon(\n              icon: \"times\", link: a!dynamicLink(\n                saveInto: a!save(local!items, remove(local!items, fv!index)))))\n          }\n        )\n      )\n    ),\n    a!linkField(links: a!dynamicLink(label: \"+ Add Row\",\n      saveInto: a!save(local!items, append(local!items,\n        a!map(id: count(local!items)+1, name: \"\", qty: 0)))))\n  }\n)",
     "why": "Using append() and remove() on the list ensures indices stay correct. The grid re-renders cleanly because a!forEach rebuilds all rows from the current list state.",
-    "tags": ["grid", "editable-grid", "add-row", "remove-row"]
+    "tags": [
+      "grid",
+      "editable-grid",
+      "add-row",
+      "remove-row"
+    ]
   },
   {
     "id": "p3",
@@ -30,7 +39,11 @@
     "solution": "Store each selection in a local variable. Use a!save() to clear child selections when parent changes. Query child options based on parent value.",
     "example": "a!localVariables(\n  local!country: null,\n  local!state: null,\n  local!states: {},\n  {\n    a!dropdownField(\n      label: \"Country\",\n      choiceLabels: {\"UK\", \"US\", \"Canada\"},\n      choiceValues: {\"UK\", \"US\", \"CA\"},\n      value: local!country,\n      saveInto: {\n        local!country,\n        a!save(local!state, null),\n        a!save(local!states, rule!getStatesByCountry(save!value))\n      }\n    ),\n    a!dropdownField(\n      label: \"State/Region\",\n      choiceLabels: local!states.label,\n      choiceValues: local!states.value,\n      value: local!state,\n      saveInto: local!state,\n      disabled: isnull(local!country)\n    )\n  }\n)",
     "why": "The key is the a!save() chain in the parent's saveInto. When country changes, state is nulled AND the state list is refreshed in one atomic save. No stale data.",
-    "tags": ["dropdown", "cascading", "dependent-fields"]
+    "tags": [
+      "dropdown",
+      "cascading",
+      "dependent-fields"
+    ]
   },
   {
     "id": "p4",
@@ -41,7 +54,12 @@
     "solution": "Always check sync status in the Health Check dashboard. Set up process models that periodically verify record counts match source tables. Use a!queryRecordType with fetchTotalCount to monitor.",
     "example": "/* Monitoring expression rule */\na!localVariables(\n  local!recordCount: a!queryRecordType(\n    recordType: 'recordType!Customer',\n    pagingInfo: a!pagingInfo(1, 0),\n    fetchTotalCount: true\n  ).totalCount,\n  local!dbCount: fn!queryEntity(\n    entity: cons!DS_CUSTOMER,\n    query: a!query(pagingInfo: a!pagingInfo(1, 0)),\n    fetchTotalCount: true\n  ).totalCount,\n  if(\n    local!recordCount <> local!dbCount,\n    \"SYNC MISMATCH: Records=\" & local!recordCount & \" DB=\" & local!dbCount,\n    \"Sync OK: \" & local!recordCount & \" records\"\n  )\n)",
     "why": "Record sync issues are the #1 data problem on the Appian community. Proactive monitoring catches mismatches before users do. The Health Check dashboard only shows errors if you look at it.",
-    "tags": ["records", "sync", "monitoring", "data-integrity"]
+    "tags": [
+      "records",
+      "sync",
+      "monitoring",
+      "data-integrity"
+    ]
   },
   {
     "id": "p5",
@@ -52,7 +70,13 @@
     "solution": "Design tables first, CDTs second. Use proper foreign keys. Keep tables normalised (3NF). Use separate related record types instead of cramming everything into one table.",
     "example": "/* Good: Normalised with relationships */\n-- orders table (id, customer_id FK, order_date, status)\n-- order_items table (id, order_id FK, product_id FK, quantity, unit_price)\n-- products table (id, name, category, price)\n\n/* Bad: Denormalised mega-table */\n-- orders table (id, customer_name, customer_email, customer_phone,\n--   item1_name, item1_qty, item1_price,\n--   item2_name, item2_qty, item2_price, ...)",
     "why": "Appian record types work best with properly normalised tables. Related records let you build powerful record views without custom queries. Denormalised tables cause sync bloat and make filtering painful.",
-    "tags": ["cdt", "database", "design", "normalisation", "relationships"]
+    "tags": [
+      "cdt",
+      "database",
+      "design",
+      "normalisation",
+      "relationships"
+    ]
   },
   {
     "id": "p6",
@@ -63,7 +87,12 @@
     "solution": "Always check the HTTP status code AND parse the response body for errors. Store the full response in a log entity for debugging. Use a wrapper rule for all integrations.",
     "example": "/* Integration wrapper rule */\na!localVariables(\n  local!result: rule!INT_CallExternalAPI(ri!payload),\n  local!status: local!result.statusCode,\n  local!body: local!result.body,\n  if(\n    local!status = 200,\n    a!map(success: true, data: local!body),\n    a!map(\n      success: false,\n      error: \"HTTP \" & local!status & \": \" &\n        if(isnull(local!body.error), local!body, local!body.error),\n      statusCode: local!status\n    )\n  )\n)",
     "why": "A consistent wrapper means every integration call returns the same shape. UI code can check result.success instead of guessing. Error details are preserved for debugging instead of lost in a generic 'integration failed' message.",
-    "tags": ["integration", "http", "error-handling", "api"]
+    "tags": [
+      "integration",
+      "http",
+      "error-handling",
+      "api"
+    ]
   },
   {
     "id": "p7",
@@ -74,7 +103,12 @@
     "solution": "Use OAuth 2.0 Client Credentials flow. Register an Azure AD app with the correct Graph API permissions (Sites.ReadWrite.All for documents). Test with Postman first before configuring in Appian.",
     "example": "/* Connected System Setup */\n1. Azure AD: Register App > API Permissions > Microsoft Graph:\n   - Sites.ReadWrite.All (Application)\n   - Files.ReadWrite.All (Application)\n2. Grant Admin Consent\n3. Create Client Secret (note expiry!)\n4. Appian Connected System:\n   - Type: HTTP\n   - Base URL: https://graph.microsoft.com/v1.0\n   - Auth: OAuth 2.0 Client Credentials\n   - Token URL: https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token\n   - Scope: https://graph.microsoft.com/.default",
     "why": "The Microsoft Graph API is the modern way to access SharePoint. Legacy SharePoint REST API still works but has auth headaches. Client Credentials flow avoids per-user consent. Always test the token in Postman before debugging in Appian.",
-    "tags": ["sharepoint", "integration", "oauth", "microsoft-graph"]
+    "tags": [
+      "sharepoint",
+      "integration",
+      "oauth",
+      "microsoft-graph"
+    ]
   },
   {
     "id": "p8",
@@ -85,7 +119,12 @@
     "solution": "Always use server-side pagination. Pass the grid's pagingInfo to a!queryRecordType. Never load all records into a local variable then filter client-side.",
     "example": "a!gridField(\n  label: \"Customers\",\n  data: a!recordData(\n    recordType: 'recordType!Customer',\n    filters: a!queryLogicalExpression(\n      operator: \"AND\",\n      filters: {\n        a!queryFilter(\"status\", \"=\", \"Active\"),\n        if(isnull(local!search), {}, \n          a!queryFilter(\"name\", \"includes\", local!search))\n      }\n    )\n  ),\n  columns: {\n    a!gridColumn(label: \"Name\", sortField: \"name\",\n      value: fv!row['recordType!Customer.fields.name']),\n    a!gridColumn(label: \"Email\", sortField: \"email\",\n      value: fv!row['recordType!Customer.fields.email'])\n  },\n  pageSize: 25\n)",
     "why": "Using a!recordData directly in the grid lets Appian handle pagination automatically. It only fetches the current page from the database. Loading all records first then displaying them defeats the purpose of a grid.",
-    "tags": ["pagination", "query", "performance", "grid"]
+    "tags": [
+      "pagination",
+      "query",
+      "performance",
+      "grid"
+    ]
   },
   {
     "id": "p9",
@@ -96,7 +135,12 @@
     "solution": "Use Exception Flows on every Write to Data Store and Integration node. Route exceptions to a dedicated error-handling subprocess that logs the error and notifies admins.",
     "example": "/* Error handling subprocess pattern */\n1. Main process: Write to Data Store node\n   → Exception Flow → 'Handle Error' subprocess\n\n2. Handle Error subprocess receives:\n   - ac!errorMessage (from exception)\n   - pv!processName\n   - pv!nodeName\n   - pp!initiator\n\n3. Subprocess actions:\n   a) Write error to error_log table\n   b) Send notification to admin group\n   c) Optionally retry (with counter to prevent infinite loops)",
     "why": "Unhandled exceptions pause processes and create zombie instances. An exception flow catches the error gracefully, logs it for debugging, and alerts someone. Without this, you discover errors when users complain - or worse, when auditors ask.",
-    "tags": ["process", "error-handling", "exception-flow", "monitoring"]
+    "tags": [
+      "process",
+      "error-handling",
+      "exception-flow",
+      "monitoring"
+    ]
   },
   {
     "id": "p10",
@@ -107,7 +151,12 @@
     "solution": "Use a local!submitted flag. Only show validations after the user clicks submit. Use a!save to set the flag, then use it in all validation parameters.",
     "example": "a!localVariables(\n  local!submitted: false,\n  local!name: \"\",\n  local!email: \"\",\n  {\n    a!textField(\n      label: \"Name\",\n      value: local!name,\n      saveInto: local!name,\n      required: true,\n      validations: if(local!submitted and len(local!name) < 2,\n        \"Name must be at least 2 characters\", {})\n    ),\n    a!textField(\n      label: \"Email\",\n      value: local!email,\n      saveInto: local!email,\n      validations: if(local!submitted and not(\n        regexMatch(\"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\", local!email)),\n        \"Enter a valid email address\", {})\n    ),\n    a!buttonLayout(\n      primaryButtons: a!buttonWidget(\n        label: \"Submit\",\n        saveInto: a!save(local!submitted, true),\n        validate: true\n      )\n    )\n  }\n)",
     "why": "The local!submitted flag prevents validation messages from appearing before the user has had a chance to fill in the form. It fires all validations at once on submit, giving a clean UX.",
-    "tags": ["validation", "form", "ux", "submit"]
+    "tags": [
+      "validation",
+      "form",
+      "ux",
+      "submit"
+    ]
   },
   {
     "id": "ap1",
@@ -118,7 +167,12 @@
     "solution": "Query ALL the data BEFORE the loop. Join or filter the pre-fetched data inside the loop using index() or a!match.",
     "example": "/* ANTI-PATTERN - Don't do this */\na!forEach(\n  items: local!orderIds,\n  expression: a!queryRecordType(\n    recordType: 'recordType!OrderItem',\n    filters: a!queryFilter(\"orderId\", \"=\", fv!item)\n  ).data\n)\n\n/* PATTERN - Do this instead */\na!localVariables(\n  local!allItems: a!queryRecordType(\n    recordType: 'recordType!OrderItem',\n    filters: a!queryFilter(\"orderId\", \"in\", local!orderIds),\n    pagingInfo: a!pagingInfo(1, -1)\n  ).data,\n  a!forEach(\n    items: local!orderIds,\n    expression: index(\n      local!allItems,\n      wherecontains(fv!item, local!allItems.orderId),\n      {}\n    )\n  )\n)",
     "why": "One query returning 500 rows is 100x faster than 100 queries returning 5 rows each. Database round trips are expensive. Batch your queries, filter in memory.",
-    "tags": ["performance", "query", "n-plus-1", "foreach"]
+    "tags": [
+      "performance",
+      "query",
+      "n-plus-1",
+      "foreach"
+    ]
   },
   {
     "id": "ap2",
@@ -129,7 +183,12 @@
     "solution": "Replace load() with a!localVariables(). Variables can reference earlier ones in the sequence. Use local! prefix instead of load! to prevent confusion.",
     "example": "/* ANTI-PATTERN */\nload(\n  local!x: 5,\n  local!y: 10,\n  local!sum: local!x + local!y,  /* This might not work reliably */\n  /* ... */\n)\n\n/* PATTERN */\na!localVariables(\n  local!x: 5,\n  local!y: 10,\n  local!sum: local!x + local!y,  /* Guaranteed to work */\n  /* ... */\n)",
     "why": "a!localVariables evaluates sequentially, so each variable can use previous ones. load() doesn't guarantee evaluation order. Appian recommends a!localVariables in all new development. load() may be removed in future versions.",
-    "tags": ["deprecated", "load", "localvariables", "migration"]
+    "tags": [
+      "deprecated",
+      "load",
+      "localvariables",
+      "migration"
+    ]
   },
   {
     "id": "ap3",
@@ -140,7 +199,12 @@
     "solution": "Always store foreign keys or system IDs. Look up display values at render time using related records or expression rules.",
     "example": "/* ANTI-PATTERN */\n-- orders table: status VARCHAR = 'Approved'\n-- If 'Approved' is renamed to 'Accepted', all old orders show wrong status\n\n/* PATTERN */\n-- orders table: status_id INTEGER FK -> statuses(id)\n-- statuses table: id=1, label='Approved'\n-- Rename is instant: update statuses SET label='Accepted' WHERE id=1\n-- All orders now show 'Accepted' automatically via the relationship",
     "why": "Referential integrity. A single update to the lookup table fixes every record. Storing text means you need to find-and-replace across millions of rows. It also prevents typos from creating phantom statuses.",
-    "tags": ["data", "foreign-key", "normalisation", "integrity"]
+    "tags": [
+      "data",
+      "foreign-key",
+      "normalisation",
+      "integrity"
+    ]
   },
   {
     "id": "ap4",
@@ -151,7 +215,12 @@
     "solution": "Split into separate interfaces per mode: CreateForm, EditForm, ViewSummary, ApprovalForm. Use a parent interface or section to route to the correct one.",
     "example": "/* ANTI-PATTERN - One god interface */\nif(ri!mode = \"create\",\n  /* 500 lines of create UI */,\n  if(ri!mode = \"edit\",\n    /* 500 lines of edit UI */,\n    if(ri!mode = \"view\",\n      /* 500 lines of view UI */,\n      /* 500 lines of approval UI */\n    )\n  )\n)\n\n/* PATTERN - Router + focused interfaces */\na!localVariables(\n  local!mode: ri!mode,\n  choose(\n    wherecontains(local!mode, {\"create\", \"edit\", \"view\", \"approve\"}),\n    rule!FORM_Create(data: ri!data),\n    rule!FORM_Edit(data: ri!data),\n    rule!FORM_View(data: ri!data),\n    rule!FORM_Approve(data: ri!data)\n  )\n)",
     "why": "Small focused interfaces are easier to test, debug, and maintain. Each mode has different validation rules and field visibility - mixing them creates spaghetti. The router pattern keeps each mode independent.",
-    "tags": ["interface", "maintainability", "separation-of-concerns", "architecture"]
+    "tags": [
+      "interface",
+      "maintainability",
+      "separation-of-concerns",
+      "architecture"
+    ]
   },
   {
     "id": "ap5",
@@ -162,7 +231,12 @@
     "solution": "Define relationships in the record type configuration. Use related record fields in queries and grids. Let Appian optimise the joins.",
     "example": "/* ANTI-PATTERN - Manual joins */\na!localVariables(\n  local!orders: a!queryRecordType('recordType!Order', ...).data,\n  local!customers: a!queryRecordType('recordType!Customer', ...).data,\n  /* Manually match orders to customers in code */\n)\n\n/* PATTERN - Use relationships */\na!queryRecordType(\n  recordType: 'recordType!Order',\n  fields: {\n    'recordType!Order.fields.orderDate',\n    'recordType!Order.relationships.customer.fields.name',\n    'recordType!Order.relationships.customer.fields.email'\n  },\n  pagingInfo: a!pagingInfo(1, 25)\n)",
     "why": "Record type relationships let Appian generate optimised SQL joins. They work in grids, reports, and record views automatically. Manual joins mean every developer reinvents the wheel and probably gets it wrong.",
-    "tags": ["records", "relationships", "joins", "queries"]
+    "tags": [
+      "records",
+      "relationships",
+      "joins",
+      "queries"
+    ]
   },
   {
     "id": "p11",
@@ -173,7 +247,12 @@
     "solution": "Use a!dynamicLink that calls a process model to log the download, then returns the document URL. The process writes to an audit table before serving the file.",
     "example": "a!dynamicLink(\n  label: fv!row.documentName,\n  saveInto: {\n    a!startProcess(\n      processModel: cons!PM_LOG_DOWNLOAD,\n      processParameters: {\n        documentId: fv!row.documentId,\n        userId: loggedInUser(),\n        downloadedAt: now()\n      }\n    ),\n    a!save(local!downloadUrl,\n      urlForDocument(fv!row.documentId))\n  }\n)",
     "why": "Creates an audit trail without blocking the download. The process model fires asynchronously so the user gets their file immediately. The download_log table gives you who, what, and when.",
-    "tags": ["documents", "audit", "tracking", "compliance"]
+    "tags": [
+      "documents",
+      "audit",
+      "tracking",
+      "compliance"
+    ]
   },
   {
     "id": "p12",
@@ -184,7 +263,13 @@
     "solution": "Use a!richTextDisplayField with a!richTextHighlight or conditionally apply rich text styling. For full row highlighting, use stampField or side/header column colours.",
     "example": "a!gridField(\n  data: local!items,\n  columns: {\n    a!gridColumn(\n      label: \"Status\",\n      value: a!richTextDisplayField(\n        value: a!richTextItem(\n          text: fv!row.status,\n          style: if(\n            fv!row.status = \"Overdue\", \"NEGATIVE\",\n            if(fv!row.status = \"Complete\", \"POSITIVE\", \"STANDARD\")\n          )\n        )\n      )\n    ),\n    a!gridColumn(\n      label: \"Priority\",\n      value: a!stampField(\n        text: fv!row.priority,\n        backgroundColor: if(\n          fv!row.priority = \"High\", \"RED\",\n          if(fv!row.priority = \"Medium\", \"ORANGE\", \"GREEN\")\n        ),\n        size: \"SMALL\"\n      )\n    )\n  }\n)",
     "why": "Stamp fields and rich text styling are the Appian-native way to add colour to grids. CSS hacks break on upgrades. These methods work reliably across versions and respect the design system.",
-    "tags": ["grid", "styling", "conditional", "colour", "stamps"]
+    "tags": [
+      "grid",
+      "styling",
+      "conditional",
+      "colour",
+      "stamps"
+    ]
   },
   {
     "id": "ap6",
@@ -195,7 +280,13 @@
     "solution": "Configure sync batch sizes appropriately. For large tables, use source filters to only sync active/recent records. Archive old data to separate tables.",
     "example": "/* Source filter on record type - only sync last 2 years */\na!queryFilter(\n  field: \"created_date\",\n  operator: \">=\",\n  value: datetext(subtractyears(today(), 2), \"yyyy-MM-dd\")\n)\n\n/* Or filter by status */\na!queryFilter(\n  field: \"status\",\n  operator: \"<>\",\n  value: \"Archived\"\n)",
     "why": "Syncing millions of historical records you never query wastes resources. Source filters keep the sync set small and fast. Archive old data to a reporting table that doesn't sync.",
-    "tags": ["sync", "performance", "records", "archiving", "limits"]
+    "tags": [
+      "sync",
+      "performance",
+      "records",
+      "archiving",
+      "limits"
+    ]
   },
   {
     "id": "p13",
@@ -206,7 +297,13 @@
     "solution": "Read the Excel into a CDT array first, validate every row, show a preview with errors highlighted, then only import valid rows.",
     "example": "/* Step 1: Read Excel */\nlocal!rawData: fn!readExcelSheet(ri!document, 1)\n\n/* Step 2: Validate each row */\nlocal!validated: a!forEach(\n  items: local!rawData,\n  expression: a!map(\n    row: fv!item,\n    errors: {\n      if(isnull(fv!item.email), \"Email required\", null),\n      if(isnull(fv!item.name), \"Name required\", null),\n      if(not(regexMatch(\"^[a-zA-Z0-9._%+-]+@\", fv!item.email)),\n        \"Invalid email format\", null)\n    },\n    isValid: and(\n      not(isnull(fv!item.email)),\n      not(isnull(fv!item.name))\n    )\n  )\n)\n\n/* Step 3: Show preview with error column */\n/* Step 4: Import only where isValid = true */",
     "why": "Users will upload anything. A validation step prevents junk data from entering your system. Showing a preview builds trust - users see exactly what will be imported and can fix errors before committing.",
-    "tags": ["excel", "import", "validation", "upload", "data-quality"]
+    "tags": [
+      "excel",
+      "import",
+      "validation",
+      "upload",
+      "data-quality"
+    ]
   },
   {
     "id": "p14",
@@ -217,7 +314,13 @@
     "solution": "Always use encodeUriComponent() for query parameter values. Build URLs with a helper rule that handles encoding consistently.",
     "example": "/* Helper rule: buildApiUrl */\na!localVariables(\n  local!base: \"https://api.example.com/search\",\n  local!params: {\n    a!map(key: \"q\", value: encodeUriComponent(ri!searchTerm)),\n    a!map(key: \"page\", value: ri!page),\n    a!map(key: \"limit\", value: ri!limit)\n  },\n  local!base & \"?\" & joinarray(\n    a!forEach(\n      items: local!params,\n      expression: fv!item.key & \"=\" & fv!item.value\n    ),\n    \"&\"\n  )\n)",
     "why": "encodeUriComponent handles spaces (%20), ampersands (%26), and all special characters correctly. Without encoding, a search for 'Tom & Jerry' breaks the URL. A helper rule means every integration uses the same encoding logic.",
-    "tags": ["url", "encoding", "webapi", "integration", "special-characters"]
+    "tags": [
+      "url",
+      "encoding",
+      "webapi",
+      "integration",
+      "special-characters"
+    ]
   },
   {
     "id": "ap7",
@@ -228,7 +331,12 @@
     "solution": "Use Application Constants (cons!) for all environment-specific and configurable values. Group them by type: cons!GROUP_ADMINS, cons!FOLDER_TEMPLATES, cons!STATUS_ACTIVE.",
     "example": "/* ANTI-PATTERN */\nif(isMemberOfGroup(loggedInUser(), 42), /* admin stuff */)\nwriteToDataStore(ds: 17, entity: \"users\", ...)\n\n/* PATTERN */\nif(isMemberOfGroup(loggedInUser(), cons!GROUP_ADMINS), /* admin stuff */)\nwriteToDataStore(ds: cons!DS_MAIN, entity: cons!ENTITY_USERS, ...)",
     "why": "Constants are searchable, documented, and environment-aware. When you promote from DEV to PROD, constant values change automatically if configured correctly. Hardcoded IDs break across environments.",
-    "tags": ["constants", "configuration", "maintainability", "environments"]
+    "tags": [
+      "constants",
+      "configuration",
+      "maintainability",
+      "environments"
+    ]
   },
   {
     "id": "ap8",
@@ -239,7 +347,13 @@
     "solution": "Always add a default/else path on every XOR gateway. The default should either route to error handling or a safe fallback path.",
     "example": "/* XOR Gateway: Order Approval */\nCondition 1: pv!amount < 1000 → Auto-Approve\nCondition 2: pv!amount >= 1000 AND pv!amount < 10000 → Manager Review\nCondition 3: pv!amount >= 10000 → Director Review\nDefault: → Error Handler (log unexpected value)\n\n/* The default catches: null amounts, negative values, or any future\n   business rule changes that create gaps in the conditions */",
     "why": "Process instances that get stuck at gateways are invisible problems. They consume memory, confuse reports, and eventually someone asks 'why didn't my request get processed?' A default path makes failures visible and recoverable.",
-    "tags": ["process", "gateway", "xor", "error-handling", "conditions"]
+    "tags": [
+      "process",
+      "gateway",
+      "xor",
+      "error-handling",
+      "conditions"
+    ]
   },
   {
     "id": "p15",
@@ -250,7 +364,13 @@
     "solution": "Chunk the data into batches of 100-200 records. Use a subprocess loop with a counter to process each chunk. This also helps with transaction management.",
     "example": "/* Main process: pass full list */\n/* Subprocess: chunk and write */\nlocal!chunkSize: 200\nlocal!totalChunks: ceiling(count(pv!records) / local!chunkSize)\n\n/* Loop from 1 to totalChunks */\nlocal!startIndex: ((fv!index - 1) * local!chunkSize) + 1\nlocal!endIndex: min(fv!index * local!chunkSize, count(pv!records))\nlocal!chunk: pv!records[local!startIndex .. local!endIndex]\n\n/* Write chunk to data store */",
     "why": "Smaller transactions are more reliable. If one chunk fails, you've only lost 200 records, not 10,000. Chunking also prevents memory pressure and keeps process engines responsive.",
-    "tags": ["bulk-write", "performance", "chunking", "data-store", "transactions"]
+    "tags": [
+      "bulk-write",
+      "performance",
+      "chunking",
+      "data-store",
+      "transactions"
+    ]
   },
   {
     "id": "p16",
@@ -261,7 +381,13 @@
     "solution": "Check permissions proactively with isUserMemberOfGroup() and show friendly messages with instructions on who to contact.",
     "example": "if(\n  not(a!isUserMemberOfGroup(loggedInUser(), cons!GROUP_EDITORS)),\n  a!cardLayout(\n    contents: {\n      a!richTextDisplayField(value: {\n        a!richTextIcon(icon: \"lock\", size: \"LARGE\"),\n        char(10),\n        a!richTextItem(\n          text: \"You don't have access to this section.\",\n          style: \"STRONG\"),\n        char(10),\n        \"Contact your team lead or \",\n        a!richTextItem(\n          text: cons!SUPPORT_EMAIL,\n          link: a!safeLink(uri: \"mailto:\" & cons!SUPPORT_EMAIL))\n      })\n    }\n  ),\n  /* Normal content for authorized users */\n)",
     "why": "Proactive permission checks prevent cryptic error messages. Users know immediately who to contact. Reduces support tickets by 90%. Always better to show a friendly gate than let Appian throw an ugly error.",
-    "tags": ["permissions", "security", "ux", "error-handling", "groups"]
+    "tags": [
+      "permissions",
+      "security",
+      "ux",
+      "error-handling",
+      "groups"
+    ]
   },
   {
     "id": "ap9",
@@ -272,7 +398,13 @@
     "solution": "Migrate queries to a!queryRecordType. Use record type field references instead of string field names. Only use queryEntity for edge cases (stored procedures, complex aggregations not supported by records).",
     "example": "/* ANTI-PATTERN */\na!queryEntity(\n  entity: cons!DS_CUSTOMER_ENTITY,\n  query: a!query(\n    filter: a!queryFilter(\"status\", \"=\", \"Active\"),\n    pagingInfo: a!pagingInfo(1, 25)\n  )\n)\n\n/* PATTERN */\na!queryRecordType(\n  recordType: 'recordType!Customer',\n  filters: a!queryFilter(\n    field: 'recordType!Customer.fields.status',\n    operator: \"=\",\n    value: \"Active\"\n  ),\n  pagingInfo: a!pagingInfo(1, 25)\n)",
     "why": "Record types are the future of Appian data. They provide automatic security, sync caching, relationship traversal, and work in record views/reports. queryEntity skips all of that. Migrating is worth the effort.",
-    "tags": ["records", "migration", "legacy", "queryEntity", "data"]
+    "tags": [
+      "records",
+      "migration",
+      "legacy",
+      "queryEntity",
+      "data"
+    ]
   },
   {
     "id": "p17",
@@ -283,7 +415,13 @@
     "solution": "Always wrap AI skill calls with error handling. Provide a manual fallback path. Log confidence scores and flag low-confidence results for human review.",
     "example": "a!localVariables(\n  local!aiResult: a!try(\n    rule!AI_ExtractInvoiceData(document: ri!doc),\n    a!map(success: false, error: \"AI extraction failed\")\n  ),\n  local!confidence: if(\n    local!aiResult.success,\n    local!aiResult.confidence,\n    0\n  ),\n  if(\n    local!confidence >= 0.85,\n    /* Auto-process with AI results */\n    rule!processInvoice(local!aiResult.data),\n    /* Route to human review queue */\n    rule!queueForManualReview(ri!doc, local!aiResult)\n  )\n)",
     "why": "AI is probabilistic - it will get things wrong. A confidence threshold with human fallback gives you automation benefits without catastrophic failures. Log everything so you can tune the threshold over time.",
-    "tags": ["ai", "document-extraction", "error-handling", "confidence", "fallback"]
+    "tags": [
+      "ai",
+      "document-extraction",
+      "error-handling",
+      "confidence",
+      "fallback"
+    ]
   },
   {
     "id": "ap10",
@@ -294,6 +432,27 @@
     "solution": "Always test in the actual context: start a process, open the task, verify the record view. Test with different user accounts (admin, regular user, read-only).",
     "example": "/* Testing checklist */\n1. Expression editor: Does it render without errors?\n2. As admin user: Does it work with full permissions?\n3. As regular user: Does security trim correctly?\n4. As read-only user: Are edit controls hidden?\n5. In a task form: Does submission work end-to-end?\n6. In a record view: Does related data load?\n7. Mobile: Does the layout adapt?\n8. With no data: Does the empty state make sense?\n9. With max data: Does pagination work?",
     "why": "The expression editor runs as the developer (full admin). Real users have different groups, record-level security, and permissions. A link that works in testing returns 'insufficient privileges' in production. Test as the user will experience it.",
-    "tags": ["testing", "security", "context", "quality-assurance"]
+    "tags": [
+      "testing",
+      "security",
+      "context",
+      "quality-assurance"
+    ]
+  },
+  {
+    "id": "ap11",
+    "title": "Using a!try() for Error Handling",
+    "type": "anti-pattern",
+    "category": "General",
+    "problem": "a!try() is an undocumented, unsupported Appian function that appears in some community examples. It is not listed in official Appian documentation and its behaviour is not guaranteed across versions.",
+    "solution": "Use proper error handling patterns instead: validate inputs with isnull()/a!isNullOrEmpty() before operations, use if() with type checks, leverage a!httpResponse() for integration error handling, and use process model error flows for async operations. If you need to catch expression errors, restructure the logic to prevent errors rather than catch them.",
+    "example": "Instead of a!try():\\n\\na!localVariables(\\n  local!value: ri!inputValue,\\n  if(\\n    or(isnull(local!value), local!value = 0),\\n    0,\\n    100 / local!value\\n  )\\n)",
+    "why": "Undocumented functions can be removed or changed without notice in any Appian release. Building production applications on unsupported functions creates upgrade risk and makes it impossible to get Appian Support assistance when issues arise.",
+    "tags": [
+      "error-handling",
+      "unsupported",
+      "undocumented",
+      "risk"
+    ]
   }
 ]

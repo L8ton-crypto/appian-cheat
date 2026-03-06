@@ -823,7 +823,7 @@ export const functions: FunctionItem[] = [
     example: 'a!dynamicLink(label: "View Details", value: fv!row.id, saveInto: local!selectedId)',
     category: "Interface Components",
     subcategory: "Action",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Dynamic_Link.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Dynamic_Link_Component.html"
   },
   {
     name: "a!radioButtonField",
@@ -898,22 +898,13 @@ export const functions: FunctionItem[] = [
     docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Component.html"
   },
   {
-    name: "a!richTextHighlight",
-    syntax: "a!richTextHighlight(text, ...)",
-    description: "Highlights text within a rich text display field. Used for search result emphasis.",
-    example: 'a!richTextHighlight(text: "important")',
-    category: "Interface Components",
-    subcategory: "Display",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Styled_Text.html"
-  },
-  {
     name: "a!richTextIcon",
     syntax: "a!richTextIcon(icon, color, size, ...)",
     description: "Displays a Font Awesome icon inline within rich text.",
     example: 'a!richTextIcon(icon: "check-circle", color: "POSITIVE", size: "MEDIUM")',
     category: "Interface Components",
     subcategory: "Display",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Icon.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Styled_Icon_Component.html"
   },
   {
     name: "a!imageField",
@@ -948,7 +939,7 @@ export const functions: FunctionItem[] = [
     description: "Fully customizable grid layout for complex table UIs. Unlike a!gridField, gives full control over cell rendering.",
     example: 'a!gridLayout(headerCells: {a!gridLayoutHeaderCell(label: "Name")}, rows: a!forEach(items: local!data, expression: a!gridRowLayout(contents: {a!textField(value: fv!item.name)})))',
     category: "Layout Components",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Grid_Layout.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Editable_Grid_Component.html"
   },
   {
     name: "a!gridRowLayout",
@@ -956,7 +947,7 @@ export const functions: FunctionItem[] = [
     description: "Defines a single row inside a!gridLayout. Each content item maps to a column.",
     example: 'a!gridRowLayout(contents: {a!textField(value: fv!item.name), a!integerField(value: fv!item.qty)})',
     category: "Layout Components",
-    docUrl: "https://docs.appian.com/suite/help/25.4/Grid_Row_Layout.html"
+    docUrl: "https://docs.appian.com/suite/help/25.4/Grid_Row_Component.html"
   },
   {
     name: "a!fileUploadField",
@@ -1634,22 +1625,7 @@ export const functions: FunctionItem[] = [
     category: "System",
     docUrl: "https://docs.appian.com/suite/help/25.4/Expressions.html"
   },
-  {
-    name: "fn!queryEntity",
-    syntax: "fn!queryEntity(entity, query)",
-    description: "Queries a data store entity directly. Legacy approach - prefer a!queryRecordType for new development.",
-    example: 'fn!queryEntity(cons!DS_ENTITY, a!query(pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 50)))',
-    category: "Data & Query",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_queryentity.html"
-  },
-  {
-    name: "fn!readExcelSheet",
-    syntax: "fn!readExcelSheet(excelDocument, sheetNumber, ...)",
-    description: "Reads data from an Excel spreadsheet document. Returns a list of dictionaries.",
-    example: 'fn!readExcelSheet(excelDocument: ri!myExcel, sheetNumber: 1, startRow: 2, numRows: 100)',
-    category: "Document",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_readexcelsheet.html"
-  },
+
   {
     name: "ri!",
     syntax: "ri!ruleInputName",
@@ -2026,14 +2002,7 @@ export const functions: FunctionItem[] = [
     category: "System",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_system_a_torecordidentifier.html"
   },
-  {
-    name: "a!try",
-    syntax: "a!try(expression, default)",
-    description: "Evaluates an expression and returns a default value if an error occurs. Essential for error handling.",
-    example: 'a!try(expression: 1/0, default: 0) → 0',
-    category: "Scripting",
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_scripting_a_try.html"
-  },
+
   {
     name: "a!userRecordIdentifier",
     syntax: "a!userRecordIdentifier(user)",
