@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, useRef } from "react";
 import { functions, recipes, queryRecipesRecords, queryRecipesEntity, connectedSystems, categories, FunctionItem, ConnectedSystem } from "@/lib/data";
 import { patterns, patternCategories, PatternItem } from "@/lib/patterns";
+import { errors, errorCategories, ErrorItem } from "@/lib/errors";
 // Embedding generation now happens server-side in /api/search
 
 interface SemanticResult {
@@ -225,13 +226,107 @@ function PatternCard({ pattern, onTagClick }: { pattern: PatternItem; onTagClick
   );
 }
 
+function ErrorCard({ error }: { error: ErrorItem }) {
+  const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
+  
+  const categoryColors: Record<string, string> = {
+    "Interface": "bg-blue-500/20 text-blue-400",
+    "Process": "bg-orange-500/20 text-orange-400",
+    "Data Sync": "bg-purple-500/20 text-purple-400",
+    "Integration": "bg-cyan-500/20 text-cyan-400",
+    "Expression": "bg-yellow-500/20 text-yellow-400",
+    "Portal": "bg-pink-500/20 text-pink-400",
+  };
+
+  const copyMessage = () => {
+    navigator.clipboard.writeText(error.message);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  
+  return (
+    <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-4 hover:bg-gray-800 hover:border-gray-600/50 transition-colors">
+      <div 
+        className="cursor-pointer"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] font-mono text-gray-500">{error.id}</span>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${categoryColors[error.category] || "bg-gray-500/20 text-gray-400"}`}>
+              {error.category}
+            </span>
+          </div>
+          <span className="text-gray-600 text-xs">{expanded ? "−" : "+"}</span>
+        </div>
+        
+        <div className="relative group">
+          <code className="block text-xs font-mono text-red-400 bg-red-500/10 px-3 py-2 rounded border border-red-500/20 break-words">
+            {error.message}
+          </code>
+        </div>
+        
+        <p className="text-xs text-gray-400 mt-2">
+          <span className="text-orange-400 font-medium">Cause:</span>{" "}
+          {expanded ? error.cause : error.cause.split('.')[0] + '...'}
+        </p>
+      </div>
+
+      {expanded && (
+        <div className="mt-4 space-y-3">
+          <div>
+            <p className="text-xs text-emerald-400 font-medium mb-1">How to Fix</p>
+            <p className="text-xs text-gray-300 leading-relaxed">{error.fix}</p>
+          </div>
+          
+          <div className="flex items-center gap-2 pt-2 border-t border-gray-700/50">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                copyMessage();
+              }}
+              className="text-[10px] px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
+            >
+              {copied ? "✓ Copied" : "Copy Error"}
+            </button>
+            {error.docUrl && (
+              <a
+                href={error.docUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="text-[10px] px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 text-blue-400 transition-colors"
+              >
+                📖 Appian Docs →
+              </a>
+            )}
+          </div>
+          
+          <div className="flex flex-wrap gap-1">
+            {error.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedPatternType, setSelectedPatternType] = useState<string>("all");
   const [selectedPatternCategory, setSelectedPatternCategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<"functions" | "functionRecipes" | "queryRecipes" | "connectedSystems" | "patterns">("functions");
+  const [selectedErrorCategory, setSelectedErrorCategory] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<"functions" | "functionRecipes" | "queryRecipes" | "connectedSystems" | "patterns" | "errors">("functions");
   const [aiSearch, setAiSearch] = useState(false);
   const [aiResults, setAiResults] = useState<SemanticResult[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -362,6 +457,18 @@ export default function Home() {
     });
   }, [search, selectedPatternType, selectedPatternCategory, selectedTags]);
 
+  const filteredErrors = useMemo(() => {
+    return errors.filter((error) => {
+      const matchesSearch = !search ||
+        error.message.toLowerCase().includes(search.toLowerCase()) ||
+        error.cause.toLowerCase().includes(search.toLowerCase()) ||
+        error.fix.toLowerCase().includes(search.toLowerCase()) ||
+        error.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()));
+      const matchesCategory = selectedErrorCategory === "all" || error.category === selectedErrorCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [search, selectedErrorCategory]);
+
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
     patterns.forEach(pattern => {
@@ -487,6 +594,16 @@ export default function Home() {
               >
                 Patterns ({filteredPatterns.length})
               </button>
+              <button
+                onClick={() => setActiveTab("errors")}
+                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${
+                  activeTab === "errors"
+                    ? "bg-red-600 text-white"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                }`}
+              >
+                🔴 Errors ({filteredErrors.length})
+              </button>
             </div>
             
             {(activeTab === "functions" || activeTab === "functionRecipes") && (
@@ -497,6 +614,19 @@ export default function Home() {
               >
                 <option value="all">All Categories</option>
                 {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            )}
+            
+            {activeTab === "errors" && (
+              <select
+                value={selectedErrorCategory}
+                onChange={(e) => setSelectedErrorCategory(e.target.value)}
+                className="bg-gray-800/60 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:border-red-500/50"
+              >
+                <option value="all">All Categories</option>
+                {errorCategories.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
@@ -737,7 +867,7 @@ export default function Home() {
               </div>
             )}
           </div>
-        ) : (
+        ) : activeTab === "patterns" ? (
           <div className="space-y-6">
             <div className="grid grid-cols-1 gap-4">
               {filteredPatterns.map((pattern) => (
@@ -763,6 +893,26 @@ export default function Home() {
               <div className="text-center py-16 text-gray-500">
                 <div className="text-4xl mb-3">🔍</div>
                 <p>No patterns found matching your criteria.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4">
+              <p className="text-xs text-red-400">
+                <span className="font-semibold">🔴 Error Reference</span> — Common Appian error messages with causes and fixes. Search by error text or filter by category.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-3">
+              {filteredErrors.map((error) => (
+                <ErrorCard key={error.id} error={error} />
+              ))}
+            </div>
+            
+            {filteredErrors.length === 0 && (
+              <div className="text-center py-16 text-gray-500">
+                <div className="text-4xl mb-3">🔍</div>
+                <p>No errors found matching your search.</p>
               </div>
             )}
           </div>
