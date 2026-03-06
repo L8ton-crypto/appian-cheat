@@ -454,5 +454,170 @@
       "undocumented",
       "risk"
     ]
+  },
+  {
+    "id": "p18",
+    "title": "Use-Case Specific Query Expressions (DRY Done Right)",
+    "type": "pattern",
+    "category": "Data",
+    "problem": "Developers create a single generic query wrapper with many parameters (recordType, filters, pagingInfo, etc.) thinking it follows DRY. This just duplicates a!queryRecordType() and forces the same complex parameters everywhere.",
+    "solution": "Create separate named query expressions for each use case. Use descriptive names like ABC_Q_GetVehicleByLicensePlate or ABC_Q_GetPatientsByCity. Return a single record for singular names, a DataSubset for plural. Add pagingInfo parameter to plural queries.",
+    "example": "/* Single item - returns typed record */\nrule!ABC_Q_GetArticleById(ri!id)\n\n/* Multiple items - returns DataSubset */\nrule!ABC_Q_GetPatientsByCity(\n  city: \"London\",\n  pagingInfo: a!pagingInfo(1, 50)\n)",
+    "why": "True DRY means implementing each concept once, not reducing lines of code. Named query expressions hide implementation details (field names, filters) and give teams a shared vocabulary. Source: Stefan Helzle, appian.rocks",
+    "tags": [
+      "query",
+      "DRY",
+      "reusability",
+      "naming",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "p19",
+    "title": "Combine Form + Wizard Layouts for Dynamic Steps",
+    "type": "pattern",
+    "category": "User Interface",
+    "problem": "Building a wizard with a dynamic number of steps causes steps to appear and disappear as the user enters data, creating a confusing UX.",
+    "solution": "Use a!formLayout for the initial data-gathering step, then switch to a!wizardLayout once you know which steps to show. Use if() or match() to toggle between layouts since Appian doesn't allow a list of top-level layouts.",
+    "example": "a!localVariables(\n  local!mode: \"INITIAL\",\n  local!activeSteps: {1, 2, 3},\n  if(\n    local!mode = \"INITIAL\",\n    a!formLayout(\n      contents: { /* gather step config */ },\n      buttons: a!buttonLayout(\n        primaryButtons: a!buttonWidget(\n          label: \"Next\",\n          value: \"WIZARD\",\n          saveInto: local!mode\n        )\n      )\n    ),\n    a!wizardLayout(\n      steps: { /* dynamic steps based on gathered data */ }\n    )\n  )\n)",
+    "why": "Users see a stable wizard with predictable steps instead of steps appearing/disappearing mid-flow. Match title and styling between layouts for a seamless UX. Source: Stefan Helzle, appian.rocks",
+    "tags": [
+      "wizard",
+      "layout",
+      "UX",
+      "dynamic-steps",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "p20",
+    "title": "Reset Scroll Position Between Wizard Steps",
+    "type": "pattern",
+    "category": "User Interface",
+    "problem": "In wizard interfaces with scrollable content, Appian preserves scroll position between steps. Users may land mid-page when navigating forward or back.",
+    "solution": "Instead of swapping content inside one layout, use separate layout components for each step. Layout components reset scroll position when hidden and shown again. Use if() to render only the active step's layout.",
+    "example": "/* Each step gets its own a!formLayout */\nif(\n  local!step = 1,\n  a!formLayout(contents: { /* Step 1 */ }),\n  if(\n    local!step = 2,\n    a!formLayout(contents: { /* Step 2 */ }),\n    a!formLayout(contents: { /* Step 3 */ })\n  )\n)",
+    "why": "Layout components (formLayout, paneLayout, headerContentLayout, cardLayout) internally store scroll position and reset it when re-rendered. Source: Stefan Helzle, appian.rocks",
+    "tags": [
+      "scroll",
+      "wizard",
+      "UX",
+      "layout",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "p21",
+    "title": "Use saveInto Scope to Transform Data Before Saving",
+    "type": "pattern",
+    "category": "Data",
+    "problem": "After a user interaction (e.g. clicking a map, selecting a value), you need to transform the raw value before storing it. Developers often add extra local variables and refresh logic.",
+    "solution": "Use a!save() inside saveInto to intercept and transform save!value before passing it along. You can parse JSON, resolve identifiers, call APIs, or even nest a!localVariables() inside saveInto.",
+    "example": "a!textField(\n  saveInto: a!save(\n    target: local!parsedData,\n    value: a!fromJson(save!value)\n  )\n)\n\n/* Or: resolve a record from an ID */\na!save(\n  target: local!fullRecord,\n  value: a!queryRecordByIdentifier(\n    recordType: recordType!Customer,\n    identifier: save!value\n  )\n)",
+    "why": "The saveInto scope creates a new variable context with save!value. Transforming data here keeps your interface cleaner and prevents downstream components from dealing with raw/unparsed data. Source: Stefan Helzle, appian.rocks",
+    "tags": [
+      "saveInto",
+      "scope",
+      "data-transformation",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "p22",
+    "title": "Use a!formLayout for Start and Task Forms",
+    "type": "pattern",
+    "category": "User Interface",
+    "problem": "Developers use billboard, header content, or custom layouts for task forms, then wonder why they look wrong in popups, sites, or the task management UI.",
+    "solution": "Always use a!formLayout as the top-level layout for start forms and task forms. It handles scroll management in popups, button ordering for RTL languages, responsive button stacking, and integration with Appian's task management UI.",
+    "example": "a!formLayout(\n  label: \"Request Form\",\n  contents: { /* form fields */ },\n  buttons: a!buttonLayout(\n    primaryButtons: a!buttonWidget(label: \"Submit\", submit: true),\n    secondaryButtons: a!buttonWidget(label: \"Cancel\", submit: true, validate: false)\n  )\n)",
+    "why": "a!formLayout is purpose-built for task contexts. It provides content scrolling in popups (while keeping buttons fixed), automatic RTL button reordering, and consistent display across sites, tempo, and embedded views. Source: Stefan Helzle, appian.rocks",
+    "tags": [
+      "formLayout",
+      "task",
+      "layout",
+      "UX",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "p23",
+    "title": "Build a Debug Display Component",
+    "type": "pattern",
+    "category": "General",
+    "problem": "Debugging interfaces at runtime is difficult. You can't always use the expression editor, and error messages don't always show line numbers.",
+    "solution": "Create a reusable debug component that displays variable type, value, count, and null status inside a!boxLayout with ERROR styling. Include it temporarily in any interface during development.",
+    "example": "/* PFX_C_DebugField */\na!boxLayout(\n  label: \"DEBUGGING IN PROGRESS ...\",\n  style: \"ERROR\",\n  contents: {\n    a!richTextDisplayField(\n      label: concat(\n        \"Type: \", typename(typeof(ri!input)),\n        \" | Items: \", count(ri!input),\n        \" | isNull: \", a!isNullOrEmpty(ri!input)\n      ),\n      value: a!richTextItem(\n        text: tostring(ri!input),\n        style: \"EMPHASIS\"\n      )\n    )\n  }\n)",
+    "why": "A standardised debug component lets any team member quickly inspect variable state at runtime without modifying business logic. Remove it before deploying to production. Source: Stefan Helzle, appian.rocks",
+    "tags": [
+      "debugging",
+      "development",
+      "reusable-component",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "ap12",
+    "title": "Using a Generic Query Wrapper Instead of Named Queries",
+    "type": "anti-pattern",
+    "category": "Data",
+    "problem": "Developers create a single universal query expression like rule!ABC_GetRecordByFilters(recordType, filters, pagingInfo, selection, aggregation, returnData) and call it everywhere.",
+    "solution": "This just duplicates a!queryRecordType() with extra steps. Create separate named query expressions for each use case instead: rule!ABC_Q_GetVehicleByPlate(plate), rule!ABC_Q_GetOrdersByCustomer(customerId, pagingInfo).",
+    "example": "/* ANTI-PATTERN */\nrule!ABC_GetRecordByFilters(\n  recordType: recordType!Vehicle,\n  filters: a!queryFilter(field: \"plate\", operator: \"=\", value: local!plate),\n  pagingInfo: a!pagingInfo(1,1)\n)\n\n/* PATTERN */\nrule!ABC_Q_GetVehicleByPlate(plate: local!plate)",
+    "why": "Generic wrappers don't abstract anything meaningful - they just move parameters around. Named queries hide implementation details and give teams a shared vocabulary. Source: Stefan Helzle, appian.rocks",
+    "tags": [
+      "query",
+      "DRY",
+      "abstraction",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "ap13",
+    "title": "Mixing User Input Tasks and Database Tasks",
+    "type": "anti-pattern",
+    "category": "Process",
+    "problem": "Teams mix Appian User Input Tasks (UITs) with custom database-driven tasks in the same application, leading to dual task management, inconsistent assignment logic, and no unified task list.",
+    "solution": "Choose one approach per application. Use UITs for structured workflows where Appian's built-in assignment, escalation, and tracking are sufficient. Use database tasks only for highly dynamic case-driven workflows. Never mix both unless you have a clear integration strategy.",
+    "example": "/* Use UITs when: */\n- Structured sequential/parallel workflow\n- Built-in assignment and escalation needed\n- Appian task list and reporting required\n\n/* Use DB tasks when: */\n- Case-driven with dynamic task creation\n- Millions of concurrent tasks\n- Cross-application custom task management",
+    "why": "Mixing approaches creates redundant task management code, prevents unified task lists across applications, and confuses developers working on the project. Source: Stefan Helzle, Appian Rocks podcast",
+    "tags": [
+      "tasks",
+      "process-design",
+      "architecture",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "p24",
+    "title": "Feature Flags for Controlled Rollouts",
+    "type": "pattern",
+    "category": "General",
+    "problem": "Deploying new features requires bundling all changes into one release. If something breaks, you need a full rollback. You can't gradually enable features for testing.",
+    "solution": "Implement feature flags using constants or expression rules. Reference them in interfaces and processes to toggle features at runtime without redeployment. Track flag lifecycle - document which flags are active, temporary, and when they should be retired.",
+    "example": "/* Expression rule: ABC_FF_IsFeatureEnabled */\na!localVariables(\n  local!flags: cons!FEATURE_FLAGS,\n  contains(local!flags, ri!featureName)\n)\n\n/* Usage in interface */\nif(\n  rule!ABC_FF_IsFeatureEnabled(\"new-dashboard\"),\n  rule!ABC_NewDashboard(),\n  rule!ABC_OldDashboard()\n)",
+    "why": "Feature flags decouple deployment from feature availability. Teams can safely merge incomplete features, test in production with limited users, and instantly disable problematic features. Clean up retired flags to avoid technical debt. Source: Stefan Helzle, Appian Rocks podcast",
+    "tags": [
+      "feature-flags",
+      "deployment",
+      "rollout",
+      "stefan-helzle"
+    ]
+  },
+  {
+    "id": "ap14",
+    "title": "Record Data in Timer and Deadline Configurations",
+    "type": "anti-pattern",
+    "category": "Process",
+    "problem": "Using record data expressions directly in timer, deadline, escalation, or exception configurations in process models. Record data does not work for date/time values in these contexts.",
+    "solution": "Calculate the date/time value in a preceding node, store it in a process variable, then reference that process variable in the timer/deadline configuration.",
+    "example": "/* ANTI-PATTERN: record data in timer */\n/* Timer deadline: recordType!Order.fields.dueDate - doesn't work */\n\n/* PATTERN: calculate first, then use PV */\n/* Script task: pv!deadline = local!order.dueDate */\n/* Timer deadline: pv!deadline - works correctly */",
+    "why": "This is a platform limitation - record data expressions aren't evaluated in timer/deadline contexts. The workaround is simple but the bug is subtle and hard to diagnose. Source: Stefan Helzle, appian.rocks",
+    "tags": [
+      "timer",
+      "process",
+      "record-data",
+      "deadline",
+      "stefan-helzle"
+    ]
   }
 ]
