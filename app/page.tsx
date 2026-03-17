@@ -500,6 +500,12 @@ export default function Home() {
                 <h1 className="text-xl font-bold text-white tracking-tight">AppianCheat</h1>
                 <p className="text-[11px] text-gray-500">Quick reference for Appian 25.4</p>
               </div>
+              <a
+                href="/patterns"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-400 hover:to-red-500 transition-all"
+              >
+                📐 Design Patterns
+              </a>
             </div>
             
             {/* Search */}
