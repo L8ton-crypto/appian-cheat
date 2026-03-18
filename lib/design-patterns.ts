@@ -1904,41 +1904,95 @@ a!localVariables(
   },
   {
     id: "perf-caching-strategy",
-    title: "Expression Caching Strategy",
+    title: "Refresh Variable Strategy",
     category: "Performance",
-    difficulty: "advanced",
-    overview: "Use Appian's expression caching to reduce redundant queries and computation. Cache expression rule results that are expensive to compute and don't change frequently.",
-    problem: "Expression rules get evaluated on every interface refresh. If a rule queries the database or calls an integration, it runs repeatedly even when the data has not changed. This wastes server resources and creates slow user experiences, especially on interfaces with multiple components calling the same expensive rule.",
-    solution: "Enable caching on expression rules that query data or perform expensive computation. Set appropriate cache durations based on how frequently data changes. Use rule inputs as cache keys so different parameters get separate cached results. Combine with a!localVariables to avoid re-evaluating the same rule multiple times in one interface.",
+    difficulty: "intermediate",
+    overview: "Use a!refreshVariable to control when local variables re-evaluate in interfaces. Prevent unnecessary queries on every user interaction by defining explicit refresh conditions.",
+    problem: "By default, local variables in a!localVariables re-evaluate whenever their dependencies change. On complex interfaces, a query or integration call can re-fire on every keystroke, dropdown change, or unrelated interaction - hammering the database and making the UI sluggish.",
+    solution: "Wrap expensive local variables in a!refreshVariable to control exactly when they re-evaluate. Use refreshInterval for polling, refreshOnVarChange to re-query only when a specific filter changes, refreshAfter for re-querying after a save action, and refreshAlways: false to prevent re-evaluation on unrelated interactions.",
     codeExamples: [
       {
-        title: "Cacheable Expression Rule Configuration",
-        code: `/* Expression Rule: rule!getActiveUserCount
-   Cache Duration: 5 minutes
-   
-   In the rule configuration panel:
-   - Enable "Cache the result for" 
-   - Set to 5 minutes
-   
-   The cache key is automatically based on rule inputs.
-   Same inputs = cached result. Different inputs = separate cache entry.
-*/
-
-/* Rule Definition */
-a!queryRecordType(
-  recordType: 'recordType!User',
-  filters: a!queryFilter(
-    field: 'recordType!User.fields.status',
-    operator: "=",
-    value: "Active"
+        title: "Refresh on Interval (Dashboard Polling)",
+        code: `a!localVariables(
+  /* Re-query every 60 seconds instead of on every interaction */
+  local!activeCases: a!refreshVariable(
+    value: a!queryRecordType(
+      recordType: recordType!Case,
+      filters: a!queryFilter(
+        field: recordType!Case.fields.status,
+        operator: "=",
+        value: "Open"
+      ),
+      pagingInfo: a!pagingInfo(1, 20)
+    ).data,
+    refreshInterval: 60
   ),
-  pagingInfo: a!pagingInfo(1, 0),
-  fetchTotalCount: true
-).totalCount
-
-/* This query runs ONCE per 5 minutes, regardless of 
-   how many users have the dashboard open */`,
-        description: "Cache expensive queries with appropriate TTL"
+  /* Interface uses local!activeCases */
+  a!gridField(
+    data: local!activeCases
+  )
+)`,
+        description: "Poll for fresh data at a fixed interval instead of re-querying on every interaction"
+      },
+      {
+        title: "Refresh When a Filter Changes",
+        code: `a!localVariables(
+  local!selectedStatus: "Open",
+  
+  /* Only re-query when local!selectedStatus changes */
+  local!cases: a!refreshVariable(
+    value: a!queryRecordType(
+      recordType: recordType!Case,
+      filters: a!queryFilter(
+        field: recordType!Case.fields.status,
+        operator: "=",
+        value: local!selectedStatus
+      ),
+      pagingInfo: a!pagingInfo(1, 50)
+    ).data,
+    refreshOnVarChange: local!selectedStatus
+  ),
+  
+  {
+    a!dropdownField(
+      label: "Status",
+      choiceLabels: { "Open", "Closed", "Pending" },
+      choiceValues: { "Open", "Closed", "Pending" },
+      value: local!selectedStatus,
+      saveInto: local!selectedStatus
+    ),
+    a!gridField(data: local!cases)
+  }
+)`,
+        description: "Re-query only when the relevant filter variable changes, not on every interaction"
+      },
+      {
+        title: "Refresh After a Save Action",
+        code: `a!localVariables(
+  local!refreshTrigger: 0,
+  
+  /* Re-query after the user saves a new record */
+  local!records: a!refreshVariable(
+    value: a!queryRecordType(
+      recordType: recordType!Task,
+      pagingInfo: a!pagingInfo(1, 50)
+    ).data,
+    refreshAfter: local!refreshTrigger
+  ),
+  
+  {
+    a!gridField(data: local!records),
+    a!buttonWidget(
+      label: "Save New Task",
+      saveInto: {
+        a!writeRecords(records: recordType!Task, /* ... */),
+        /* Increment the trigger to force a refresh */
+        a!save(local!refreshTrigger, local!refreshTrigger + 1)
+      }
+    )
+  }
+)`,
+        description: "Force a re-query after a write operation completes"
       },
       {
         title: "Local Variable Deduplication",
@@ -1974,35 +2028,32 @@ a!localVariables(
       }
     ],
     bestPractices: [
-      "Cache expression rules that query data, not rules that format or transform data",
-      "Set cache duration based on data freshness needs: 1 min for dashboards, 15 min for reference data",
-      "Use a!localVariables to store the result of any expression used more than once",
-      "Monitor cache hit rates in the Admin Console under Expression Rule Performance",
-      "Keep rule inputs simple (primitives, not complex CDTs) for effective cache keys",
-      "Do not cache rules with side effects or rules that return user-specific data unless keyed by user"
+      "Use refreshOnVarChange to tie queries to specific filter variables instead of re-running on every interaction",
+      "Use refreshInterval for dashboard-style polling - keeps data fresh without user action",
+      "Use refreshAfter to re-query data after a write operation (save, delete, update)",
+      "Combine a!refreshVariable with a!localVariables to store expensive results and reference them multiple times",
+      "Set refreshAlways: false on variables that should only evaluate once when the interface loads"
     ],
     pitfalls: [
-      "Caching rules that return user-specific data without user input as a cache key",
-      "Setting cache duration too high for frequently changing data (stale results)",
-      "Caching rules with no inputs (global cache - one wrong result affects everyone)",
-      "Not using localVariables and calling the same cached rule 10 times (still has lookup overhead)",
-      "Caching rules that return large CDT arrays (high memory usage per cache entry)"
+      "Not using refreshOnVarChange and letting queries fire on every unrelated interaction",
+      "Setting refreshInterval too low (e.g. 1 second) - creates unnecessary server load",
+      "Forgetting that refreshOnVarChange tracks the variable reference, not the value - use the variable directly, not an expression",
+      "Using refreshAlways: true when you actually need refreshOnVarChange - refreshAlways re-evaluates on every interaction"
     ],
     whenToUse: [
-      "Dashboard summary cards (total counts, averages, KPIs)",
-      "Reference data lookups (dropdown options, configuration values)",
-      "Rules called from multiple components on the same interface",
-      "Expensive aggregation queries that do not need real-time accuracy"
+      "Interfaces with expensive queries that don't need to update on every interaction",
+      "Dashboard polling (refreshInterval) for near-real-time data",
+      "Forms where a query depends on a specific filter or selection (refreshOnVarChange)",
+      "Re-fetching data after a save/delete action (refreshAfter)"
     ],
     whenNotToUse: [
-      "Rules that must return real-time data (live stock prices, queue lengths)",
-      "Rules with side effects (writing data, triggering processes)",
-      "Rules with many unique input combinations (cache explosion)",
-      "Simple transformation rules (concatenation, formatting) - overhead of caching exceeds computation"
+      "Simple interfaces with a single query and no user interactions",
+      "Variables that genuinely need to re-evaluate on every change (calculated fields, formatting)",
+      "When the default refresh behaviour already works correctly"
     ],
     relatedPatterns: ["perf-query-optimization"],
-    tags: ["performance", "caching", "expression-rules", "optimization", "memory"],
-    docUrl: undefined
+    tags: ["performance", "refresh", "a!refreshVariable", "interfaces", "optimization"],
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_refreshvariable.html"
   },
 
   // ==================== RECORDS & DATA PATTERNS ====================
