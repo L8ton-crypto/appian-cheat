@@ -105,7 +105,7 @@ pv!relatedRecordId   /* Integer - optional context */
     ],
     relatedPatterns: ["pm-error-handling", "pm-write-back"],
     tags: ["process", "subprocess", "reuse", "modularity"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/process-model-patterns.html"
+    docUrl: undefined
   },
   {
     id: "pm-error-handling",
@@ -195,7 +195,7 @@ a!localVariables(
     ],
     relatedPatterns: ["pm-subprocess-reuse", "int-retry-backoff"],
     tags: ["process", "error-handling", "exception", "retry", "resilience"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Handling_Errors.html"
+    docUrl: undefined
   },
   {
     id: "pm-timer-escalation",
@@ -271,7 +271,7 @@ a!localVariables(
     ],
     relatedPatterns: ["pm-subprocess-reuse", "pm-mni"],
     tags: ["process", "timer", "escalation", "SLA", "approval"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Timer_Event.html"
+    docUrl: undefined
   },
   {
     id: "pm-mni",
@@ -349,7 +349,7 @@ a!localVariables(
     ],
     relatedPatterns: ["pm-subprocess-reuse", "pm-error-handling"],
     tags: ["process", "MNI", "parallel", "batch", "loop"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/MNI.html"
+    docUrl: undefined
   },
   {
     id: "pm-write-back",
@@ -553,7 +553,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["data-views", "data-source-filter"],
     tags: ["data", "CDT", "normalisation", "relationships", "database", "design"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Working_with_Data_in_Appian.html"
+    docUrl: undefined
   },
   {
     id: "data-source-filter",
@@ -649,7 +649,7 @@ or(
     ],
     relatedPatterns: ["data-cdt-normalization", "sec-group-access"],
     tags: ["data", "security", "source-filter", "multi-tenant", "record-type"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Source_Filters.html"
+    docUrl: undefined
   },
   {
     id: "data-views",
@@ -751,7 +751,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["data-cdt-normalization", "data-source-filter"],
     tags: ["data", "database", "views", "SQL", "performance", "aggregation"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Supported_Database_and_Data_Source_Configurations.html"
+    docUrl: undefined
   },
 
   // ==================== INTERFACE (SAIL) PATTERNS ====================
@@ -892,7 +892,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["sail-master-detail", "sail-editable-grid", "pm-write-back"],
     tags: ["interface", "SAIL", "wizard", "form", "UX", "progressive-disclosure"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Interfaces.html"
+    docUrl: undefined
   },
   {
     id: "sail-master-detail",
@@ -1275,7 +1275,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["sail-wizard", "sail-editable-grid"],
     tags: ["interface", "SAIL", "dynamic", "configuration", "form-builder"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Interfaces.html"
+    docUrl: undefined
   },
 
   // ==================== INTEGRATION PATTERNS ====================
@@ -1392,7 +1392,7 @@ a!localVariables(
     ],
     relatedPatterns: ["pm-error-handling", "int-caching"],
     tags: ["integration", "retry", "backoff", "resilience", "error-handling"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Call_Integration.html"
+    docUrl: undefined
   },
   {
     id: "int-caching",
@@ -1504,7 +1504,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["int-retry-backoff", "pm-subprocess-reuse"],
     tags: ["integration", "caching", "performance", "resilience", "TTL"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Integration_Best_Practices.html"
+    docUrl: undefined
   },
 
   // ==================== EXPRESSION RULE PATTERNS ====================
@@ -1786,7 +1786,7 @@ a!buttonWidget(
     ],
     relatedPatterns: ["data-source-filter", "sec-portal"],
     tags: ["security", "groups", "RBAC", "access-control", "permissions"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Appian_Groups.html"
+    docUrl: undefined
   },
 
   // ==================== PORTAL PATTERNS ====================
@@ -1911,7 +1911,7 @@ a!localVariables(
     ],
     relatedPatterns: ["sec-group-access", "pm-write-back"],
     tags: ["portal", "security", "public", "external", "reCAPTCHA", "service-account"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Portal_Object.html"
+    docUrl: undefined
   },
 
   // ==================== PERFORMANCE PATTERNS ====================
@@ -2113,7 +2113,7 @@ a!localVariables(
     ],
     relatedPatterns: ["perf-query-optimization", "int-cache-first"],
     tags: ["performance", "caching", "expression-rules", "optimization", "memory"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Expression_Rule_Object.html"
+    docUrl: undefined
   },
 
   // ==================== RECORDS & DATA PATTERNS ====================
@@ -2298,7 +2298,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["rec-write-back", "perf-query-optimization", "data-cdt-normalization"],
     tags: ["records", "aggregation", "relationships", "dashboard", "queries", "reporting"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Querying_from_Related_Record_Types.html"
+    docUrl: undefined
   },
   {
     id: "rec-sync-strategy",
@@ -2383,7 +2383,7 @@ a!syncRecords(
     ],
     relatedPatterns: ["perf-query-optimization", "data-source-filter"],
     tags: ["records", "sync", "caching", "data-source", "performance", "architecture"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Syncing_Data.html"
+    docUrl: undefined
   },
 
   // ==================== MORE INTEGRATION PATTERNS ====================
@@ -2603,7 +2603,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["int-retry-backoff", "int-webhook-receiver", "pm-error-handling"],
     tags: ["integration", "logging", "monitoring", "error-handling", "admin", "observability"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Integration_Monitoring.html"
+    docUrl: undefined
   },
 
   // ==================== MORE INTERFACE (SAIL) PATTERNS ====================
@@ -2722,7 +2722,7 @@ a!localVariables(
     ],
     relatedPatterns: ["sail-wizard", "sail-master-detail"],
     tags: ["interface", "SAIL", "responsive", "cards", "mobile", "layout", "UI"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Cards_Layout.html"
+    docUrl: undefined
   },
   {
     id: "sail-confirmation-dialog",
@@ -2845,7 +2845,7 @@ a!localVariables(
     ],
     relatedPatterns: ["rec-write-back", "sail-editable-grid"],
     tags: ["interface", "SAIL", "dialog", "confirmation", "UX", "destructive-action"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Card_Layout.html"
+    docUrl: undefined
   },
 
   // ==================== MORE EXPRESSION RULE PATTERNS ====================
@@ -2949,7 +2949,7 @@ a!match(
     ],
     relatedPatterns: ["expr-helper-composition", "expr-guard-clause"],
     tags: ["expression-rules", "decision-table", "logic", "branching", "match", "refactoring"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_match.html"
+    docUrl: undefined
   },
 
   // ==================== MORE PROCESS MODEL PATTERNS ====================
@@ -3050,7 +3050,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["pm-subprocess-reuse", "pm-mni", "perf-query-optimization"],
     tags: ["process-model", "batch", "performance", "looping", "large-data", "ETL"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Process_Model_Design_Best_Practices.html"
+    docUrl: undefined
   },
 
   // ==================== ADDITIONAL SECURITY PATTERN ====================
@@ -3137,6 +3137,6 @@ and(
     ],
     relatedPatterns: ["sec-group-access", "sec-portal", "sail-confirmation-dialog"],
     tags: ["security", "validation", "input", "defence-in-depth", "injection", "forms"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/Validation.html"
+    docUrl: undefined
   }
 ];
