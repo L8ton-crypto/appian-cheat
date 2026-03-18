@@ -1390,11 +1390,122 @@ a!localVariables(
       "Validation errors (400) - the request is wrong, not the service",
       "When immediate failure reporting is required"
     ],
-    relatedPatterns: ["pm-error-handling"],
+    relatedPatterns: ["pm-error-handling", "int-caching"],
     tags: ["integration", "retry", "backoff", "resilience", "error-handling"],
     docUrl: undefined
   },
+  {
+    id: "int-caching",
+    title: "Integration Response Caching",
+    category: "Integration",
+    difficulty: "intermediate",
+    overview: "Cache external API responses in an Appian data table to reduce call volume, improve performance, and provide fallback data when the external service is unavailable.",
+    problem: "Every page load calls an external API. With 100 users, you're making 100 identical calls for the same data. This is slow, expensive (API metering), and brittle (any outage breaks all users).",
+    solution: "Store API responses in an Appian data table with a timestamp. Before calling the external API, check if cached data exists and is fresh enough. If yes, return the cache. If stale, refresh from the API and update the cache. Use process-based refresh for background updates.",
+    codeExamples: [
+      {
+        title: "Cache-First Query Pattern",
+        code: `/* Expression Rule: rule!getCachedOrFresh
+   Inputs: ri!cacheKey (Text), ri!maxAgeMinutes (Integer) */
+   
+a!localVariables(
+  /* Check cache first */
+  local!cached: a!queryRecordType(
+    recordType: recordType!ApiCache,
+    filters: {
+      a!queryFilter(
+        field: recordType!ApiCache.fields.cacheKey,
+        operator: "=",
+        value: ri!cacheKey
+      )
+    },
+    pagingInfo: a!pagingInfo(1, 1)
+  ).data,
+  
+  local!isFresh: and(
+    length(local!cached) > 0,
+    todatetime(
+      index(local!cached, "updatedAt", null)
+    ) > now() - intervalds(0, 0, ri!maxAgeMinutes, 0)
+  ),
+  
+  if(
+    local!isFresh,
+    /* Return cached data */
+    a!fromJson(index(local!cached, "responseJson", "{}")),
+    
+    /* Cache miss or stale - call the API */
+    a!localVariables(
+      local!fresh: rule!callExternalApi(ri!cacheKey),
+      /* The process model will update the cache async */
+      local!fresh
+    )
+  )
+)`,
+        description: "Check cache before calling external API"
+      },
+      {
+        title: "Background Cache Refresh Process",
+        code: `/* Process Model: PM_RefreshApiCache
+   Triggered by: Timer (every 15 min) or on-demand
+   
+   Node 1: Script Task - Get stale cache entries */
+a!queryRecordType(
+  recordType: recordType!ApiCache,
+  filters: a!queryFilter(
+    field: recordType!ApiCache.fields.updatedAt,
+    operator: "<",
+    value: now() - intervalds(0, 0, 15, 0)
+  ),
+  pagingInfo: a!pagingInfo(1, 50)
+).data
 
+/* Node 2: MNI Subprocess - Refresh each entry
+   For each stale entry:
+   1. Call the external API
+   2. Update the cache record with fresh data + new timestamp
+   3. On API failure: keep the stale cache (better than no data)
+
+   Cache table schema:
+   api_cache (
+     id INT PRIMARY KEY,
+     cache_key VARCHAR(255) UNIQUE,
+     response_json TEXT,
+     updated_at TIMESTAMP,
+     ttl_minutes INT DEFAULT 15
+   ) */`,
+        description: "Background process to keep cache fresh"
+      }
+    ],
+    bestPractices: [
+      "Set TTL (time-to-live) based on how often the external data changes",
+      "Use background processes for cache refresh, not user-triggered calls",
+      "Return stale data on API failure rather than showing an error (stale > nothing)",
+      "Use the cache key pattern: 'service:endpoint:params' for granular caching",
+      "Monitor cache hit rates to tune TTL values",
+      "Clear the cache when you know data has changed (webhooks, manual trigger)"
+    ],
+    pitfalls: [
+      "Cache invalidation is hard - stale data can cause business problems if TTL is too long",
+      "Caching user-specific data without including the user in the cache key",
+      "Not handling cache table growth - add a cleanup process for expired entries",
+      "Caching error responses - only cache successful API responses"
+    ],
+    whenToUse: [
+      "Reference data that changes infrequently (exchange rates, product catalogues)",
+      "Expensive API calls (per-call pricing, slow responses)",
+      "High-traffic interfaces where many users need the same data",
+      "Providing resilience against external service outages"
+    ],
+    whenNotToUse: [
+      "Real-time data where staleness is unacceptable (live stock prices, fraud detection)",
+      "User-specific data that varies per request",
+      "Write operations (only cache reads, never writes)"
+    ],
+    relatedPatterns: ["int-retry-backoff", "pm-subprocess-reuse"],
+    tags: ["integration", "caching", "performance", "resilience", "TTL"],
+    docUrl: undefined
+  },
 
   // ==================== EXPRESSION RULE PATTERNS ====================
   {
@@ -2428,7 +2539,7 @@ a!localVariables(
       "Internal Appian-to-Appian communication (use process messaging or record events)",
       "Real-time bidirectional communication (consider message queues or streaming)"
     ],
-    relatedPatterns: ["int-retry-backoff"],
+    relatedPatterns: ["int-retry-backoff", "int-caching"],
     tags: ["integration", "webhook", "web-api", "REST", "async", "external-systems"],
     docUrl: "https://docs.appian.com/suite/help/25.4/Web_APIs.html"
   },
