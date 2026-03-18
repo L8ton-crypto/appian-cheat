@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { designPatterns, designPatternCategories, DesignPattern, CodeExample } from "@/lib/design-patterns";
 
 interface PatternCardProps {
@@ -8,9 +8,11 @@ interface PatternCardProps {
   onRelatedClick: (patternId: string) => void;
   expanded: boolean;
   onToggle: () => void;
+  onCopyLink: () => void;
+  linkCopied: boolean;
 }
 
-function PatternCard({ pattern, onRelatedClick, expanded, onToggle }: PatternCardProps) {
+function PatternCard({ pattern, onRelatedClick, expanded, onToggle, onCopyLink, linkCopied }: PatternCardProps) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const copyCode = (code: string, title: string) => {
@@ -200,9 +202,9 @@ function PatternCard({ pattern, onRelatedClick, expanded, onToggle }: PatternCar
             </div>
           )}
 
-          {/* Documentation Link */}
-          {pattern.docUrl && (
-            <div className="pt-4 border-t border-gray-700/50">
+          {/* Footer: Doc Link + Share */}
+          <div className="pt-4 border-t border-gray-700/50 flex items-center justify-between">
+            {pattern.docUrl ? (
               <a
                 href={pattern.docUrl}
                 target="_blank"
@@ -211,8 +213,17 @@ function PatternCard({ pattern, onRelatedClick, expanded, onToggle }: PatternCar
               >
                 📖 Appian Docs →
               </a>
-            </div>
-          )}
+            ) : <span />}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onCopyLink();
+              }}
+              className="text-xs px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
+            >
+              {linkCopied ? "✓ Link Copied" : "🔗 Share Pattern"}
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -224,6 +235,19 @@ export default function PatternsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [expandedPatterns, setExpandedPatterns] = useState<Set<string>>(new Set());
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
+
+  // Read hash on mount - expand and scroll to that pattern
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    if (hash) {
+      setExpandedPatterns(new Set([hash]));
+      setTimeout(() => {
+        const el = document.getElementById(`pattern-${hash}`);
+        el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, []);
 
   const filteredPatterns = useMemo(() => {
     return designPatterns.filter(pattern => {
@@ -251,11 +275,20 @@ export default function PatternsPage() {
       const next = new Set(prev);
       if (next.has(patternId)) {
         next.delete(patternId);
+        history.replaceState(null, "", window.location.pathname);
       } else {
         next.add(patternId);
+        history.replaceState(null, "", `#${patternId}`);
       }
       return next;
     });
+  };
+
+  const copyPatternLink = (patternId: string) => {
+    const url = `${window.location.origin}/patterns#${patternId}`;
+    navigator.clipboard.writeText(url);
+    setCopiedLink(patternId);
+    setTimeout(() => setCopiedLink(null), 2000);
   };
 
   const scrollToPattern = (patternId: string) => {
@@ -393,6 +426,8 @@ export default function PatternsPage() {
                   onRelatedClick={scrollToPattern}
                   expanded={expandedPatterns.has(pattern.id)}
                   onToggle={() => togglePattern(pattern.id)}
+                  onCopyLink={() => copyPatternLink(pattern.id)}
+                  linkCopied={copiedLink === pattern.id}
                 />
               </div>
             ))
