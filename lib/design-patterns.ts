@@ -12,6 +12,7 @@ export interface DesignPattern {
   overview: string;
   problem: string;
   solution: string;
+  diagram?: string;
   codeExamples: CodeExample[];
   bestPractices: string[];
   pitfalls: string[];
@@ -44,6 +45,20 @@ export const designPatterns: DesignPattern[] = [
     overview: "Extract common business logic into reusable subprocesses that can be called from multiple parent processes. Reduces duplication and makes maintenance easier.",
     problem: "Multiple process models contain the same sequence of activities (e.g. send notification, update audit log, create task). Changes require updating every copy, leading to inconsistency and bugs.",
     solution: "Create a standalone subprocess for each reusable unit of work. Parent processes call the subprocess node, passing parameters in and receiving outputs. Use asynchronous subprocesses for fire-and-forget work (notifications, logging) and synchronous for work the parent needs to wait on.",
+    diagram: `┌─────────────────┐     ┌─────────────────┐
+│  Onboarding PM  │     │  Support Case   │
+│                 │     │  Resolution PM  │
+└───────┬─────────┘     └───────┬─────────┘
+        │                       │
+        │  (sync call)          │  (async call)
+        ▼                       ▼
+┌─────────────────────────────────────────┐
+│     📧 Send Notification Subprocess     │
+│  ┌──────┐  ┌──────┐  ┌──────────────┐  │
+│  │Email │  │Push  │  │Audit Log     │  │
+│  │Node  │  │Note  │  │Write to DS   │  │
+│  └──────┘  └──────┘  └──────────────┘  │
+└─────────────────────────────────────────┘`,
     codeExamples: [
       {
         title: "Subprocess Input - Notification Parameters",
@@ -115,6 +130,25 @@ pv!relatedRecordId   /* Integer - optional context */
     overview: "Use exception flows and error-handling nodes to gracefully manage failures in process models. Prevents silent failures and provides structured error recovery.",
     problem: "Integration calls fail, smart services throw errors, and subprocesses crash. Without structured error handling, processes pause silently, leaving users and admins unaware of problems.",
     solution: "Attach exception flows to nodes that can fail (integrations, Write to Data Store, subprocesses). Route exceptions to error-handling logic that logs the error, notifies admins, and either retries or escalates. Use the a!startProcess error handler for interface-initiated processes.",
+    diagram: `┌──────────┐    success    ┌──────────┐
+│  Start   │──────────────│  Next    │
+│  Node    │              │  Step    │
+└────┬─────┘              └──────────┘
+     │
+     │ exception flow (red connector)
+     ▼
+┌──────────────────────────────────┐
+│        Error Handler             │
+│  ┌─────────┐  ┌──────────────┐  │
+│  │Log Error│─▶│Notify Admin  │  │
+│  │to DS    │  │(Send Email)  │  │
+│  └─────────┘  └──────┬───────┘  │
+│                      │          │
+│               ┌──────▼───────┐  │
+│               │Retry / End   │  │
+│               │Process       │  │
+│               └──────────────┘  │
+└──────────────────────────────────┘`,
     codeExamples: [
       {
         title: "Exception Flow - Integration Error Handler",
@@ -763,6 +797,19 @@ a!queryRecordType(
     overview: "Build a step-by-step form wizard that guides users through complex data entry. Uses local variables to track the current step and validates each step before advancing.",
     problem: "A complex form with 20+ fields overwhelms users. They abandon it or make mistakes because there's too much to process at once. You need progressive disclosure with validation at each step.",
     solution: "Use a local!currentStep variable to control which section is visible. Each step has its own validation. Navigation buttons move between steps, and a progress indicator shows where the user is. Final step shows a review summary before submission.",
+    diagram: `Step 1          Step 2          Step 3          Step 4
+┌──────┐       ┌──────┐       ┌──────┐       ┌──────┐
+│ ●──○─│─○──○  │ ✓──●─│─○──○  │ ✓──✓─│─●──○  │ ✓──✓─│─✓──●
+├──────┤       ├──────┤       ├──────┤       ├──────┤
+│Basic │  ──▶  │Detail│  ──▶  │Upload│  ──▶  │Review│
+│Info  │       │Info  │       │Files │       │Submit│
+├──────┤       ├──────┤       ├──────┤       ├──────┤
+│[Next]│       │[Back]│       │[Back]│       │[Back]│
+│      │       │[Next]│       │[Next]│       │[Send]│
+└──────┘       └──────┘       └──────┘       └──────┘
+
+local!currentStep controls visibility
+Each step validates before allowing Next`,
     codeExamples: [
       {
         title: "Wizard Framework",
@@ -902,6 +949,23 @@ a!queryRecordType(
     overview: "Show a list of records (master) alongside a detail panel that updates when a record is selected. The standard pattern for browse-and-inspect interfaces.",
     problem: "Users need to browse a list of items and view details for each one. Navigating to a separate page for each item is slow and loses context. Users want to stay on one screen.",
     solution: "Use a!columnsLayout with a grid on the left (master) and a detail panel on the right. Clicking a row saves the selected record ID to a local variable, which drives the detail panel content. Use showWhen on the detail panel to hide it until a selection is made.",
+    diagram: `┌─── a!columnsLayout ─────────────────────────────┐
+│                                                  │
+│  ┌──── Master ────┐  ┌──── Detail ─────────────┐│
+│  │ a!gridField     │  │ showWhen:               ││
+│  │                 │  │   local!selectedId>0    ││
+│  │ ┌─────────────┐ │  │                         ││
+│  │ │ ▶ Record A  │ │  │ ┌─────────────────────┐││
+│  │ ├─────────────┤ │  │ │ Record A Details    │││
+│  │ │   Record B  │ │  │ │                     │││
+│  │ ├─────────────┤ │  │ │ Name: ...           │││
+│  │ │   Record C  │ │  │ │ Status: ...         │││
+│  │ └─────────────┘ │  │ │ [Edit] [Delete]     │││
+│  │                 │  │ └─────────────────────┘││
+│  │ onGridSelection │  │                         ││
+│  │ saves record ID │  │                         ││
+│  └─────────────────┘  └─────────────────────────┘│
+└──────────────────────────────────────────────────┘`,
     codeExamples: [
       {
         title: "Master-Detail Interface",
@@ -1287,6 +1351,30 @@ a!queryRecordType(
     overview: "Automatically retry failed integration calls with increasing delay between attempts. Handles transient failures (network blips, rate limits, temporary outages) without manual intervention.",
     problem: "An external API returns a 503 or times out. The process fails permanently even though the API recovers 30 seconds later. Manual retries waste time and don't scale.",
     solution: "Wrap integration calls in a retry loop using a subprocess with a timer. On failure, increment a retry counter, wait an exponentially increasing duration, and try again. Stop after a maximum number of retries and escalate.",
+    diagram: `┌────────────────────────────────────────────┐
+│            Retry Subprocess                │
+│                                            │
+│  ┌──────────┐     success                  │
+│  │Call API  │──────────────▶ Return Result  │
+│  └────┬─────┘                              │
+│       │ failure                             │
+│       ▼                                    │
+│  ┌────────────┐  retries < max             │
+│  │ retries++ │──────────────┐              │
+│  └────────────┘              │              │
+│       │ retries >= max       ▼              │
+│       │              ┌──────────────┐      │
+│       ▼              │ Timer: wait  │      │
+│  ┌──────────┐        │ 2^n seconds  │      │
+│  │Escalate  │        └──────┬───────┘      │
+│  │(Log+Notify)│             │              │
+│  └──────────┘        ┌──────▼───────┐      │
+│                      │  Loop back   │──┐   │
+│                      │  to Call API │  │   │
+│                      └──────────────┘  │   │
+└────────────────────────────────────────┘   │
+                         ▲                   │
+                         └───────────────────┘`,
     codeExamples: [
       {
         title: "Retry Subprocess Pattern",
@@ -3012,6 +3100,26 @@ a!match(
     overview: "Process large datasets in manageable chunks using a looping process model with batch sizes. Handles thousands of records without hitting memory limits or process timeouts.",
     problem: "You need to process 50,000 records (send emails, update statuses, generate documents). Loading all records into a single process variable causes out-of-memory errors. Processing them one at a time takes forever. Appian processes have memory limits and long-running processes can become unresponsive.",
     solution: "Implement a batch processor that queries records in pages (500-1000 at a time), processes each batch, and loops until all records are handled. Use a counter process variable to track progress. Include error handling per batch so one failure does not stop the entire run.",
+    diagram: `┌────────┐    ┌──────────────┐    ┌────────────┐
+│ Start  │───▶│ Query Batch  │───▶│ Process    │
+│        │    │ (500 rows)   │    │ Batch      │
+└────────┘    └──────────────┘    └─────┬──────┘
+                    ▲                    │
+                    │                    ▼
+                    │              ┌───────────┐
+                    │    more      │ offset += │
+                    └──────────────│ batchSize │
+                                   └─────┬─────┘
+                                         │ no more rows
+                                         ▼
+                                   ┌───────────┐
+                                   │  Complete  │
+                                   │  (log)     │
+                                   └───────────┘
+
+pv!offset: tracks position
+pv!batchSize: 500 (configurable)
+pv!totalProcessed: running count`,
     codeExamples: [
       {
         title: "Batch Process Model Design",

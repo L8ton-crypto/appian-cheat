@@ -51,6 +51,19 @@ function PatternCard({ pattern, onRelatedClick, expanded, onToggle, onCopyLink, 
 
       {expanded && (
         <div className="mt-6 space-y-6">
+          {/* Architecture Diagram */}
+          {pattern.diagram && (
+            <div>
+              <h3 className="text-sm font-semibold text-cyan-400 mb-2 flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-cyan-500"></span>
+                Architecture
+              </h3>
+              <pre className="text-xs font-mono bg-gray-900 px-4 py-3 rounded text-cyan-300 overflow-x-auto whitespace-pre leading-relaxed">
+                {pattern.diagram}
+              </pre>
+            </div>
+          )}
+
           {/* Problem Section */}
           <div>
             <h3 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
@@ -236,6 +249,7 @@ export default function PatternsPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [expandedPatterns, setExpandedPatterns] = useState<Set<string>>(new Set());
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Read hash on mount - expand and scroll to that pattern
   useEffect(() => {
@@ -316,12 +330,21 @@ export default function PatternsPage() {
               </div>
             </div>
             
-            <a
-              href="/"
-              className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
-            >
-              ← Back to Cheat Sheet
-            </a>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden px-2 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                aria-label="Toggle filters"
+              >
+                {sidebarOpen ? "✕ Close" : "☰ Filters"}
+              </button>
+              <a
+                href="/"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
+              >
+                ← Back to Cheat Sheet
+              </a>
+            </div>
           </div>
           
           {/* Search */}
@@ -338,15 +361,18 @@ export default function PatternsPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
-        {/* Left Sidebar */}
-        <div className="w-80 flex-shrink-0">
+        {/* Left Sidebar - hidden on mobile, toggled with hamburger */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+        )}
+        <div className={`${sidebarOpen ? "fixed inset-y-0 left-0 z-40 w-72 bg-gray-950 p-4 pt-20 overflow-y-auto" : "hidden"} md:block md:static md:w-80 md:flex-shrink-0 md:p-0 md:pt-0 md:z-auto md:bg-transparent`}>
           <div className="sticky top-24 space-y-6">
             {/* Category Filter */}
             <div>
               <h3 className="text-sm font-semibold text-gray-300 mb-3">Category</h3>
               <div className="space-y-1">
                 <button
-                  onClick={() => setSelectedCategory("all")}
+                  onClick={() => { setSelectedCategory("all"); setSidebarOpen(false); }}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                     selectedCategory === "all"
                       ? "bg-blue-600 text-white"
@@ -360,7 +386,7 @@ export default function PatternsPage() {
                   return (
                     <button
                       key={category}
-                      onClick={() => setSelectedCategory(category)}
+                      onClick={() => { setSelectedCategory(category); setSidebarOpen(false); }}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                         selectedCategory === category
                           ? "bg-blue-600 text-white"
@@ -379,7 +405,7 @@ export default function PatternsPage() {
               <h3 className="text-sm font-semibold text-gray-300 mb-3">Difficulty</h3>
               <div className="space-y-1">
                 <button
-                  onClick={() => setSelectedDifficulty("all")}
+                  onClick={() => { setSelectedDifficulty("all"); setSidebarOpen(false); }}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                     selectedDifficulty === "all"
                       ? "bg-blue-600 text-white"
@@ -397,7 +423,7 @@ export default function PatternsPage() {
                   return (
                     <button
                       key={value}
-                      onClick={() => setSelectedDifficulty(value)}
+                      onClick={() => { setSelectedDifficulty(value); setSidebarOpen(false); }}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                         selectedDifficulty === value
                           ? "bg-blue-600 text-white"
