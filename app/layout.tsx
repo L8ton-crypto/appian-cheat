@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import ChatWidget from "./components/ChatWidget";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "AppianCheat — Appian Developer Quick Reference",
-  description: "Quick-reference cheat sheet for Appian functions, expressions, and design patterns. Built for Appian 25.4.",
-  keywords: ["Appian", "cheat sheet", "functions", "expressions", "developer", "reference", "25.4"],
+  description: "Quick-reference cheat sheet for Appian functions, expressions, and design patterns. Built for Appian 25.4. Now with AI assistant.",
+  keywords: ["Appian", "cheat sheet", "functions", "expressions", "developer", "reference", "25.4", "AI assistant"],
+  openGraph: {
+    title: "AppianCheat — Appian Developer Quick Reference",
+    description: "The ultimate Appian developer cheat sheet with AI-powered assistant. Functions, patterns, errors, and instant answers.",
+    type: "website",
+    url: "https://appian-cheat.vercel.app",
+  },
 };
 
 export default function RootLayout({
@@ -18,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased bg-gray-950 text-gray-200">
         {children}
+        <ChatWidget />
         <Analytics />
         <SpeedInsights />
       </body>

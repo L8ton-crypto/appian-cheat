@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { designPatterns, designPatternCategories, DesignPattern, CodeExample } from "@/lib/design-patterns";
 
 interface PatternCardProps {
@@ -8,11 +8,9 @@ interface PatternCardProps {
   onRelatedClick: (patternId: string) => void;
   expanded: boolean;
   onToggle: () => void;
-  onCopyLink: () => void;
-  linkCopied: boolean;
 }
 
-function PatternCard({ pattern, onRelatedClick, expanded, onToggle, onCopyLink, linkCopied }: PatternCardProps) {
+function PatternCard({ pattern, onRelatedClick, expanded, onToggle }: PatternCardProps) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const copyCode = (code: string, title: string) => {
@@ -51,19 +49,6 @@ function PatternCard({ pattern, onRelatedClick, expanded, onToggle, onCopyLink, 
 
       {expanded && (
         <div className="mt-6 space-y-6">
-          {/* Architecture Diagram */}
-          {pattern.diagram && (
-            <div>
-              <h3 className="text-sm font-semibold text-cyan-400 mb-2 flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-cyan-500"></span>
-                Architecture
-              </h3>
-              <pre className="text-xs font-mono bg-gray-900 px-4 py-3 rounded text-cyan-300 overflow-x-auto whitespace-pre leading-relaxed">
-                {pattern.diagram}
-              </pre>
-            </div>
-          )}
-
           {/* Problem Section */}
           <div>
             <h3 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
@@ -215,9 +200,9 @@ function PatternCard({ pattern, onRelatedClick, expanded, onToggle, onCopyLink, 
             </div>
           )}
 
-          {/* Footer: Doc Link + Share */}
-          <div className="pt-4 border-t border-gray-700/50 flex items-center justify-between">
-            {pattern.docUrl ? (
+          {/* Documentation Link */}
+          {pattern.docUrl && (
+            <div className="pt-4 border-t border-gray-700/50">
               <a
                 href={pattern.docUrl}
                 target="_blank"
@@ -226,17 +211,8 @@ function PatternCard({ pattern, onRelatedClick, expanded, onToggle, onCopyLink, 
               >
                 📖 Appian Docs →
               </a>
-            ) : <span />}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onCopyLink();
-              }}
-              className="text-xs px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
-            >
-              {linkCopied ? "✓ Link Copied" : "🔗 Share Pattern"}
-            </button>
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -248,20 +224,6 @@ export default function PatternsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [expandedPatterns, setExpandedPatterns] = useState<Set<string>>(new Set());
-  const [copiedLink, setCopiedLink] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Read hash on mount - expand and scroll to that pattern
-  useEffect(() => {
-    const hash = window.location.hash.replace("#", "");
-    if (hash) {
-      setExpandedPatterns(new Set([hash]));
-      setTimeout(() => {
-        const el = document.getElementById(`pattern-${hash}`);
-        el?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    }
-  }, []);
 
   const filteredPatterns = useMemo(() => {
     return designPatterns.filter(pattern => {
@@ -289,20 +251,11 @@ export default function PatternsPage() {
       const next = new Set(prev);
       if (next.has(patternId)) {
         next.delete(patternId);
-        history.replaceState(null, "", window.location.pathname);
       } else {
         next.add(patternId);
-        history.replaceState(null, "", `#${patternId}`);
       }
       return next;
     });
-  };
-
-  const copyPatternLink = (patternId: string) => {
-    const url = `${window.location.origin}/patterns#${patternId}`;
-    navigator.clipboard.writeText(url);
-    setCopiedLink(patternId);
-    setTimeout(() => setCopiedLink(null), 2000);
   };
 
   const scrollToPattern = (patternId: string) => {
@@ -330,21 +283,12 @@ export default function PatternsPage() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="md:hidden px-2 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-                aria-label="Toggle filters"
-              >
-                {sidebarOpen ? "✕ Close" : "☰ Filters"}
-              </button>
-              <a
-                href="/"
-                className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                ← Back to Cheat Sheet
-              </a>
-            </div>
+            <a
+              href="/"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
+            >
+              ← Back to Cheat Sheet
+            </a>
           </div>
           
           {/* Search */}
@@ -361,18 +305,15 @@ export default function PatternsPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
-        {/* Left Sidebar - hidden on mobile, toggled with hamburger */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
-        )}
-        <div className={`${sidebarOpen ? "fixed inset-y-0 left-0 z-40 w-72 bg-gray-950 p-4 pt-20 overflow-y-auto" : "hidden"} md:block md:static md:w-80 md:flex-shrink-0 md:p-0 md:pt-0 md:z-auto md:bg-transparent`}>
+        {/* Left Sidebar */}
+        <div className="w-80 flex-shrink-0">
           <div className="sticky top-24 space-y-6">
             {/* Category Filter */}
             <div>
               <h3 className="text-sm font-semibold text-gray-300 mb-3">Category</h3>
               <div className="space-y-1">
                 <button
-                  onClick={() => { setSelectedCategory("all"); setSidebarOpen(false); }}
+                  onClick={() => setSelectedCategory("all")}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                     selectedCategory === "all"
                       ? "bg-blue-600 text-white"
@@ -386,7 +327,7 @@ export default function PatternsPage() {
                   return (
                     <button
                       key={category}
-                      onClick={() => { setSelectedCategory(category); setSidebarOpen(false); }}
+                      onClick={() => setSelectedCategory(category)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                         selectedCategory === category
                           ? "bg-blue-600 text-white"
@@ -405,7 +346,7 @@ export default function PatternsPage() {
               <h3 className="text-sm font-semibold text-gray-300 mb-3">Difficulty</h3>
               <div className="space-y-1">
                 <button
-                  onClick={() => { setSelectedDifficulty("all"); setSidebarOpen(false); }}
+                  onClick={() => setSelectedDifficulty("all")}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                     selectedDifficulty === "all"
                       ? "bg-blue-600 text-white"
@@ -423,7 +364,7 @@ export default function PatternsPage() {
                   return (
                     <button
                       key={value}
-                      onClick={() => { setSelectedDifficulty(value); setSidebarOpen(false); }}
+                      onClick={() => setSelectedDifficulty(value)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                         selectedDifficulty === value
                           ? "bg-blue-600 text-white"
@@ -452,8 +393,6 @@ export default function PatternsPage() {
                   onRelatedClick={scrollToPattern}
                   expanded={expandedPatterns.has(pattern.id)}
                   onToggle={() => togglePattern(pattern.id)}
-                  onCopyLink={() => copyPatternLink(pattern.id)}
-                  linkCopied={copiedLink === pattern.id}
                 />
               </div>
             ))

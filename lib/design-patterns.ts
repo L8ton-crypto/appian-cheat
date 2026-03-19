@@ -12,7 +12,6 @@ export interface DesignPattern {
   overview: string;
   problem: string;
   solution: string;
-  diagram?: string;
   codeExamples: CodeExample[];
   bestPractices: string[];
   pitfalls: string[];
@@ -45,20 +44,6 @@ export const designPatterns: DesignPattern[] = [
     overview: "Extract common business logic into reusable subprocesses that can be called from multiple parent processes. Reduces duplication and makes maintenance easier.",
     problem: "Multiple process models contain the same sequence of activities (e.g. send notification, update audit log, create task). Changes require updating every copy, leading to inconsistency and bugs.",
     solution: "Create a standalone subprocess for each reusable unit of work. Parent processes call the subprocess node, passing parameters in and receiving outputs. Use asynchronous subprocesses for fire-and-forget work (notifications, logging) and synchronous for work the parent needs to wait on.",
-    diagram: `┌─────────────────┐     ┌─────────────────┐
-│  Onboarding PM  │     │  Support Case   │
-│                 │     │  Resolution PM  │
-└───────┬─────────┘     └───────┬─────────┘
-        │                       │
-        │  (sync call)          │  (async call)
-        ▼                       ▼
-┌─────────────────────────────────────────┐
-│     📧 Send Notification Subprocess     │
-│  ┌──────┐  ┌──────┐  ┌──────────────┐  │
-│  │Email │  │Push  │  │Audit Log     │  │
-│  │Node  │  │Note  │  │Write to DS   │  │
-│  └──────┘  └──────┘  └──────────────┘  │
-└─────────────────────────────────────────┘`,
     codeExamples: [
       {
         title: "Subprocess Input - Notification Parameters",
@@ -120,7 +105,7 @@ pv!relatedRecordId   /* Integer - optional context */
     ],
     relatedPatterns: ["pm-error-handling", "pm-write-back"],
     tags: ["process", "subprocess", "reuse", "modularity"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/process-model-patterns.html"
   },
   {
     id: "pm-error-handling",
@@ -130,25 +115,6 @@ pv!relatedRecordId   /* Integer - optional context */
     overview: "Use exception flows and error-handling nodes to gracefully manage failures in process models. Prevents silent failures and provides structured error recovery.",
     problem: "Integration calls fail, smart services throw errors, and subprocesses crash. Without structured error handling, processes pause silently, leaving users and admins unaware of problems.",
     solution: "Attach exception flows to nodes that can fail (integrations, Write to Data Store, subprocesses). Route exceptions to error-handling logic that logs the error, notifies admins, and either retries or escalates. Use the a!startProcess error handler for interface-initiated processes.",
-    diagram: `┌──────────┐    success    ┌──────────┐
-│  Start   │──────────────│  Next    │
-│  Node    │              │  Step    │
-└────┬─────┘              └──────────┘
-     │
-     │ exception flow (red connector)
-     ▼
-┌──────────────────────────────────┐
-│        Error Handler             │
-│  ┌─────────┐  ┌──────────────┐  │
-│  │Log Error│─▶│Notify Admin  │  │
-│  │to DS    │  │(Send Email)  │  │
-│  └─────────┘  └──────┬───────┘  │
-│                      │          │
-│               ┌──────▼───────┐  │
-│               │Retry / End   │  │
-│               │Process       │  │
-│               └──────────────┘  │
-└──────────────────────────────────┘`,
     codeExamples: [
       {
         title: "Exception Flow - Integration Error Handler",
@@ -229,7 +195,7 @@ a!localVariables(
     ],
     relatedPatterns: ["pm-subprocess-reuse", "int-retry-backoff"],
     tags: ["process", "error-handling", "exception", "retry", "resilience"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Handling_Errors.html"
   },
   {
     id: "pm-timer-escalation",
@@ -305,7 +271,7 @@ a!localVariables(
     ],
     relatedPatterns: ["pm-subprocess-reuse", "pm-mni"],
     tags: ["process", "timer", "escalation", "SLA", "approval"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Timer_Event.html"
   },
   {
     id: "pm-mni",
@@ -383,7 +349,7 @@ a!localVariables(
     ],
     relatedPatterns: ["pm-subprocess-reuse", "pm-error-handling"],
     tags: ["process", "MNI", "parallel", "batch", "loop"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/MNI.html"
   },
   {
     id: "pm-write-back",
@@ -587,7 +553,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["data-views", "data-source-filter"],
     tags: ["data", "CDT", "normalisation", "relationships", "database", "design"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Working_with_Data_in_Appian.html"
   },
   {
     id: "data-source-filter",
@@ -683,7 +649,7 @@ or(
     ],
     relatedPatterns: ["data-cdt-normalization", "sec-group-access"],
     tags: ["data", "security", "source-filter", "multi-tenant", "record-type"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Source_Filters.html"
   },
   {
     id: "data-views",
@@ -785,7 +751,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["data-cdt-normalization", "data-source-filter"],
     tags: ["data", "database", "views", "SQL", "performance", "aggregation"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Supported_Database_and_Data_Source_Configurations.html"
   },
 
   // ==================== INTERFACE (SAIL) PATTERNS ====================
@@ -797,19 +763,6 @@ a!queryRecordType(
     overview: "Build a step-by-step form wizard that guides users through complex data entry. Uses local variables to track the current step and validates each step before advancing.",
     problem: "A complex form with 20+ fields overwhelms users. They abandon it or make mistakes because there's too much to process at once. You need progressive disclosure with validation at each step.",
     solution: "Use a local!currentStep variable to control which section is visible. Each step has its own validation. Navigation buttons move between steps, and a progress indicator shows where the user is. Final step shows a review summary before submission.",
-    diagram: `Step 1          Step 2          Step 3          Step 4
-┌──────┐       ┌──────┐       ┌──────┐       ┌──────┐
-│ ●──○─│─○──○  │ ✓──●─│─○──○  │ ✓──✓─│─●──○  │ ✓──✓─│─✓──●
-├──────┤       ├──────┤       ├──────┤       ├──────┤
-│Basic │  ──▶  │Detail│  ──▶  │Upload│  ──▶  │Review│
-│Info  │       │Info  │       │Files │       │Submit│
-├──────┤       ├──────┤       ├──────┤       ├──────┤
-│[Next]│       │[Back]│       │[Back]│       │[Back]│
-│      │       │[Next]│       │[Next]│       │[Send]│
-└──────┘       └──────┘       └──────┘       └──────┘
-
-local!currentStep controls visibility
-Each step validates before allowing Next`,
     codeExamples: [
       {
         title: "Wizard Framework",
@@ -939,7 +892,7 @@ Each step validates before allowing Next`,
     ],
     relatedPatterns: ["sail-master-detail", "sail-editable-grid", "pm-write-back"],
     tags: ["interface", "SAIL", "wizard", "form", "UX", "progressive-disclosure"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Interfaces.html"
   },
   {
     id: "sail-master-detail",
@@ -949,23 +902,6 @@ Each step validates before allowing Next`,
     overview: "Show a list of records (master) alongside a detail panel that updates when a record is selected. The standard pattern for browse-and-inspect interfaces.",
     problem: "Users need to browse a list of items and view details for each one. Navigating to a separate page for each item is slow and loses context. Users want to stay on one screen.",
     solution: "Use a!columnsLayout with a grid on the left (master) and a detail panel on the right. Clicking a row saves the selected record ID to a local variable, which drives the detail panel content. Use showWhen on the detail panel to hide it until a selection is made.",
-    diagram: `┌─── a!columnsLayout ─────────────────────────────┐
-│                                                  │
-│  ┌──── Master ────┐  ┌──── Detail ─────────────┐│
-│  │ a!gridField     │  │ showWhen:               ││
-│  │                 │  │   local!selectedId>0    ││
-│  │ ┌─────────────┐ │  │                         ││
-│  │ │ ▶ Record A  │ │  │ ┌─────────────────────┐││
-│  │ ├─────────────┤ │  │ │ Record A Details    │││
-│  │ │   Record B  │ │  │ │                     │││
-│  │ ├─────────────┤ │  │ │ Name: ...           │││
-│  │ │   Record C  │ │  │ │ Status: ...         │││
-│  │ └─────────────┘ │  │ │ [Edit] [Delete]     │││
-│  │                 │  │ └─────────────────────┘││
-│  │ onGridSelection │  │                         ││
-│  │ saves record ID │  │                         ││
-│  └─────────────────┘  └─────────────────────────┘│
-└──────────────────────────────────────────────────┘`,
     codeExamples: [
       {
         title: "Master-Detail Interface",
@@ -1339,7 +1275,7 @@ Each step validates before allowing Next`,
     ],
     relatedPatterns: ["sail-wizard", "sail-editable-grid"],
     tags: ["interface", "SAIL", "dynamic", "configuration", "form-builder"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Interfaces.html"
   },
 
   // ==================== INTEGRATION PATTERNS ====================
@@ -1351,30 +1287,6 @@ Each step validates before allowing Next`,
     overview: "Automatically retry failed integration calls with increasing delay between attempts. Handles transient failures (network blips, rate limits, temporary outages) without manual intervention.",
     problem: "An external API returns a 503 or times out. The process fails permanently even though the API recovers 30 seconds later. Manual retries waste time and don't scale.",
     solution: "Wrap integration calls in a retry loop using a subprocess with a timer. On failure, increment a retry counter, wait an exponentially increasing duration, and try again. Stop after a maximum number of retries and escalate.",
-    diagram: `┌────────────────────────────────────────────┐
-│            Retry Subprocess                │
-│                                            │
-│  ┌──────────┐     success                  │
-│  │Call API  │──────────────▶ Return Result  │
-│  └────┬─────┘                              │
-│       │ failure                             │
-│       ▼                                    │
-│  ┌────────────┐  retries < max             │
-│  │ retries++ │──────────────┐              │
-│  └────────────┘              │              │
-│       │ retries >= max       ▼              │
-│       │              ┌──────────────┐      │
-│       ▼              │ Timer: wait  │      │
-│  ┌──────────┐        │ 2^n seconds  │      │
-│  │Escalate  │        └──────┬───────┘      │
-│  │(Log+Notify)│             │              │
-│  └──────────┘        ┌──────▼───────┐      │
-│                      │  Loop back   │──┐   │
-│                      │  to Call API │  │   │
-│                      └──────────────┘  │   │
-└────────────────────────────────────────┘   │
-                         ▲                   │
-                         └───────────────────┘`,
     codeExamples: [
       {
         title: "Retry Subprocess Pattern",
@@ -1480,14 +1392,14 @@ a!localVariables(
     ],
     relatedPatterns: ["pm-error-handling", "int-caching"],
     tags: ["integration", "retry", "backoff", "resilience", "error-handling"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Call_Integration.html"
   },
   {
     id: "int-caching",
     title: "Integration Response Caching",
     category: "Integration",
     difficulty: "intermediate",
-    overview: "Cache external API responses in an Appian data table to reduce call volume, improve performance, and provide fallback data when the external service is unavailable.",
+    overview: "Cache external API responses to reduce call volume, improve performance, and provide fallback data when the external service is unavailable.",
     problem: "Every page load calls an external API. With 100 users, you're making 100 identical calls for the same data. This is slow, expensive (API metering), and brittle (any outage breaks all users).",
     solution: "Store API responses in an Appian data table with a timestamp. Before calling the external API, check if cached data exists and is fresh enough. If yes, return the cache. If stale, refresh from the API and update the cache. Use process-based refresh for background updates.",
     codeExamples: [
@@ -1592,7 +1504,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["int-retry-backoff", "pm-subprocess-reuse"],
     tags: ["integration", "caching", "performance", "resilience", "TTL"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Integration_Best_Practices.html"
   },
 
   // ==================== EXPRESSION RULE PATTERNS ====================
@@ -1874,7 +1786,7 @@ a!buttonWidget(
     ],
     relatedPatterns: ["data-source-filter", "sec-portal"],
     tags: ["security", "groups", "RBAC", "access-control", "permissions"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Appian_Groups.html"
   },
 
   // ==================== PORTAL PATTERNS ====================
@@ -1999,7 +1911,7 @@ a!localVariables(
     ],
     relatedPatterns: ["sec-group-access", "pm-write-back"],
     tags: ["portal", "security", "public", "external", "reCAPTCHA", "service-account"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Portal_Object.html"
   },
 
   // ==================== PERFORMANCE PATTERNS ====================
@@ -2103,95 +2015,41 @@ a!localVariables(
   },
   {
     id: "perf-caching-strategy",
-    title: "Refresh Variable Strategy",
+    title: "Expression Caching Strategy",
     category: "Performance",
-    difficulty: "intermediate",
-    overview: "Use a!refreshVariable to control when local variables re-evaluate in interfaces. Prevent unnecessary queries on every user interaction by defining explicit refresh conditions.",
-    problem: "By default, local variables in a!localVariables re-evaluate whenever their dependencies change. On complex interfaces, a query or integration call can re-fire on every keystroke, dropdown change, or unrelated interaction - hammering the database and making the UI sluggish.",
-    solution: "Wrap expensive local variables in a!refreshVariable to control exactly when they re-evaluate. Use refreshInterval for polling, refreshOnVarChange to re-query only when a specific filter changes, refreshAfter for re-querying after a save action, and refreshAlways: false to prevent re-evaluation on unrelated interactions.",
+    difficulty: "advanced",
+    overview: "Use Appian's expression caching to reduce redundant queries and computation. Cache expression rule results that are expensive to compute and don't change frequently.",
+    problem: "Expression rules get evaluated on every interface refresh. If a rule queries the database or calls an integration, it runs repeatedly even when the data has not changed. This wastes server resources and creates slow user experiences, especially on interfaces with multiple components calling the same expensive rule.",
+    solution: "Enable caching on expression rules that query data or perform expensive computation. Set appropriate cache durations based on how frequently data changes. Use rule inputs as cache keys so different parameters get separate cached results. Combine with a!localVariables to avoid re-evaluating the same rule multiple times in one interface.",
     codeExamples: [
       {
-        title: "Refresh on Interval (Dashboard Polling)",
-        code: `a!localVariables(
-  /* Re-query every 60 seconds instead of on every interaction */
-  local!activeCases: a!refreshVariable(
-    value: a!queryRecordType(
-      recordType: recordType!Case,
-      filters: a!queryFilter(
-        field: recordType!Case.fields.status,
-        operator: "=",
-        value: "Open"
-      ),
-      pagingInfo: a!pagingInfo(1, 20)
-    ).data,
-    refreshInterval: 60
+        title: "Cacheable Expression Rule Configuration",
+        code: `/* Expression Rule: rule!getActiveUserCount
+   Cache Duration: 5 minutes
+   
+   In the rule configuration panel:
+   - Enable "Cache the result for" 
+   - Set to 5 minutes
+   
+   The cache key is automatically based on rule inputs.
+   Same inputs = cached result. Different inputs = separate cache entry.
+*/
+
+/* Rule Definition */
+a!queryRecordType(
+  recordType: 'recordType!User',
+  filters: a!queryFilter(
+    field: 'recordType!User.fields.status',
+    operator: "=",
+    value: "Active"
   ),
-  /* Interface uses local!activeCases */
-  a!gridField(
-    data: local!activeCases
-  )
-)`,
-        description: "Poll for fresh data at a fixed interval instead of re-querying on every interaction"
-      },
-      {
-        title: "Refresh When a Filter Changes",
-        code: `a!localVariables(
-  local!selectedStatus: "Open",
-  
-  /* Only re-query when local!selectedStatus changes */
-  local!cases: a!refreshVariable(
-    value: a!queryRecordType(
-      recordType: recordType!Case,
-      filters: a!queryFilter(
-        field: recordType!Case.fields.status,
-        operator: "=",
-        value: local!selectedStatus
-      ),
-      pagingInfo: a!pagingInfo(1, 50)
-    ).data,
-    refreshOnVarChange: local!selectedStatus
-  ),
-  
-  {
-    a!dropdownField(
-      label: "Status",
-      choiceLabels: { "Open", "Closed", "Pending" },
-      choiceValues: { "Open", "Closed", "Pending" },
-      value: local!selectedStatus,
-      saveInto: local!selectedStatus
-    ),
-    a!gridField(data: local!cases)
-  }
-)`,
-        description: "Re-query only when the relevant filter variable changes, not on every interaction"
-      },
-      {
-        title: "Refresh After a Save Action",
-        code: `a!localVariables(
-  local!refreshTrigger: 0,
-  
-  /* Re-query after the user saves a new record */
-  local!records: a!refreshVariable(
-    value: a!queryRecordType(
-      recordType: recordType!Task,
-      pagingInfo: a!pagingInfo(1, 50)
-    ).data,
-    refreshAfter: local!refreshTrigger
-  ),
-  
-  {
-    a!gridField(data: local!records),
-    a!buttonWidget(
-      label: "Save New Task",
-      saveInto: {
-        a!writeRecords(records: recordType!Task, /* ... */),
-        /* Increment the trigger to force a refresh */
-        a!save(local!refreshTrigger, local!refreshTrigger + 1)
-      }
-    )
-  }
-)`,
-        description: "Force a re-query after a write operation completes"
+  pagingInfo: a!pagingInfo(1, 0),
+  fetchTotalCount: true
+).totalCount
+
+/* This query runs ONCE per 5 minutes, regardless of 
+   how many users have the dashboard open */`,
+        description: "Cache expensive queries with appropriate TTL"
       },
       {
         title: "Local Variable Deduplication",
@@ -2227,32 +2085,35 @@ a!localVariables(
       }
     ],
     bestPractices: [
-      "Use refreshOnVarChange to tie queries to specific filter variables instead of re-running on every interaction",
-      "Use refreshInterval for dashboard-style polling - keeps data fresh without user action",
-      "Use refreshAfter to re-query data after a write operation (save, delete, update)",
-      "Combine a!refreshVariable with a!localVariables to store expensive results and reference them multiple times",
-      "Set refreshAlways: false on variables that should only evaluate once when the interface loads"
+      "Cache expression rules that query data, not rules that format or transform data",
+      "Set cache duration based on data freshness needs: 1 min for dashboards, 15 min for reference data",
+      "Use a!localVariables to store the result of any expression used more than once",
+      "Monitor cache hit rates in the Admin Console under Expression Rule Performance",
+      "Keep rule inputs simple (primitives, not complex CDTs) for effective cache keys",
+      "Do not cache rules with side effects or rules that return user-specific data unless keyed by user"
     ],
     pitfalls: [
-      "Not using refreshOnVarChange and letting queries fire on every unrelated interaction",
-      "Setting refreshInterval too low (e.g. 1 second) - creates unnecessary server load",
-      "Forgetting that refreshOnVarChange tracks the variable reference, not the value - use the variable directly, not an expression",
-      "Using refreshAlways: true when you actually need refreshOnVarChange - refreshAlways re-evaluates on every interaction"
+      "Caching rules that return user-specific data without user input as a cache key",
+      "Setting cache duration too high for frequently changing data (stale results)",
+      "Caching rules with no inputs (global cache - one wrong result affects everyone)",
+      "Not using localVariables and calling the same cached rule 10 times (still has lookup overhead)",
+      "Caching rules that return large CDT arrays (high memory usage per cache entry)"
     ],
     whenToUse: [
-      "Interfaces with expensive queries that don't need to update on every interaction",
-      "Dashboard polling (refreshInterval) for near-real-time data",
-      "Forms where a query depends on a specific filter or selection (refreshOnVarChange)",
-      "Re-fetching data after a save/delete action (refreshAfter)"
+      "Dashboard summary cards (total counts, averages, KPIs)",
+      "Reference data lookups (dropdown options, configuration values)",
+      "Rules called from multiple components on the same interface",
+      "Expensive aggregation queries that do not need real-time accuracy"
     ],
     whenNotToUse: [
-      "Simple interfaces with a single query and no user interactions",
-      "Variables that genuinely need to re-evaluate on every change (calculated fields, formatting)",
-      "When the default refresh behaviour already works correctly"
+      "Rules that must return real-time data (live stock prices, queue lengths)",
+      "Rules with side effects (writing data, triggering processes)",
+      "Rules with many unique input combinations (cache explosion)",
+      "Simple transformation rules (concatenation, formatting) - overhead of caching exceeds computation"
     ],
-    relatedPatterns: ["perf-query-optimization"],
-    tags: ["performance", "refresh", "a!refreshVariable", "interfaces", "optimization"],
-    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_refreshvariable.html"
+    relatedPatterns: ["perf-query-optimization", "int-cache-first"],
+    tags: ["performance", "caching", "expression-rules", "optimization", "memory"],
+    docUrl: "https://docs.appian.com/suite/help/25.4/Expression_Rule_Object.html"
   },
 
   // ==================== RECORDS & DATA PATTERNS ====================
@@ -2437,7 +2298,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["rec-write-back", "perf-query-optimization", "data-cdt-normalization"],
     tags: ["records", "aggregation", "relationships", "dashboard", "queries", "reporting"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Querying_from_Related_Record_Types.html"
   },
   {
     id: "rec-sync-strategy",
@@ -2522,7 +2383,7 @@ a!syncRecords(
     ],
     relatedPatterns: ["perf-query-optimization", "data-source-filter"],
     tags: ["records", "sync", "caching", "data-source", "performance", "architecture"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Syncing_Data.html"
   },
 
   // ==================== MORE INTEGRATION PATTERNS ====================
@@ -2742,7 +2603,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["int-retry-backoff", "int-webhook-receiver", "pm-error-handling"],
     tags: ["integration", "logging", "monitoring", "error-handling", "admin", "observability"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Integration_Monitoring.html"
   },
 
   // ==================== MORE INTERFACE (SAIL) PATTERNS ====================
@@ -2861,7 +2722,7 @@ a!localVariables(
     ],
     relatedPatterns: ["sail-wizard", "sail-master-detail"],
     tags: ["interface", "SAIL", "responsive", "cards", "mobile", "layout", "UI"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Cards_Layout.html"
   },
   {
     id: "sail-confirmation-dialog",
@@ -2984,7 +2845,7 @@ a!localVariables(
     ],
     relatedPatterns: ["rec-write-back", "sail-editable-grid"],
     tags: ["interface", "SAIL", "dialog", "confirmation", "UX", "destructive-action"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Card_Layout.html"
   },
 
   // ==================== MORE EXPRESSION RULE PATTERNS ====================
@@ -3088,7 +2949,7 @@ a!match(
     ],
     relatedPatterns: ["expr-helper-composition", "expr-guard-clause"],
     tags: ["expression-rules", "decision-table", "logic", "branching", "match", "refactoring"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/fnc_evaluation_a_match.html"
   },
 
   // ==================== MORE PROCESS MODEL PATTERNS ====================
@@ -3100,26 +2961,6 @@ a!match(
     overview: "Process large datasets in manageable chunks using a looping process model with batch sizes. Handles thousands of records without hitting memory limits or process timeouts.",
     problem: "You need to process 50,000 records (send emails, update statuses, generate documents). Loading all records into a single process variable causes out-of-memory errors. Processing them one at a time takes forever. Appian processes have memory limits and long-running processes can become unresponsive.",
     solution: "Implement a batch processor that queries records in pages (500-1000 at a time), processes each batch, and loops until all records are handled. Use a counter process variable to track progress. Include error handling per batch so one failure does not stop the entire run.",
-    diagram: `┌────────┐    ┌──────────────┐    ┌────────────┐
-│ Start  │───▶│ Query Batch  │───▶│ Process    │
-│        │    │ (500 rows)   │    │ Batch      │
-└────────┘    └──────────────┘    └─────┬──────┘
-                    ▲                    │
-                    │                    ▼
-                    │              ┌───────────┐
-                    │    more      │ offset += │
-                    └──────────────│ batchSize │
-                                   └─────┬─────┘
-                                         │ no more rows
-                                         ▼
-                                   ┌───────────┐
-                                   │  Complete  │
-                                   │  (log)     │
-                                   └───────────┘
-
-pv!offset: tracks position
-pv!batchSize: 500 (configurable)
-pv!totalProcessed: running count`,
     codeExamples: [
       {
         title: "Batch Process Model Design",
@@ -3209,7 +3050,7 @@ a!queryRecordType(
     ],
     relatedPatterns: ["pm-subprocess-reuse", "pm-mni", "perf-query-optimization"],
     tags: ["process-model", "batch", "performance", "looping", "large-data", "ETL"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Process_Model_Design_Best_Practices.html"
   },
 
   // ==================== ADDITIONAL SECURITY PATTERN ====================
@@ -3296,6 +3137,6 @@ and(
     ],
     relatedPatterns: ["sec-group-access", "sec-portal", "sail-confirmation-dialog"],
     tags: ["security", "validation", "input", "defence-in-depth", "injection", "forms"],
-    docUrl: undefined
+    docUrl: "https://docs.appian.com/suite/help/25.4/Validation.html"
   }
 ];
