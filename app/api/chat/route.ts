@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-20250414",
+        model: "claude-3-haiku-20240307",
         max_tokens: 2048,
         system: systemPrompt,
         messages: messages.slice(-10), // Keep last 10 messages for context window
