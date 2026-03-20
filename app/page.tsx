@@ -506,6 +506,12 @@ export default function Home() {
               >
                 📐 Design Patterns
               </a>
+              <a
+                href="/community"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-400 hover:to-purple-500 transition-all"
+              >
+                💬 Community
+              </a>
             </div>
             
             {/* Search */}
