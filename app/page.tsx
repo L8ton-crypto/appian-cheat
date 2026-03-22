@@ -501,6 +501,12 @@ export default function Home() {
                 <p className="text-[11px] text-gray-500">Quick reference for Appian 25.4</p>
               </div>
               <a
+                href="/builder"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-400 hover:to-orange-500 transition-all"
+              >
+                🏗️ AI Builder
+              </a>
+              <a
                 href="/patterns"
                 className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-400 hover:to-red-500 transition-all"
               >

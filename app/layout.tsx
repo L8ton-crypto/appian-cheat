@@ -6,8 +6,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "AppianCheat — Appian Developer Quick Reference",
-  description: "Quick-reference cheat sheet for Appian functions, expressions, and design patterns. Built for Appian 25.4. AI assistant and community Q&A.",
-  keywords: ["Appian", "cheat sheet", "functions", "expressions", "developer", "reference", "25.4", "AI assistant", "community", "Q&A"],
+  description: "Quick-reference cheat sheet for Appian functions, expressions, and design patterns. AI-powered SAIL code generator - describe or sketch your interface. Built for Appian 25.4.",
+  keywords: ["Appian", "cheat sheet", "functions", "expressions", "developer", "reference", "25.4", "AI assistant", "SAIL generator", "interface builder", "community", "Q&A"],
   openGraph: {
     title: "AppianCheat — Appian Developer Quick Reference",
     description: "The ultimate Appian developer cheat sheet with AI-powered assistant, community Q&A, functions, patterns, errors, and instant answers.",
