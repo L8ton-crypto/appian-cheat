@@ -46,6 +46,8 @@ DISPLAY:
 - a!imageField(label, labelPosition, images, size, isThumbnail, style, showWhen, align, marginAbove, marginBelow, accessibilityText, helpTooltip, tooltip)
 - a!progressBarField(label, labelPosition, percentage, style, showWhen, helpTooltip, accessibilityText, marginAbove, marginBelow, tooltip)
 - a!gaugeField(label, labelPosition, percentage, primaryText, secondaryText, style, showWhen, helpTooltip, accessibilityText, marginAbove, marginBelow, tooltip)
+- a!milestoneField(label, instructions, steps, links, active, labelPosition, helpTooltip, showWhen, orientation, accessibilityText, color, marginAbove, marginBelow)
+  NOTE: Use a!milestoneField for step/wizard progress indicators, NOT a!progressBarField. a!progressBarField is for percentage bars only.
 - a!webContentField(label, labelPosition, showWhen, source, showBorder, height, altText, disabled)
 
 INPUT:
@@ -62,8 +64,9 @@ INPUT:
 - a!fileUploadField(label, labelPosition, instructions, helpTooltip, value, saveInto, target, maxSelections, fileNames, disabled, required, requiredMessage, validations, validationGroup, showWhen, accessibilityText, tooltip, marginAbove, marginBelow)
 
 ACTION:
-- a!buttonWidget(label, icon, value, saveInto, style, size, disabled, showWhen, validate, validationGroup, confirmHeader, confirmButtonLabel, confirmButtonStyle, confirmMessage, loadingIndicator, width, accessibilityText, tooltip, recaptchaSaveInto)
-  style values: "NORMAL","PRIMARY","SECONDARY","DESTRUCTIVE","LINK","SOLID","OUTLINE"
+- a!buttonWidget(label, style, confirmMessage, value, saveInto, disabled, submit, validate, validationGroup, size, width, confirmHeader, confirmButtonLabel, cancelButtonLabel, showWhen, icon, accessibilityText, tooltip, recaptchaSaveInto, loadingIndicator, iconPosition, color)
+  style values: "OUTLINE"(default),"GHOST","LINK","SOLID"
+  color values: "ACCENT"(default),"POSITIVE","NEGATIVE","NEUTRAL" or any hex color
 - a!buttonArrayLayout(buttons, showWhen, marginAbove, marginBelow, align)
 - a!dynamicLink(label, value, saveInto, showWhen, tooltip)
 - a!linkField(label, labelPosition, links, showWhen, helpTooltip, accessibilityText, marginAbove, marginBelow, align)
@@ -91,6 +94,9 @@ CRITICAL RULES:
 - To set background color on text, wrap in a!cardLayout with style parameter
 - a!gridColumn uses "value" not "data" or "field" for cell content
 - a!dropdownField uses choiceLabels/choiceValues, NOT options/items
+- a!buttonWidget style is "OUTLINE","GHOST","LINK","SOLID" — NOT "PRIMARY","SECONDARY","DESTRUCTIVE","NORMAL"
+- Use a!milestoneField for step indicators/wizards, NOT a!progressBarField. They are different components.
+- a!buttonWidget uses "color" for color and "style" for shape/fill — do not confuse them
 
 PATTERNS TO USE:
 - Forms: a!formLayout with buttons array, validation groups
