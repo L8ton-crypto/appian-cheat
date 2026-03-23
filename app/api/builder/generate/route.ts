@@ -18,14 +18,79 @@ RULES:
 9. Prefer a!forEach() for repeating UI elements.
 10. Use a!sectionLayout(), a!columnsLayout(), a!cardLayout() for structure.
 
-SAIL COMPONENT REFERENCE (use these correctly):
-- Layout: a!sectionLayout, a!columnsLayout, a!columnLayout, a!cardLayout, a!sideBySideLayout, a!stampLayout, a!boxLayout, a!headerContentLayout, a!formLayout
-- Input: a!textField, a!paragraphField, a!integerField, a!decimalField, a!dateField, a!dateTimeField, a!dropdownField, a!checkboxField, a!radioButtonField, a!pickerFieldUsers, a!pickerFieldRecords, a!fileUploadField
-- Display: a!richTextDisplayField, a!richTextItem, a!richTextIcon, a!richTextImage, a!richTextHeader, a!imageField, a!progressBarField, a!gaugeField, a!webContentField
-- Action: a!buttonWidget, a!buttonArrayLayout, a!linkField, a!dynamicLink, a!processTaskLink
-- Data: a!gridField, a!gridColumn, a!gridTextColumn, a!queryRecordType, a!recordData, a!pagingInfo
-- Container: a!forEach, a!localVariables, a!save, if(), a!match
-- Constants: "STANDARD", "ACCENT", "SECONDARY", "NEGATIVE", "POSITIVE", "LINK"
+SAIL COMPONENT REFERENCE — USE ONLY THESE EXACT PARAMETER NAMES:
+
+LAYOUTS:
+- a!cardLayout(contents, link, height, style, showBorder, showShadow, tooltip, showWhen, marginBelow, accessibilityText, padding, shape, marginAbove, decorativeBarPosition, decorativeBarColor, borderColor)
+  style values: "NONE","TRANSPARENT","STANDARD","ACCENT","SUCCESS","INFO","WARN","ERROR","CHARCOAL_SCHEME","NAVY_SCHEME","PLUM_SCHEME" or hex color
+- a!sectionLayout(label, contents, isCollapsible, isInitiallyCollapsed, showWhen, marginBelow, accessibilityText, labelSize, labelColor, iconAltText, labelIcon, divider, marginAbove)
+- a!columnsLayout(columns, showWhen, marginBelow, marginAbove, alignVertical, spacing, stackWhen, showDividers)
+- a!columnLayout(contents, width, showWhen)
+- a!sideBySideLayout(items, showWhen, marginBelow, alignVertical, spacing, marginAbove, stackWhen)
+- a!sideBySideItem(item, width, showWhen)
+- a!boxLayout(label, contents, style, showWhen, isCollapsible, isInitiallyCollapsed, marginBelow, accessibilityText, padding, shape, marginAbove, labelSize, headerActions)
+- a!headerContentLayout(header, contents, showWhen, backgroundColor, marginBelow, marginAbove)
+- a!formLayout(label, contents, buttons, showWhen, skipAutoFocus)
+- a!stampLayout(icon, text, backgroundColor, contentColor, showWhen, tooltip, marginAbove, marginBelow, size, align)
+
+DISPLAY:
+- a!richTextDisplayField(label, labelPosition, instructions, align, value, helpTooltip, accessibilityText, showWhen, preventWrapping, tooltip, marginAbove, marginBelow)
+  NOTE: NO backgroundColor parameter. Use style on a!richTextItem or wrap in a!cardLayout for background color.
+- a!richTextItem(text, style, size, color, link, showWhen, linkStyle)
+  style values: "PLAIN","STRONG","EMPHASIS","UNDERLINE","STRIKETHROUGH","CONNECTED","STANDOUT"
+- a!richTextIcon(icon, color, size, link, linkStyle, altText, showWhen, caption)
+- a!richTextImage(image, link, showWhen, altText, caption, labelPosition)
+- a!richTextHeader(text, showWhen)
+- a!richTextBulletedList(items, showWhen)
+- a!richTextNumberedList(items, showWhen)
+- a!imageField(label, labelPosition, images, size, isThumbnail, style, showWhen, align, marginAbove, marginBelow, accessibilityText, helpTooltip, tooltip)
+- a!progressBarField(label, labelPosition, percentage, style, showWhen, helpTooltip, accessibilityText, marginAbove, marginBelow, tooltip)
+- a!gaugeField(label, labelPosition, percentage, primaryText, secondaryText, style, showWhen, helpTooltip, accessibilityText, marginAbove, marginBelow, tooltip)
+- a!webContentField(label, labelPosition, showWhen, source, showBorder, height, altText, disabled)
+
+INPUT:
+- a!textField(label, labelPosition, instructions, helpTooltip, value, saveInto, readOnly, disabled, required, requiredMessage, validations, validationGroup, placeholder, showWhen, accessibilityText, characterLimit, showCharacterCount, inputPurpose, tooltip, marginAbove, marginBelow, align)
+- a!paragraphField(label, labelPosition, instructions, helpTooltip, value, saveInto, readOnly, disabled, required, requiredMessage, validations, validationGroup, placeholder, showWhen, characterLimit, showCharacterCount, height, tooltip, marginAbove, marginBelow)
+- a!integerField(label, labelPosition, instructions, helpTooltip, value, saveInto, readOnly, disabled, required, requiredMessage, validations, validationGroup, placeholder, showWhen, accessibilityText, tooltip, marginAbove, marginBelow, align)
+- a!decimalField(label, labelPosition, instructions, helpTooltip, value, saveInto, readOnly, disabled, required, requiredMessage, validations, validationGroup, placeholder, showWhen, accessibilityText, tooltip, marginAbove, marginBelow, align, decimalPlaces)
+- a!dateField(label, labelPosition, instructions, helpTooltip, value, saveInto, readOnly, disabled, required, requiredMessage, validations, validationGroup, showWhen, accessibilityText, tooltip, marginAbove, marginBelow)
+- a!dateTimeField(label, labelPosition, instructions, helpTooltip, value, saveInto, readOnly, disabled, required, requiredMessage, validations, validationGroup, showWhen, accessibilityText, tooltip, marginAbove, marginBelow)
+- a!dropdownField(label, labelPosition, instructions, helpTooltip, choiceLabels, choiceValues, value, saveInto, placeholderLabel, searchDisplay, disabled, required, requiredMessage, validations, validationGroup, showWhen, accessibilityText, tooltip, marginAbove, marginBelow)
+- a!checkboxField(label, labelPosition, instructions, helpTooltip, choiceLabels, choiceValues, value, saveInto, disabled, required, requiredMessage, validations, validationGroup, showWhen, accessibilityText, choiceLayout, choiceStyle, tooltip, marginAbove, marginBelow)
+- a!radioButtonField(label, labelPosition, instructions, helpTooltip, choiceLabels, choiceValues, value, saveInto, disabled, required, requiredMessage, validations, validationGroup, showWhen, accessibilityText, choiceLayout, choiceStyle, tooltip, marginAbove, marginBelow)
+- a!pickerFieldUsers(label, labelPosition, instructions, helpTooltip, value, saveInto, maxSelections, disabled, required, requiredMessage, validations, validationGroup, showWhen, accessibilityText, placeholder, tooltip, marginAbove, marginBelow)
+- a!fileUploadField(label, labelPosition, instructions, helpTooltip, value, saveInto, target, maxSelections, fileNames, disabled, required, requiredMessage, validations, validationGroup, showWhen, accessibilityText, tooltip, marginAbove, marginBelow)
+
+ACTION:
+- a!buttonWidget(label, icon, value, saveInto, style, size, disabled, showWhen, validate, validationGroup, confirmHeader, confirmButtonLabel, confirmButtonStyle, confirmMessage, loadingIndicator, width, accessibilityText, tooltip, recaptchaSaveInto)
+  style values: "NORMAL","PRIMARY","SECONDARY","DESTRUCTIVE","LINK","SOLID","OUTLINE"
+- a!buttonArrayLayout(buttons, showWhen, marginAbove, marginBelow, align)
+- a!dynamicLink(label, value, saveInto, showWhen, tooltip)
+- a!linkField(label, labelPosition, links, showWhen, helpTooltip, accessibilityText, marginAbove, marginBelow, align)
+
+DATA:
+- a!gridField(label, labelPosition, instructions, helpTooltip, emptyGridMessage, data, columns, pageSize, initialSorts, selectable, selectionStyle, selectionValue, selectionSaveInto, showWhen, shadeAlternateRows, spacing, height, borderStyle, refreshAfter, refreshInterval, refreshOnReferencedVarChange, refreshOnVarChange, refreshAlways, userFilters, showSearchBox, showRefreshButton, actionsDisplay, recordActions, openActions, tooltip, marginAbove, marginBelow, accessibilityText, secondaryTextField, rowHeader, showExportButton, validations, validationGroup)
+- a!gridColumn(label, sortField, value, align, width, showWhen, helpTooltip, displayValue)
+- a!recordData(recordType, filters)
+- a!queryRecordType(recordType, fields, filters, pagingInfo)
+- a!pagingInfo(startIndex, batchSize, sort)
+- a!sortInfo(field, ascending)
+
+CONTAINER:
+- a!forEach(items, expression)
+- a!localVariables(local!varName, ..., expression)
+- a!save(target, value)
+- if(condition, trueValue, falseValue)
+- a!match(value, equals, whenTrue, ..., default)
+
+CRITICAL RULES:
+- NEVER invent parameter names. If unsure, omit the parameter.
+- a!richTextDisplayField does NOT have: backgroundColor, background, color, fontColor, textColor
+- a!cardLayout does NOT have: title, header, footer, backgroundColor, icon, padding (padding IS valid), onClick
+- a!richTextItem uses "style" for formatting (STRONG, EMPHASIS etc) and "color" for text color
+- To set background color on text, wrap in a!cardLayout with style parameter
+- a!gridColumn uses "value" not "data" or "field" for cell content
+- a!dropdownField uses choiceLabels/choiceValues, NOT options/items
 
 PATTERNS TO USE:
 - Forms: a!formLayout with buttons array, validation groups
