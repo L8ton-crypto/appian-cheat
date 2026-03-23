@@ -210,6 +210,35 @@ export default function BuilderPage() {
       warnings.push("⚠️ Fixed invalid tagItem backgroundColor values (mapped to valid ACCENT/POSITIVE/NEGATIVE/SECONDARY).");
     }
 
+    // Fix: invalid align values (only LEFT, CENTER, RIGHT are valid)
+    const invalidAligns = /align\s*:\s*"(END|START|JUSTIFY|TOP|BOTTOM|MIDDLE)"/gi;
+    if (invalidAligns.test(sanitized)) {
+      sanitized = sanitized.replace(/align\s*:\s*"END"/gi, 'align: "RIGHT"');
+      sanitized = sanitized.replace(/align\s*:\s*"START"/gi, 'align: "LEFT"');
+      sanitized = sanitized.replace(/align\s*:\s*"JUSTIFY"/gi, 'align: "LEFT"');
+      sanitized = sanitized.replace(/align\s*:\s*"TOP"/gi, 'align: "LEFT"');
+      sanitized = sanitized.replace(/align\s*:\s*"BOTTOM"/gi, 'align: "LEFT"');
+      sanitized = sanitized.replace(/align\s*:\s*"MIDDLE"/gi, 'align: "CENTER"');
+      warnings.push("⚠️ Fixed invalid align values (only LEFT, CENTER, RIGHT are valid).");
+    }
+
+    // Fix: named CSS colors used as color values (Appian only accepts hex or semantic names)
+    const namedColors: Record<string, string> = {
+      "white": "#FFFFFF", "black": "#000000", "red": "#CC0000", "blue": "#1D6FA5",
+      "green": "#2E8B57", "gray": "#808080", "grey": "#808080", "orange": "#E67E22",
+      "yellow": "#F1C40F", "purple": "#8E44AD", "pink": "#E91E63", "brown": "#795548",
+      "WHITE": "#FFFFFF", "BLACK": "#000000", "RED": "#CC0000", "BLUE": "#1D6FA5",
+      "GREEN": "#2E8B57", "GRAY": "#808080", "GREY": "#808080", "ORANGE": "#E67E22"
+    };
+    const colorNameRegex = /color\s*:\s*"(white|black|red|blue|green|gray|grey|orange|yellow|purple|pink|brown)"/gi;
+    if (colorNameRegex.test(sanitized)) {
+      sanitized = sanitized.replace(colorNameRegex, (match, name) => {
+        const hex = namedColors[name] || namedColors[name.toLowerCase()] || "#000000";
+        return `color: "${hex}"`;
+      });
+      warnings.push("⚠️ Fixed named CSS colors (Appian requires hex colors or semantic names like ACCENT/POSITIVE/NEGATIVE/SECONDARY).");
+    }
+
     return { code: sanitized, warnings };
   };
 
