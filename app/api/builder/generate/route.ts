@@ -13,7 +13,7 @@ ABSOLUTE RULES — VIOLATIONS WILL PRODUCE INVALID CODE:
 • a!tagField is a STANDALONE component. It goes in a layout's contents array, NEVER inside a!richTextDisplayField value. Rich text value only accepts: a!richTextItem, a!richTextIcon, a!richTextImage, a!richTextBulletedList, a!richTextNumberedList. Tags are NOT rich text types.
 • a!tagItem backgroundColor only accepts: "ACCENT"(default), "POSITIVE", "NEGATIVE", "SECONDARY" or hex colors. NOT "SUCCESS", "INFO", "WARN", "ERROR", "STANDARD", "PRIMARY".
 • align parameter ONLY accepts "LEFT", "CENTER", "RIGHT". NEVER use "END", "START", "JUSTIFY".
-• color parameter on a!richTextItem accepts: "ACCENT", "POSITIVE", "NEGATIVE", "SECONDARY" or hex like "#FFFFFF". NEVER use CSS color names like "white", "red", "blue" — use hex instead.
+• a!richTextItem color ONLY accepts: "STANDARD"(default), "ACCENT", "POSITIVE", "NEGATIVE", "SECONDARY". Do NOT use hex colors or CSS color names on a!richTextItem.
 • Use showWhen (not if()) to toggle section visibility. showWhen preserves state; if() destroys it.
 
 OUTPUT RULES:

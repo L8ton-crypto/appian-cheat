@@ -229,21 +229,27 @@ export default function BuilderPage() {
       warnings.push("⚠️ Fixed invalid align values (only LEFT, CENTER, RIGHT are valid).");
     }
 
-    // Fix: named CSS colors used as color values (Appian only accepts hex or semantic names)
-    const namedColors: Record<string, string> = {
-      "white": "#FFFFFF", "black": "#000000", "red": "#CC0000", "blue": "#1D6FA5",
-      "green": "#2E8B57", "gray": "#808080", "grey": "#808080", "orange": "#E67E22",
-      "yellow": "#F1C40F", "purple": "#8E44AD", "pink": "#E91E63", "brown": "#795548",
-      "WHITE": "#FFFFFF", "BLACK": "#000000", "RED": "#CC0000", "BLUE": "#1D6FA5",
-      "GREEN": "#2E8B57", "GRAY": "#808080", "GREY": "#808080", "ORANGE": "#E67E22"
+    // Fix: invalid color values on a!richTextItem (only STANDARD, ACCENT, POSITIVE, NEGATIVE, SECONDARY)
+    // Map named CSS colors and hex to closest semantic value
+    const colorMap: Record<string, string> = {
+      "white": "STANDARD", "black": "STANDARD", "red": "NEGATIVE", "blue": "ACCENT",
+      "green": "POSITIVE", "gray": "SECONDARY", "grey": "SECONDARY", "orange": "NEGATIVE",
+      "yellow": "ACCENT", "purple": "ACCENT", "pink": "NEGATIVE", "brown": "SECONDARY"
     };
+    // Fix CSS color names
     const colorNameRegex = /color\s*:\s*"(white|black|red|blue|green|gray|grey|orange|yellow|purple|pink|brown)"/gi;
     if (colorNameRegex.test(sanitized)) {
-      sanitized = sanitized.replace(colorNameRegex, (match, name) => {
-        const hex = namedColors[name] || namedColors[name.toLowerCase()] || "#000000";
-        return `color: "${hex}"`;
+      sanitized = sanitized.replace(colorNameRegex, (_match, name) => {
+        const mapped = colorMap[name.toLowerCase()] || "STANDARD";
+        return `color: "${mapped}"`;
       });
-      warnings.push("⚠️ Fixed named CSS colors (Appian requires hex colors or semantic names like ACCENT/POSITIVE/NEGATIVE/SECONDARY).");
+      warnings.push("⚠️ Fixed invalid color names (mapped to STANDARD/ACCENT/POSITIVE/NEGATIVE/SECONDARY).");
+    }
+    // Fix hex colors on richTextItem specifically
+    const hexOnRichTextItem = /a!richTextItem\s*\([^)]*color\s*:\s*"#[0-9a-fA-F]+"/g;
+    if (hexOnRichTextItem.test(sanitized)) {
+      sanitized = sanitized.replace(/(a!richTextItem\s*\([^)]*color\s*:\s*)"#[0-9a-fA-F]+"/g, '$1"ACCENT"');
+      warnings.push("⚠️ Replaced hex color on a!richTextItem with ACCENT (use STANDARD/ACCENT/POSITIVE/NEGATIVE/SECONDARY only).");
     }
 
     return { code: sanitized, warnings };
