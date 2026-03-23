@@ -50,6 +50,7 @@ export default function BuilderPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [codeWarnings, setCodeWarnings] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLPreElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -92,6 +93,7 @@ export default function BuilderPage() {
     setGeneratedCode("");
     setError(null);
     setCopied(false);
+    setCodeWarnings([]);
 
     try {
       const response = await fetch("/api/builder/generate", {
@@ -142,7 +144,73 @@ export default function BuilderPage() {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsGenerating(false);
+      // Run post-generation sanitiser
+      setGeneratedCode(prev => {
+        const { code, warnings } = sanitizeCode(prev);
+        setCodeWarnings(warnings);
+        return code;
+      });
     }
+  };
+
+  // Post-generation sanitiser: fix known Claude hallucinations
+  const sanitizeCode = (code: string): { code: string; warnings: string[] } => {
+    const warnings: string[] = [];
+    let sanitized = code;
+
+    // Fix: a!tagField inside a!richTextDisplayField value
+    // Pattern: value: { ... a!tagField( ... } inside a richTextDisplayField context
+    const tagInRichTextRegex = /a!richTextDisplayField\s*\([^)]*value\s*:\s*\{[^}]*a!tagField\s*\(/g;
+    if (tagInRichTextRegex.test(sanitized)) {
+      warnings.push("⚠️ a!tagField was used inside a!richTextDisplayField value - tags are standalone components, not rich text types. Move a!tagField to the parent layout's contents.");
+    }
+
+    // Fix: backgroundColor on a!richTextDisplayField
+    const bgColorOnRichText = /a!richTextDisplayField\s*\([^)]*backgroundColor\s*:/g;
+    if (bgColorOnRichText.test(sanitized)) {
+      sanitized = sanitized.replace(
+        /(a!richTextDisplayField\s*\([^)]*),\s*backgroundColor\s*:\s*"[^"]*"/g,
+        '$1'
+      );
+      warnings.push("⚠️ Removed backgroundColor from a!richTextDisplayField (not a valid parameter). Wrap in a!cardLayout(style: ...) for background color.");
+    }
+
+    // Fix: invalid button styles
+    const invalidBtnStyles = /a!buttonWidget\s*\([^)]*style\s*:\s*"(PRIMARY|SECONDARY|DESTRUCTIVE|NORMAL)"/g;
+    const btnMatch = sanitized.match(invalidBtnStyles);
+    if (btnMatch) {
+      sanitized = sanitized.replace(
+        /style\s*:\s*"PRIMARY"/g, 'style: "SOLID", color: "ACCENT"'
+      ).replace(
+        /style\s*:\s*"SECONDARY"/g, 'style: "OUTLINE"'
+      ).replace(
+        /style\s*:\s*"DESTRUCTIVE"/g, 'style: "SOLID", color: "NEGATIVE"'
+      ).replace(
+        /style\s*:\s*"NORMAL"/g, 'style: "OUTLINE"'
+      );
+      warnings.push("⚠️ Fixed invalid button styles (PRIMARY→SOLID+ACCENT, SECONDARY→OUTLINE, DESTRUCTIVE→SOLID+NEGATIVE).");
+    }
+
+    // Fix: invalid tagItem backgroundColor values
+    const invalidTagBg = /a!tagItem\s*\([^)]*backgroundColor\s*:\s*"(SUCCESS|INFO|WARN|ERROR|STANDARD|PRIMARY)"/g;
+    if (invalidTagBg.test(sanitized)) {
+      sanitized = sanitized.replace(
+        /backgroundColor\s*:\s*"SUCCESS"/g, 'backgroundColor: "POSITIVE"'
+      ).replace(
+        /backgroundColor\s*:\s*"INFO"/g, 'backgroundColor: "ACCENT"'
+      ).replace(
+        /backgroundColor\s*:\s*"WARN"/g, 'backgroundColor: "SECONDARY"'
+      ).replace(
+        /backgroundColor\s*:\s*"ERROR"/g, 'backgroundColor: "NEGATIVE"'
+      ).replace(
+        /backgroundColor\s*:\s*"STANDARD"/g, 'backgroundColor: "SECONDARY"'
+      ).replace(
+        /backgroundColor\s*:\s*"PRIMARY"/g, 'backgroundColor: "ACCENT"'
+      );
+      warnings.push("⚠️ Fixed invalid tagItem backgroundColor values (mapped to valid ACCENT/POSITIVE/NEGATIVE/SECONDARY).");
+    }
+
+    return { code: sanitized, warnings };
   };
 
   const copyCode = () => {
@@ -482,7 +550,14 @@ export default function BuilderPage() {
               <div className="flex items-center gap-4 text-xs text-gray-500">
                 <span>{generatedCode.split("\n").length} lines</span>
                 <span>{generatedCode.length.toLocaleString()} characters</span>
-                <span className="text-emerald-500">Ready to paste into Appian</span>
+                <span className="text-emerald-500">{codeWarnings.length > 0 ? "Auto-fixed — review warnings below" : "Ready to paste into Appian"}</span>
+              </div>
+            )}
+            {codeWarnings.length > 0 && !isGenerating && (
+              <div className="mt-2 space-y-1">
+                {codeWarnings.map((w, i) => (
+                  <div key={i} className="text-xs text-amber-400 bg-amber-900/20 border border-amber-800/30 rounded px-3 py-1.5">{w}</div>
+                ))}
               </div>
             )}
           </div>

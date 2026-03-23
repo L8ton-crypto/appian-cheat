@@ -191,7 +191,7 @@ a!localVariables(
         columns: {
           a!gridColumn(label: "Name", sortField: recordType!Employee.fields.name, value: fv!row[recordType!Employee.fields.name]),
           a!gridColumn(label: "Email", value: fv!row[recordType!Employee.fields.email]),
-          a!gridColumn(label: "Status", value: a!tagField(tags: {a!tagItem(text: fv!row[recordType!Employee.fields.status], backgroundColor: if(fv!row[recordType!Employee.fields.status] = "Active", "POSITIVE", "SECONDARY"))}))
+          a!gridColumn(label: "Status", value: fv!row[recordType!Employee.fields.status])
         },
         pageSize: 10,
         initialSorts: {a!sortInfo(field: recordType!Employee.fields.name, ascending: true)},
