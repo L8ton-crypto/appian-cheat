@@ -217,17 +217,27 @@ export default function BuilderPage() {
       warnings.push("⚠️ Removed align from a!richTextItem (not a valid parameter). Use align on a!richTextDisplayField instead.");
     }
 
-    // Fix: invalid align values (only LEFT, CENTER, RIGHT are valid)
-    const invalidAligns = /align\s*:\s*"(END|START|JUSTIFY|TOP|BOTTOM|MIDDLE)"/gi;
-    if (invalidAligns.test(sanitized)) {
-      sanitized = sanitized.replace(/align\s*:\s*"END"/gi, 'align: "RIGHT"');
-      sanitized = sanitized.replace(/align\s*:\s*"START"/gi, 'align: "LEFT"');
-      sanitized = sanitized.replace(/align\s*:\s*"JUSTIFY"/gi, 'align: "LEFT"');
-      sanitized = sanitized.replace(/align\s*:\s*"TOP"/gi, 'align: "LEFT"');
-      sanitized = sanitized.replace(/align\s*:\s*"BOTTOM"/gi, 'align: "LEFT"');
-      sanitized = sanitized.replace(/align\s*:\s*"MIDDLE"/gi, 'align: "CENTER"');
-      warnings.push("⚠️ Fixed invalid align values (only LEFT, CENTER, RIGHT are valid).");
-    }
+    // Note: align values differ by component:
+    // a!richTextDisplayField, a!linkField, a!imageField: "LEFT", "CENTER", "RIGHT"  
+    // a!buttonArrayLayout: "START", "CENTER", "END"
+    // a!columnsLayout alignVertical: "TOP", "MIDDLE", "BOTTOM"
+    // Do NOT blindly convert - only fix clearly invalid combos
+    
+    // Fix: LEFT/RIGHT on buttonArrayLayout (should be START/END)
+    sanitized = sanitized.replace(
+      /(a!buttonArrayLayout\s*\([^)]*align\s*:\s*)"LEFT"/g, '$1"START"'
+    );
+    sanitized = sanitized.replace(
+      /(a!buttonArrayLayout\s*\([^)]*align\s*:\s*)"RIGHT"/g, '$1"END"'
+    );
+    
+    // Fix: START/END on richTextDisplayField (should be LEFT/RIGHT)
+    sanitized = sanitized.replace(
+      /(a!richTextDisplayField\s*\([^)]*align\s*:\s*)"START"/g, '$1"LEFT"'
+    );
+    sanitized = sanitized.replace(
+      /(a!richTextDisplayField\s*\([^)]*align\s*:\s*)"END"/g, '$1"RIGHT"'
+    );
 
     // Fix: invalid color values on a!richTextItem (only STANDARD, ACCENT, POSITIVE, NEGATIVE, SECONDARY)
     // Map named CSS colors and hex to closest semantic value
@@ -250,6 +260,18 @@ export default function BuilderPage() {
     if (hexOnRichTextItem.test(sanitized)) {
       sanitized = sanitized.replace(/(a!richTextItem\s*\([^)]*color\s*:\s*)"#[0-9a-fA-F]+"/g, '$1"ACCENT"');
       warnings.push("⚠️ Replaced hex color on a!richTextItem with ACCENT (use STANDARD/ACCENT/POSITIVE/NEGATIVE/SECONDARY only).");
+    }
+
+    // Fix: showSearchBox/showRefreshButton on a!gridField with non-record data
+    // These params only work when data is a!recordData(). With local variables/arrays, they cause errors.
+    // Simple heuristic: if code has "data: local!" and showSearchBox/showRefreshButton, flag it
+    const hasLocalData = /data\s*:\s*local!/.test(sanitized);
+    const hasSearchBox = /showSearchBox\s*:\s*(true|false)/.test(sanitized);
+    const hasRefreshBtn = /showRefreshButton\s*:\s*(true|false)/.test(sanitized);
+    if (hasLocalData && (hasSearchBox || hasRefreshBtn)) {
+      sanitized = sanitized.replace(/,\s*showSearchBox\s*:\s*(true|false)/g, '');
+      sanitized = sanitized.replace(/,\s*showRefreshButton\s*:\s*(true|false)/g, '');
+      warnings.push("⚠️ Removed showSearchBox/showRefreshButton from grid (only valid when data source is a!recordData, not local variables).");
     }
 
     return { code: sanitized, warnings };

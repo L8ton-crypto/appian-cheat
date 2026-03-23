@@ -14,6 +14,8 @@ ABSOLUTE RULES — VIOLATIONS WILL PRODUCE INVALID CODE:
 • a!tagItem backgroundColor only accepts: "ACCENT"(default), "POSITIVE", "NEGATIVE", "SECONDARY" or hex colors. NOT "SUCCESS", "INFO", "WARN", "ERROR", "STANDARD", "PRIMARY".
 • align parameter ONLY accepts "LEFT", "CENTER", "RIGHT". NEVER use "END", "START", "JUSTIFY".
 • a!richTextItem color ONLY accepts: "STANDARD"(default), "ACCENT", "POSITIVE", "NEGATIVE", "SECONDARY". Do NOT use hex colors or CSS color names on a!richTextItem.
+• a!buttonArrayLayout align uses "START", "CENTER", "END" — NOT "LEFT"/"RIGHT". Different from richTextDisplayField which uses LEFT/CENTER/RIGHT.
+• a!gridField showSearchBox and showRefreshButton ONLY work when data source is a!recordData(). When using local variable arrays as data, do NOT include these parameters.
 • Use showWhen (not if()) to toggle section visibility. showWhen preserves state; if() destroys it.
 
 OUTPUT RULES:
