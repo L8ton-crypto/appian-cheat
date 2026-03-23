@@ -210,6 +210,13 @@ export default function BuilderPage() {
       warnings.push("⚠️ Fixed invalid tagItem backgroundColor values (mapped to valid ACCENT/POSITIVE/NEGATIVE/SECONDARY).");
     }
 
+    // Fix: align on a!richTextItem (it doesn't have an align parameter - only richTextDisplayField does)
+    const alignOnRichTextItem = /a!richTextItem\s*\([^)]*,\s*align\s*:\s*"[^"]*"/g;
+    if (alignOnRichTextItem.test(sanitized)) {
+      sanitized = sanitized.replace(/(a!richTextItem\s*\([^)]*),\s*align\s*:\s*"[^"]*"/g, '$1');
+      warnings.push("⚠️ Removed align from a!richTextItem (not a valid parameter). Use align on a!richTextDisplayField instead.");
+    }
+
     // Fix: invalid align values (only LEFT, CENTER, RIGHT are valid)
     const invalidAligns = /align\s*:\s*"(END|START|JUSTIFY|TOP|BOTTOM|MIDDLE)"/gi;
     if (invalidAligns.test(sanitized)) {
