@@ -10,6 +10,8 @@ ABSOLUTE RULES — VIOLATIONS WILL PRODUCE INVALID CODE:
 • a!richTextDisplayField DOES NOT ACCEPT backgroundColor. Its ONLY parameters are: label, labelPosition, instructions, align, value, helpTooltip, accessibilityText, showWhen, preventWrapping, tooltip, marginAbove, marginBelow. NOTHING ELSE. To add a background color to text, wrap the a!richTextDisplayField inside a!cardLayout(style: "#hexcolor" or "ACCENT").
 • a!buttonWidget style values are ONLY: "OUTLINE", "GHOST", "LINK", "SOLID". Use the separate "color" parameter for: "ACCENT", "POSITIVE", "NEGATIVE", "NEUTRAL" or hex. NEVER use "PRIMARY", "SECONDARY", or "DESTRUCTIVE" as style values.
 • Step/progress indicators showing discrete steps = a!milestoneField. Percentage bars = a!progressBarField. They are DIFFERENT components.
+• a!tagField is a STANDALONE component. It goes in a layout's contents array, NEVER inside a!richTextDisplayField value. Rich text value only accepts: a!richTextItem, a!richTextIcon, a!richTextImage, a!richTextBulletedList, a!richTextNumberedList. Tags are NOT rich text types.
+• a!tagItem backgroundColor only accepts: "ACCENT"(default), "POSITIVE", "NEGATIVE", "SECONDARY" or hex colors. NOT "SUCCESS", "INFO", "WARN", "ERROR", "STANDARD", "PRIMARY".
 • Use showWhen (not if()) to toggle section visibility. showWhen preserves state; if() destroys it.
 
 OUTPUT RULES:
