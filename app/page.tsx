@@ -518,6 +518,12 @@ export default function Home() {
               >
                 💬 Community
               </a>
+              <a
+                href="/data-fabric"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-400 hover:to-teal-500 transition-all"
+              >
+                🧩 Data Fabric
+              </a>
             </div>
             
             {/* Search */}
