@@ -1034,6 +1034,87 @@ export const functions: FunctionItem[] = [
     docUrl: "https://docs.appian.com/suite/help/25.4/Stamp_Component.html"
   },
   {
+    name: "a!progressBarField",
+    syntax: "a!progressBarField(label, labelPosition, instructions, helpTooltip, percentage, style, showWhen, accessibilityText, tooltip, marginAbove, marginBelow, color)",
+    description: "Displays a progress bar showing a percentage value. Use for task completion, loading progress, or capacity indicators.",
+    example: 'a!progressBarField(label: "Project Completion", percentage: 75, style: "ACCENT")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Progress_Bar_Component.html"
+  },
+  {
+    name: "a!gaugeField",
+    syntax: "a!gaugeField(label, labelPosition, instructions, helpTooltip, percentage, primaryText, secondaryText, style, showWhen, accessibilityText, tooltip, marginAbove, marginBelow, color)",
+    description: "Displays a circular gauge with a percentage fill, primary text, and secondary text. Use for KPIs, scores, or circular progress indicators.",
+    example: 'a!gaugeField(label: "SLA Compliance", percentage: 92, primaryText: a!richTextDisplayField(value: "92%"), secondaryText: "On Target")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Gauge_Component.html"
+  },
+  {
+    name: "a!toggleField",
+    syntax: "a!toggleField(label, labelPosition, instructions, helpTooltip, value, saveInto, disabled, showWhen, accessibilityText, tooltip, marginAbove, marginBelow, validations, validationGroup, required, requiredMessage)",
+    description: "Displays a toggle switch for boolean on/off values. Added in Appian 26.1.",
+    example: 'a!toggleField(label: "Enable Notifications", value: local!enableNotifications, saveInto: local!enableNotifications)',
+    category: "Interface Components",
+    subcategory: "Input",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Toggle_Component.html"
+  },
+  {
+    name: "a!barChartField",
+    syntax: "a!barChartField(label, labelPosition, instructions, helpTooltip, categories, series, stacking, showLegend, showDataLabels, showTooltips, colorScheme, style, showWhen, xAxisTitle, yAxisTitle, referenceLines, accessibilityText, marginAbove, marginBelow)",
+    description: "Displays a bar chart. Use for comparing values across categories.",
+    example: 'a!barChartField(label: "Sales by Region", categories: {"North", "South", "East", "West"}, series: {a!chartSeries(label: "Revenue", data: {120, 95, 140, 88})})',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Bar_Chart_Component.html"
+  },
+  {
+    name: "a!pieChartField",
+    syntax: "a!pieChartField(label, labelPosition, instructions, helpTooltip, series, showDataLabels, showTooltips, showLegend, colorScheme, style, showWhen, accessibilityText, marginAbove, marginBelow, seriesLabelStyle)",
+    description: "Displays a pie or donut chart. Use for showing proportions of a whole.",
+    example: 'a!pieChartField(label: "Task Distribution", series: {a!chartSeries(label: "Completed", data: 45), a!chartSeries(label: "In Progress", data: 30), a!chartSeries(label: "Pending", data: 25)}, style: "DONUT")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Pie_Chart_Component.html"
+  },
+  {
+    name: "a!lineChartField",
+    syntax: "a!lineChartField(label, labelPosition, instructions, helpTooltip, categories, series, showLegend, showDataLabels, showTooltips, colorScheme, style, showWhen, xAxisTitle, yAxisTitle, referenceLines, accessibilityText, marginAbove, marginBelow)",
+    description: "Displays a line chart. Use for trends over time.",
+    example: 'a!lineChartField(label: "Monthly Revenue", categories: {"Jan", "Feb", "Mar", "Apr"}, series: {a!chartSeries(label: "2025", data: {100, 120, 115, 140})})',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Line_Chart_Component.html"
+  },
+  {
+    name: "a!columnChartField",
+    syntax: "a!columnChartField(label, labelPosition, instructions, helpTooltip, categories, series, stacking, showLegend, showDataLabels, showTooltips, colorScheme, style, showWhen, xAxisTitle, yAxisTitle, referenceLines, accessibilityText, marginAbove, marginBelow)",
+    description: "Displays a column chart. Use for comparing values with vertical bars.",
+    example: 'a!columnChartField(label: "Quarterly Results", categories: {"Q1", "Q2", "Q3", "Q4"}, series: {a!chartSeries(label: "Actual", data: {200, 250, 230, 280})})',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Column_Chart_Component.html"
+  },
+  {
+    name: "a!videoField",
+    syntax: "a!videoField(label, labelPosition, instructions, helpTooltip, value, showWhen, accessibilityText, marginAbove, marginBelow)",
+    description: "Displays a video player for Appian document videos.",
+    example: 'a!videoField(label: "Training Video", value: cons!TRAINING_VIDEO_DOC)',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Video_Component.html"
+  },
+  {
+    name: "a!milestoneField",
+    syntax: "a!milestoneField(label, instructions, steps, links, active, labelPosition, helpTooltip, showWhen, orientation, accessibilityText, color, marginAbove, marginBelow, stepStyle)",
+    description: "Displays completed, current, and future steps of a process or sequence. Use for wizard progress, onboarding flows, or business process status tracking.",
+    example: 'a!milestoneField(label: "Order Status", steps: {"Placed", "Processing", "Shipped", "Delivered"}, active: 2, stepStyle: "CHEVRON", color: "ACCENT")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Milestone_Component.html"
+  },
+  {
     name: "a!billboardLayout",
     syntax: "a!billboardLayout(backgroundMedia, contents, ...)",
     description: "Full-width banner with background image.",
