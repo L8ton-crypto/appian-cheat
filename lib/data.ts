@@ -2800,6 +2800,451 @@ export const functions: FunctionItem[] = [
     category: "Trigonometry",
     docUrl: "https://docs.appian.com/suite/help/25.4/fnc_mathematical_pi.html"
   },
+  {
+    name: "a!cardChoiceField",
+    syntax: "a!cardChoiceField(label, labelPosition, instructions, helpTooltip, data, sort, cardTemplate, value, saveInto, maxSelections, align, showShadow, required, requiredMessage, disabled, validations, validationGroup, showWhen, accessibilityText, spacing, marginAbove, marginBelow)",
+    description: "Displays a set of cards from which the user may select one or many cards and saves a value based on the selected choice. Use for visual selection from a list of options.",
+    example: 'a!cardChoiceField(label: "Select Industry", data: local!industries, cardTemplate: a!cardTemplateBarTextStacked(id: fv!data.id, primaryText: fv!data.name), value: local!selected, saveInto: local!selected, maxSelections: 1)',
+    category: "Interface Components",
+    subcategory: "Selection",
+    docUrl: "https://docs.appian.com/suite/help/25.4/card-choices-component.html"
+  },
+  {
+    name: "a!dropdownFieldByIndex",
+    syntax: "a!dropdownFieldByIndex(label, labelPosition, instructions, required, disabled, choiceLabels, placeholder, value, validations, saveInto, validationGroup, requiredMessage, helpTooltip, accessibilityText, showWhen, searchDisplay)",
+    description: "Displays a list of choices for the user to select one item and saves the index of the selected choice. To save a value instead of the index, use a dropdown component.",
+    example: 'a!dropdownFieldByIndex(label: "Priority", choiceLabels: {"High", "Medium", "Low"}, value: 1, saveInto: local!priorityIndex)',
+    category: "Interface Components",
+    subcategory: "Selection",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Dropdown_By_Index_Component.html"
+  },
+  {
+    name: "a!multipleDropdownField",
+    syntax: "a!multipleDropdownField(label, instructions, required, disabled, placeholder, choiceLabels, choiceValues, value, validations, saveInto, validationGroup, requiredMessage, labelPosition, helpTooltip, accessibilityText, showWhen, searchDisplay, data, sort, marginAbove, marginBelow)",
+    description: "Displays a list of choices for the user to select multiple items and saves values based on the selected choices. If users should only select one choice, use radio buttons or a dropdown component instead.",
+    example: 'a!multipleDropdownField(label: "Skills", choiceLabels: {"Java", "Python", "SQL"}, choiceValues: {1, 2, 3}, value: local!selectedSkills, saveInto: local!selectedSkills)',
+    category: "Interface Components",
+    subcategory: "Selection",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Multiple_Dropdown_Component.html"
+  },
+  {
+    name: "a!checkboxFieldByIndex",
+    syntax: "a!checkboxFieldByIndex(label, instructions, required, disabled, choiceLabels, value, validations, saveInto, validationGroup, requiredMessage, align, labelPosition, helpTooltip, choiceLayout, accessibilityText, showWhen, choiceStyle, choicePosition)",
+    description: "Displays a limited set of choices from which the user may select none, one, or many items and saves the indices of the selected choices. To save a value instead of an index, use checkboxes.",
+    example: 'a!checkboxFieldByIndex(label: "Features", choiceLabels: {"Dashboard", "Reports", "Analytics"}, value: {1, 3}, saveInto: local!selectedFeatures)',
+    category: "Interface Components",
+    subcategory: "Selection",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Checkbox_By_Index_Component.html"
+  },
+  {
+    name: "a!radioButtonFieldByIndex",
+    syntax: "a!radioButtonFieldByIndex(label, instructions, required, disabled, choiceLabels, value, validations, saveInto, validationGroup, requiredMessage, labelPosition, choiceLayout, helpTooltip, accessibilityText, showWhen, choiceStyle, choicePosition)",
+    description: "Displays a limited set of choices from which the user must select one item and saves the index of the selected choice. To save a value instead of the index, use radio buttons.",
+    example: 'a!radioButtonFieldByIndex(label: "Priority", choiceLabels: {"High", "Medium", "Low"}, value: 1, saveInto: local!priorityIndex)',
+    category: "Interface Components",
+    subcategory: "Selection",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Radio_Button_By_Index_Component.html"
+  },
+  {
+    name: "a!tagField",
+    syntax: "a!tagField(label, labelPosition, instructions, helpTooltip, tags, align, accessibilityText, size, showWhen, marginAbove, marginBelow)",
+    description: "Displays a list of short text labels with colored background to highlight important attributes. Use with a!tagItem() for individual tag configuration.",
+    example: 'a!tagField(label: "Status", tags: {a!tagItem(text: "Active", backgroundColor: "POSITIVE"), a!tagItem(text: "Beta", backgroundColor: "ACCENT")})',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Tag_Component.html"
+  },
+  {
+    name: "a!tagItem",
+    syntax: "a!tagItem(text, backgroundColor, textColor, tooltip, showWhen, link)",
+    description: "Displays a short text label with colored background for use with a!tagField. Tag items can contain a record link or user record link.",
+    example: 'a!tagItem(text: "High Priority", backgroundColor: "NEGATIVE", tooltip: "This item requires immediate attention")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Tag_Item_Component.html"
+  },
+  {
+    name: "a!headingField",
+    syntax: "a!headingField(text, size, headingTag, color, fontWeight, Link, showWhen, align, marginAbove, marginBelow, preventWrapping)",
+    description: "Displays a heading with configurations for the color, size, and font weight. Also supports heading accessibility tags, which are used by screen readers.",
+    example: 'a!headingField(text: "Dashboard", size: "LARGE", color: "ACCENT", fontWeight: "BOLD")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/heading-component.html"
+  },
+  {
+    name: "a!horizontalLine",
+    syntax: "a!horizontalLine(color, weight, marginAbove, marginBelow, showWhen, style)",
+    description: "Displays a horizontal line. This component is best used when you need to visually distinguish and separate content within a page.",
+    example: 'a!horizontalLine(color: "ACCENT", weight: "MEDIUM", style: "SOLID")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Horizontal_Line_Component.html"
+  },
+  {
+    name: "a!kpiField",
+    syntax: "a!kpiField(data, primaryMeasure, primaryText, icon, helpTooltip, align, accessibilityText, tooltip, showWhen, secondaryMeasure, trend, trendFormat, trendIcon, trendColor, secondaryText, iconColor, primaryTextColor, primaryMeasureColor, secondaryTextColor, iconStyle, template, refreshAlways, refreshInterval, refreshOnReferencedVarChange, refreshOnVarChange, refreshAfter, size, primaryTextStyle, loadDataAsync)",
+    description: "Displays a key performance indicator that can be configured using a record type as the source. Shows numerical values with optional trends and custom styling.",
+    example: 'a!kpiField(data: recordType!Orders, primaryMeasure: a!measure(function: "COUNT"), primaryText: "Total Orders", icon: "shopping-cart")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/KPI_Component.html"
+  },
+  {
+    name: "a!messageBanner",
+    syntax: "a!messageBanner(primaryText, secondaryText, backgroundColor, highlightColor, icon, showDecorativeBar, shape, marginAbove, marginBelow, showWhen, announceBehavior, accessibilityText)",
+    description: "Displays a message banner that screen readers can announce whenever the component is evaluated. Best used for status messages per Web Content Accessibility Guidelines.",
+    example: 'a!messageBanner(primaryText: "Success!", secondaryText: "Your form has been submitted.", backgroundColor: "SUCCESS", icon: "check-circle")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Message_Banner.html"
+  },
+  {
+    name: "a!documentViewerField",
+    syntax: "a!documentViewerField(label, labelPosition, instructions, helpTooltip, document, showWhen, height, accessibilityText, marginAbove, marginBelow)",
+    description: "Displays a document in a viewer that allows users to view and interact with the document content without downloading it.",
+    example: 'a!documentViewerField(label: "Contract", document: cons!CONTRACT_DOCUMENT, height: "MEDIUM")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Document_Viewer_Field.html"
+  },
+  {
+    name: "a!richTextItem",
+    syntax: "a!richTextItem(text, color, size, style, link, linkStyle, showWhen)",
+    description: "Used within a!richTextDisplayField to configure text with specific styling, colors, and optional links.",
+    example: 'a!richTextItem(text: "Important Notice", color: "ACCENT", size: "LARGE", style: "STRONG")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Item.html"
+  },
+  {
+    name: "a!richTextImage",
+    syntax: "a!richTextImage(image, altText, caption, link, showWhen, style)",
+    description: "Used within a!richTextDisplayField to display an image with optional caption and link.",
+    example: 'a!richTextImage(image: cons!COMPANY_LOGO, altText: "Company Logo", caption: "Our Company")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Image.html"
+  },
+  {
+    name: "a!richTextBulletedList",
+    syntax: "a!richTextBulletedList(items, showWhen)",
+    description: "Used within a!richTextDisplayField to display a bulleted list of items.",
+    example: 'a!richTextBulletedList(items: {a!richTextItem(text: "First item"), a!richTextItem(text: "Second item")})',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Bulleted_List.html"
+  },
+  {
+    name: "a!richTextNumberedList",
+    syntax: "a!richTextNumberedList(items, showWhen)",
+    description: "Used within a!richTextDisplayField to display a numbered list of items.",
+    example: 'a!richTextNumberedList(items: {a!richTextItem(text: "Step one"), a!richTextItem(text: "Step two")})',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Rich_Text_Numbered_List.html"
+  },
+  {
+    name: "a!gaugeFraction",
+    syntax: "a!gaugeFraction(percentage, primaryText, secondaryText, color, size, tooltip, showWhen, marginAbove, marginBelow)",
+    description: "Displays a fraction gauge showing progress as a portion of a circle with customizable styling and text.",
+    example: 'a!gaugeFraction(percentage: 75, primaryText: "75%", secondaryText: "Complete", color: "POSITIVE")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Gauge_Fraction_Component.html"
+  },
+  {
+    name: "a!gaugePercentage",
+    syntax: "a!gaugePercentage(percentage, primaryText, secondaryText, color, size, tooltip, showWhen, marginAbove, marginBelow)",
+    description: "Displays a percentage gauge showing progress as a horizontal bar with customizable styling and text.",
+    example: 'a!gaugePercentage(percentage: 85, primaryText: "Task Progress", color: "ACCENT")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Gauge_Percentage_Component.html"
+  },
+  {
+    name: "a!wizardLayout",
+    syntax: "a!wizardLayout(steps, showWhen, marginAbove, marginBelow)",
+    description: "Displays a wizard layout with multiple steps that users can navigate through sequentially.",
+    example: 'a!wizardLayout(steps: {a!wizardStepField(label: "Step 1", contents: {...}), a!wizardStepField(label: "Step 2", contents: {...})})',
+    category: "Layout Components",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Wizard_Layout.html"
+  },
+  {
+    name: "a!wizardStepField",
+    syntax: "a!wizardStepField(label, contents, showWhen, validations, skip, disabled)",
+    description: "Used within a!wizardLayout to define individual steps in a wizard with content and validation.",
+    example: 'a!wizardStepField(label: "Personal Information", contents: {a!textField(label: "Name", value: local!name, saveInto: local!name)})',
+    category: "Layout Components",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Wizard_Step_Field.html"
+  },
+  {
+    name: "a!cardGroupLayout",
+    syntax: "a!cardGroupLayout(contents, height, style, showWhen, marginAbove, marginBelow, accessibilityText)",
+    description: "Groups cards together with consistent styling and spacing for organized display of related content.",
+    example: 'a!cardGroupLayout(contents: {a!cardLayout(contents: {...}), a!cardLayout(contents: {...})}, style: "TRANSPARENT")',
+    category: "Layout Components",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Card_Group_Layout.html"
+  },
+  {
+    name: "a!paneLayout",
+    syntax: "a!paneLayout(firstPane, secondPane, style, showWhen, marginAbove, marginBelow)",
+    description: "Creates a two-pane layout for displaying content side by side with customizable styling and proportions.",
+    example: 'a!paneLayout(firstPane: {a!richTextDisplayField(...)}, secondPane: {a!imageField(...)}, style: "TWO_THIRDS_FIRST")',
+    category: "Layout Components",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Pane_Layout.html"
+  },
+  {
+    name: "a!sideBySideItem",
+    syntax: "a!sideBySideItem(item, width, showWhen)",
+    description: "Used within a!sideBySideLayout to define individual items with specific widths in a side-by-side arrangement.",
+    example: 'a!sideBySideItem(item: a!textField(label: "First Name", value: local!firstName), width: "MINIMIZE")',
+    category: "Layout Components",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Side_By_Side_Item.html"
+  },
+  {
+    name: "a!safeLink",
+    syntax: "a!safeLink(uri, text, showWhen)",
+    description: "Creates a safe external link that opens in a new tab/window with security considerations for external URLs.",
+    example: 'a!safeLink(uri: "https://www.example.com", text: "Visit Example")',
+    category: "Interface Components",
+    subcategory: "Action",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Web_Link_Component.html"
+  },
+  {
+    name: "a!startProcessLink",
+    syntax: "a!startProcessLink(processModel, processParameters, text, showWhen)",
+    description: "Creates a link that starts a process model when clicked, optionally passing parameters to the process.",
+    example: 'a!startProcessLink(processModel: cons!APPROVAL_PROCESS, text: "Start Approval", processParameters: {approver: ri!currentUser})',
+    category: "Interface Components",
+    subcategory: "Action",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Start_Process_Link_Component.html"
+  },
+  {
+    name: "a!submitLink",
+    syntax: "a!submitLink(text, confirmMessage, showWhen, skipValidation, value, saveInto, confirmHeader, confirmButtonLabel, cancelButtonLabel, validations, validationGroup)",
+    description: "Creates a link that submits a form when clicked, with optional confirmation dialog and validation.",
+    example: 'a!submitLink(text: "Submit Form", confirmMessage: "Are you sure you want to submit?")',
+    category: "Interface Components",
+    subcategory: "Action",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Submit_Link_Component.html"
+  },
+  {
+    name: "a!processTaskLink",
+    syntax: "a!processTaskLink(task, text, showWhen)",
+    description: "Creates a link to a specific process task that opens the task form when clicked.",
+    example: 'a!processTaskLink(task: pv!taskId, text: "Complete Task")',
+    category: "Interface Components",
+    subcategory: "Action",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Process_Task_Link_Component.html"
+  },
+  {
+    name: "a!recordActionItem",
+    syntax: "a!recordActionItem(action, identifier, showWhen)",
+    description: "Represents a record action that can be displayed in buttons, links, or other action contexts.",
+    example: 'a!recordActionItem(action: recordType!Customer.actions.approve, identifier: ri!customerId)',
+    category: "Interface Components",
+    subcategory: "Action",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Record_Action_Item.html"
+  },
+  {
+    name: "a!buttonLayout",
+    syntax: "a!buttonLayout(primaryButtons, secondaryButtons, showWhen, marginAbove, marginBelow)",
+    description: "Organizes buttons with primary and secondary styling and proper spacing for consistent button arrangements.",
+    example: 'a!buttonLayout(primaryButtons: {a!buttonWidget(label: "Save", submit: true)}, secondaryButtons: {a!buttonWidget(label: "Cancel")})',
+    category: "Interface Components",
+    subcategory: "Action",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Button_Layout.html"
+  },
+  {
+    name: "a!authorizationLink",
+    syntax: "a!authorizationLink(text, showWhen)",
+    description: "Creates a link for authorization workflows, typically used for approval or permission-granting processes.",
+    example: 'a!authorizationLink(text: "Approve Request")',
+    category: "Interface Components",
+    subcategory: "Action",
+    docUrl: "https://docs.appian.com/suite/help/25.4/authorization_link_component.html"
+  },
+  {
+    name: "a!areaChartField",
+    syntax: "a!areaChartField(label, instructions, data, config, refreshAlways, refreshAfter, refreshInterval, refreshOnReferencedVarChange, refreshOnVarChange, showWhen, accessibilityText, colorScheme, height, xAxisStyle, yAxisStyle, referenceLines, showLegend, showTooltips, allowDecimalAxisLabels, connectNulls, showDataLabels, labelPosition, helpTooltip, marginAbove, marginBelow)",
+    description: "Displays data as an area chart with filled regions between the data line and axis.",
+    example: 'a!areaChartField(label: "Revenue Over Time", data: ri!revenueData, config: a!areaChartConfig(primaryGrouping: a!grouping(field: "month"), measures: {a!measure(field: "revenue")}))',
+    category: "Interface Components",
+    subcategory: "Charts",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Area_Chart_Component.html"
+  },
+  {
+    name: "a!scatterChartField",
+    syntax: "a!scatterChartField(label, instructions, data, config, refreshAlways, refreshAfter, refreshInterval, refreshOnReferencedVarChange, refreshOnVarChange, showWhen, accessibilityText, colorScheme, height, xAxisStyle, yAxisStyle, referenceLines, showLegend, showTooltips, allowDecimalAxisLabels, showDataLabels, labelPosition, helpTooltip, marginAbove, marginBelow)",
+    description: "Displays data as a scatter plot showing relationships between two numerical variables.",
+    example: 'a!scatterChartField(label: "Sales vs Marketing Spend", data: ri!salesData, config: a!scatterChartConfig(xAxisField: "marketing_spend", yAxisField: "sales_amount"))',
+    category: "Interface Components",
+    subcategory: "Charts",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Scatter_Chart_Component.html"
+  },
+  {
+    name: "a!chartSeries",
+    syntax: "a!chartSeries(label, data, color, showWhen)",
+    description: "Defines a data series for use in chart components with custom labels and styling.",
+    example: 'a!chartSeries(label: "Q1 Sales", data: local!q1Data, color: "BLUE")',
+    category: "Interface Components",
+    subcategory: "Charts",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Chart_Series.html"
+  },
+  {
+    name: "a!chartReferenceLine",
+    syntax: "a!chartReferenceLine(label, value, color, style, showWhen)",
+    description: "Displays a reference line on charts to highlight important values or thresholds.",
+    example: 'a!chartReferenceLine(label: "Target", value: 100000, color: "RED", style: "DASHED")',
+    category: "Interface Components",
+    subcategory: "Charts",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Chart_Reference_Line.html"
+  },
+  {
+    name: "a!chartCustomColorScheme",
+    syntax: "a!chartCustomColorScheme(colors)",
+    description: "Defines a custom color scheme for charts using specific color values.",
+    example: 'a!chartCustomColorScheme(colors: {"#FF5733", "#33FF57", "#3357FF", "#FF33F5"})',
+    category: "Interface Components",
+    subcategory: "Charts",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Chart_Custom_Color_Scheme.html"
+  },
+  {
+    name: "a!pickerFieldCustom",
+    syntax: "a!pickerFieldCustom(label, instructions, maxSelections, value, saveInto, required, requiredMessage, disabled, validations, validationGroup, labelPosition, helpTooltip, placeholder, noResultsText, accessibilityText, showWhen, marginAbove, marginBelow, data, sort, identifierText, expression, customTextExpression, searchFunction, selectedLabels)",
+    description: "Creates a custom picker field that allows users to search and select items from a dynamic data source.",
+    example: 'a!pickerFieldCustom(label: "Select Employee", data: recordType!Employee, expression: fv!data.firstName & " " & fv!data.lastName, value: local!selectedEmployee, saveInto: local!selectedEmployee)',
+    category: "Interface Components",
+    subcategory: "Pickers",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Custom_Picker_Component.html"
+  },
+  {
+    name: "a!pickerFieldDocuments",
+    syntax: "a!pickerFieldDocuments(label, instructions, maxSelections, value, saveInto, required, requiredMessage, disabled, validations, validationGroup, labelPosition, helpTooltip, placeholder, noResultsText, accessibilityText, showWhen, marginAbove, marginBelow, rootFolder, allowFolderSelection, allowDocumentSelection, allowedFileTypes)",
+    description: "Provides a picker interface for selecting documents and folders from Appian document management.",
+    example: 'a!pickerFieldDocuments(label: "Select Attachments", value: local!documents, saveInto: local!documents, rootFolder: cons!SHARED_FOLDER)',
+    category: "Interface Components",
+    subcategory: "Pickers",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Documents_Picker_Component.html"
+  },
+  {
+    name: "a!pickerFieldUsersAndGroups",
+    syntax: "a!pickerFieldUsersAndGroups(label, instructions, maxSelections, value, saveInto, required, requiredMessage, disabled, validations, validationGroup, labelPosition, helpTooltip, placeholder, noResultsText, accessibilityText, showWhen, marginAbove, marginBelow, groupFilter, allowUsers, allowGroups)",
+    description: "Provides a picker interface for selecting users and groups from the Appian directory.",
+    example: 'a!pickerFieldUsersAndGroups(label: "Select Approvers", value: local!approvers, saveInto: local!approvers, allowUsers: true, allowGroups: true)',
+    category: "Interface Components",
+    subcategory: "Pickers",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Users_and_Groups_Picker_Component.html"
+  },
+  {
+    name: "a!encryptedTextField",
+    syntax: "a!encryptedTextField(label, instructions, required, requiredMessage, disabled, placeholder, value, validations, saveInto, refreshAfter, validationGroup, labelPosition, readOnly, showWhen, helpTooltip, accessibilityText, characterLimit, showCharacterCount, maskValue, marginAbove, marginBelow)",
+    description: "Displays a text input field that automatically encrypts the entered value for secure data entry.",
+    example: 'a!encryptedTextField(label: "Password", placeholder: "Enter password", value: local!password, saveInto: local!password, maskValue: true)',
+    category: "Interface Components",
+    subcategory: "Input",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Encrypted_Text_Component.html"
+  },
+  {
+    name: "a!styledTextEditorField",
+    syntax: "a!styledTextEditorField(label, instructions, required, requiredMessage, disabled, value, saveInto, validations, validationGroup, labelPosition, readOnly, showWhen, helpTooltip, accessibilityText, height, marginAbove, marginBelow, refreshAfter)",
+    description: "Provides a rich text editor interface for creating formatted text content with styling options.",
+    example: 'a!styledTextEditorField(label: "Description", value: local!description, saveInto: local!description, height: "MEDIUM")',
+    category: "Interface Components",
+    subcategory: "Input",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Styled_Text_Editor_Component.html"
+  },
+  {
+    name: "a!barcodeField",
+    syntax: "a!barcodeField(label, instructions, required, requiredMessage, disabled, value, saveInto, validations, validationGroup, labelPosition, readOnly, showWhen, helpTooltip, accessibilityText, barcodeType, marginAbove, marginBelow, refreshAfter)",
+    description: "Displays a field for scanning or entering barcode values with support for various barcode formats.",
+    example: 'a!barcodeField(label: "Product Code", value: local!productCode, saveInto: local!productCode, barcodeType: "QR_CODE")',
+    category: "Interface Components",
+    subcategory: "Input",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Barcode_Component.html"
+  },
+  {
+    name: "a!documentBrowserField",
+    syntax: "a!documentBrowserField(label, labelPosition, instructions, helpTooltip, rootFolder, pathValue, selectionValue, pathSaveInto, selectionSaveInto, readOnly, disabled, validations, validationGroup, required, requiredMessage, showWhen, height, accessibilityText, marginAbove, marginBelow)",
+    description: "Provides a browser interface for navigating and selecting documents from Appian document management.",
+    example: 'a!documentBrowserField(label: "Browse Documents", rootFolder: cons!SHARED_FOLDER, selectionValue: local!selectedDoc, selectionSaveInto: local!selectedDoc)',
+    category: "Interface Components",
+    subcategory: "Browsers",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Document_Browser_Component.html"
+  },
+  {
+    name: "a!folderBrowserField",
+    syntax: "a!folderBrowserField(label, labelPosition, instructions, helpTooltip, rootFolder, pathValue, selectionValue, pathSaveInto, selectionSaveInto, readOnly, disabled, validations, validationGroup, required, requiredMessage, showWhen, height, accessibilityText, marginAbove, marginBelow)",
+    description: "Provides a browser interface for navigating and selecting folders from Appian document management.",
+    example: 'a!folderBrowserField(label: "Select Folder", rootFolder: cons!ROOT_FOLDER, selectionValue: local!selectedFolder, selectionSaveInto: local!selectedFolder)',
+    category: "Interface Components",
+    subcategory: "Browsers",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Folder_Browser_Component.html"
+  },
+  {
+    name: "a!userBrowserField",
+    syntax: "a!userBrowserField(label, labelPosition, instructions, helpTooltip, selectionValue, selectionSaveInto, readOnly, disabled, validations, validationGroup, required, requiredMessage, showWhen, height, accessibilityText, marginAbove, marginBelow)",
+    description: "Provides a browser interface for browsing and selecting users from the Appian directory.",
+    example: 'a!userBrowserField(label: "Select User", selectionValue: local!selectedUser, selectionSaveInto: local!selectedUser)',
+    category: "Interface Components",
+    subcategory: "Browsers",
+    docUrl: "https://docs.appian.com/suite/help/25.4/User_Browser_Component.html"
+  },
+  {
+    name: "a!groupBrowserField",
+    syntax: "a!groupBrowserField(label, labelPosition, instructions, helpTooltip, selectionValue, selectionSaveInto, readOnly, disabled, validations, validationGroup, required, requiredMessage, showWhen, height, accessibilityText, marginAbove, marginBelow)",
+    description: "Provides a browser interface for browsing and selecting groups from the Appian directory.",
+    example: 'a!groupBrowserField(label: "Select Group", selectionValue: local!selectedGroup, selectionSaveInto: local!selectedGroup)',
+    category: "Interface Components",
+    subcategory: "Browsers",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Group_Browser_Component.html"
+  },
+  {
+    name: "a!chatField",
+    syntax: "a!chatField(label, labelPosition, instructions, helpTooltip, initialPrompt, height, showWhen, accessibilityText, marginAbove, marginBelow)",
+    description: "Provides an AI chatbot interface for interactive conversations and assistance within forms and interfaces.",
+    example: 'a!chatField(label: "AI Assistant", initialPrompt: "How can I help you today?", height: "MEDIUM")',
+    category: "Interface Components",
+    subcategory: "Input",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Chat_Component.html"
+  },
+  {
+    name: "a!timeDisplayField",
+    syntax: "a!timeDisplayField(label, labelPosition, instructions, value, showWhen, helpTooltip, accessibilityText, marginAbove, marginBelow)",
+    description: "Displays time values in a formatted, read-only manner with various display options.",
+    example: 'a!timeDisplayField(label: "Meeting Time", value: time(14, 30, 0))',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Time_Display_Component.html"
+  },
+  {
+    name: "a!webVideoField",
+    syntax: "a!webVideoField(label, labelPosition, instructions, source, altText, showWhen, helpTooltip, accessibilityText, marginAbove, marginBelow)",
+    description: "Displays web videos from various sources with accessibility support and customizable controls.",
+    example: 'a!webVideoField(label: "Training Video", source: "https://www.youtube.com/watch?v=VIDEO_ID", altText: "Product training video")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Web_Video_Component.html"
+  },
+  {
+    name: "a!userImage",
+    syntax: "a!userImage(user, size, showWhen, accessibilityText)",
+    description: "Displays a user's profile image with various sizing options and accessibility support.",
+    example: 'a!userImage(user: ri!currentUser, size: "MEDIUM")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/User_Image_Component.html"
+  },
+  {
+    name: "a!webImage",
+    syntax: "a!webImage(source, altText, caption, size, style, showWhen, link, accessibilityText)",
+    description: "Displays images from web URLs with customizable sizing, styling, and optional links.",
+    example: 'a!webImage(source: "https://example.com/image.jpg", altText: "Company logo", size: "MEDIUM")',
+    category: "Interface Components",
+    subcategory: "Display",
+    docUrl: "https://docs.appian.com/suite/help/25.4/Web_Image_Component.html"
+  },
 ];
 
 export const recipes = [
