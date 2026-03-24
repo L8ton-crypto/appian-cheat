@@ -518,6 +518,12 @@ export default function Home() {
               >
                 🧩 Data Fabric
               </a>
+              <a
+                href="/process-optimizer"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-400 hover:to-indigo-500 transition-all"
+              >
+                🔍 Process Optimizer
+              </a>
             </div>
             
             {/* Search */}

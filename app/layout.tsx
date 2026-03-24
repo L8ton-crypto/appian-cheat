@@ -6,11 +6,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "AppianCheat — Appian Developer Quick Reference",
-  description: "Quick-reference cheat sheet for Appian functions, expressions, and design patterns. AI-powered SAIL code generator - describe or sketch your interface. Built for Appian 25.4.",
-  keywords: ["Appian", "cheat sheet", "functions", "expressions", "developer", "reference", "25.4", "AI assistant", "SAIL generator", "interface builder", "community", "Q&A"],
+  description: "Quick-reference cheat sheet for Appian functions, expressions, and design patterns. AI-powered SAIL code generator, process model optimizer, and Data Fabric wizard. Built for Appian 25.4.",
+  keywords: ["Appian", "cheat sheet", "functions", "expressions", "developer", "reference", "25.4", "AI assistant", "SAIL generator", "interface builder", "community", "Q&A", "process optimizer", "data fabric"],
   openGraph: {
     title: "AppianCheat — Appian Developer Quick Reference",
-    description: "The ultimate Appian developer cheat sheet with AI-powered assistant, community Q&A, functions, patterns, errors, and instant answers.",
+    description: "The ultimate Appian developer cheat sheet with AI-powered assistant, process optimizer, Data Fabric wizard, community Q&A, functions, patterns, and errors.",
     type: "website",
     url: "https://appian-cheat.vercel.app",
   },
