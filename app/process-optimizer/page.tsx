@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import { ActionToolbar, GradeBadge, extractGrade, saveToHistory } from "../components/ReviewToolbar";
 
 type InputType = "description" | "xml";
 
@@ -150,8 +151,26 @@ export default function ProcessOptimizer() {
     setIsAnalyzing(false);
   };
 
-  const copyOutput = () => {
-    navigator.clipboard.writeText(output);
+  const STORAGE_KEY = "appian-cheat-process-optimizer";
+
+  // Save to history when analysis completes
+  useEffect(() => {
+    if (output && !isAnalyzing) {
+      const gradeInfo = extractGrade(output);
+      saveToHistory(STORAGE_KEY, {
+        label: input.slice(0, 60).replace(/\n/g, " ") + "...",
+        input: input,
+        output: output,
+        score: gradeInfo?.score,
+        grade: gradeInfo?.grade,
+      });
+    }
+  }, [isAnalyzing, output, input]);
+
+  const loadFromHistory = (entry: { input: string; output: string }) => {
+    setInput(entry.input);
+    setOutput(entry.output);
+    setIsAnalyzing(false);
   };
 
   const isValid = input.trim().length >= 20;
@@ -404,24 +423,22 @@ export default function ProcessOptimizer() {
                 Analysis Results
               </h2>
               <div className="flex items-center gap-2">
-                {output && !isAnalyzing && (
-                  <>
-                    <button
-                      onClick={copyOutput}
-                      className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors text-sm"
-                    >
-                      📋 Copy
-                    </button>
-                    <button
-                      onClick={reset}
-                      className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors text-sm"
-                    >
-                      🔄 New Analysis
-                    </button>
-                  </>
-                )}
+                {output && !isAnalyzing && (() => {
+                  const gradeInfo = extractGrade(output);
+                  return gradeInfo ? <GradeBadge grade={gradeInfo.grade} score={gradeInfo.score} /> : null;
+                })()}
               </div>
             </div>
+
+            {output && !isAnalyzing && (
+              <ActionToolbar
+                output={output}
+                onNew={reset}
+                downloadFilename="process-optimization"
+                storageKey={STORAGE_KEY}
+                onLoadHistory={loadFromHistory}
+              />
+            )}
 
             <div
               ref={outputRef}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import { ActionToolbar, GradeBadge, extractGrade, saveToHistory, getHistory } from "../components/ReviewToolbar";
 
 // Simple markdown-to-HTML function for basic formatting
 function markdownToHtml(text: string): string {
@@ -137,8 +138,38 @@ const EXAMPLE_SNIPPETS = [
   }
 ];
 
+// Client-side SAIL syntax pre-check
+function preScanSail(code: string): string[] {
+  const warnings: string[] = [];
+  
+  // Bracket matching
+  const open = (code.match(/\(/g) || []).length;
+  const close = (code.match(/\)/g) || []).length;
+  if (open !== close) {
+    warnings.push(`⚠️ Bracket mismatch: ${open} opening vs ${close} closing parentheses`);
+  }
+  
+  // Common known-bad patterns (instant feedback)
+  if (/\bif\s*\(/.test(code) && !/showWhen/.test(code)) {
+    warnings.push("💡 Uses if() - consider showWhen for visibility toggling (preserves component state)");
+  }
+  if (/\bload\s*\(/.test(code)) {
+    warnings.push("💡 Uses load() - consider a!localVariables() instead (modern pattern)");
+  }
+  if (/batchSize\s*:\s*-1/.test(code)) {
+    warnings.push("🔴 batchSize: -1 detected - always use an explicit batch size");
+  }
+  if (/a!queryEntity\s*\(/.test(code) && !/a!queryRecordType\s*\(/.test(code)) {
+    warnings.push("💡 Uses a!queryEntity - consider migrating to a!queryRecordType (record-centric)");
+  }
+  
+  return warnings;
+}
+
 export default function SAILReviewer() {
   const [code, setCode] = useState("");
+  const [compareCode, setCompareCode] = useState("");
+  const [compareMode, setCompareMode] = useState(false);
   const [level, setLevel] = useState<"quick" | "standard" | "deep">("standard");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState("");
@@ -146,16 +177,22 @@ export default function SAILReviewer() {
 
   const handleReview = async () => {
     if (!code.trim()) return;
+    if (compareMode && !compareCode.trim()) return;
     
     setIsAnalyzing(true);
     setShowResults(false);
     setAnalysis("");
 
+    // Build the request - include compare code if in compare mode
+    const body = compareMode 
+      ? { code: `ORIGINAL CODE:\n\`\`\`sail\n${code}\n\`\`\`\n\nREFACTORED CODE:\n\`\`\`sail\n${compareCode}\n\`\`\`\n\nPlease compare both versions. Analyse what improved, what regressed, and provide updated scores for both. Show a side-by-side comparison of key changes.`, level }
+      : { code, level };
+
     try {
       const response = await fetch("/api/sail-reviewer/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, level })
+        body: JSON.stringify(body)
       });
 
       if (!response.ok) {
@@ -209,15 +246,36 @@ export default function SAILReviewer() {
     setAnalysis("");
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(analysis);
-  };
+  const STORAGE_KEY = "appian-cheat-sail-reviews";
+
+  // Save to history when analysis completes
+  useEffect(() => {
+    if (showResults && analysis) {
+      const gradeInfo = extractGrade(analysis);
+      saveToHistory(STORAGE_KEY, {
+        label: code.slice(0, 60).replace(/\n/g, " ") + "...",
+        input: code,
+        output: analysis,
+        score: gradeInfo?.score,
+        grade: gradeInfo?.grade,
+      });
+    }
+  }, [showResults, analysis, code]);
 
   const newReview = () => {
     setCode("");
+    setCompareCode("");
     setAnalysis("");
     setShowResults(false);
     setLevel("standard");
+    setCompareMode(false);
+  };
+
+  const loadFromHistory = (entry: { input: string; output: string }) => {
+    setCode(entry.input);
+    setAnalysis(entry.output);
+    setShowResults(true);
+    setIsAnalyzing(false);
   };
 
   return (
@@ -242,13 +300,56 @@ export default function SAILReviewer() {
               <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
                 <h2 className="text-xl font-semibold text-white mb-4">Your SAIL Code</h2>
                 
+                {/* Compare mode toggle */}
+                <div className="flex items-center gap-3 mb-3">
+                  <button
+                    onClick={() => setCompareMode(!compareMode)}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center gap-1.5 ${
+                      compareMode
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-700 border border-gray-600 text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    ⚖️ Compare Mode
+                  </button>
+                  {compareMode && (
+                    <span className="text-[11px] text-gray-500">Paste original + refactored to see what improved</span>
+                  )}
+                </div>
+
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="Paste your SAIL code here..."
-                  rows={12}
+                  placeholder={compareMode ? "Paste your ORIGINAL SAIL code here..." : "Paste your SAIL code here..."}
+                  rows={compareMode ? 8 : 12}
                   className="w-full bg-gray-900 text-gray-100 border border-gray-600 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
                 />
+
+                {compareMode && (
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Refactored Code</label>
+                    <textarea
+                      value={compareCode}
+                      onChange={(e) => setCompareCode(e.target.value)}
+                      placeholder="Paste your REFACTORED SAIL code here..."
+                      rows={8}
+                      className="w-full bg-gray-900 text-gray-100 border border-blue-600/50 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    />
+                  </div>
+                )}
+
+                {/* Pre-scan warnings */}
+                {code.trim().length > 10 && (() => {
+                  const warnings = preScanSail(code);
+                  return warnings.length > 0 ? (
+                    <div className="mt-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                      <p className="text-[11px] text-amber-400 font-medium mb-1">Quick scan detected:</p>
+                      {warnings.map((w, i) => (
+                        <p key={i} className="text-[11px] text-amber-300/80">{w}</p>
+                      ))}
+                    </div>
+                  ) : null;
+                })()}
 
                 <div className="flex items-center justify-between mt-4">
                   <div>
@@ -269,7 +370,7 @@ export default function SAILReviewer() {
 
                   <button
                     onClick={handleReview}
-                    disabled={!code.trim() || isAnalyzing}
+                    disabled={!code.trim() || (compareMode && !compareCode.trim()) || isAnalyzing}
                     className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2"
                   >
                     {isAnalyzing ? (
@@ -333,27 +434,30 @@ export default function SAILReviewer() {
 
               {analysis && (
                 <div className="space-y-4">
+                  {/* Grade Badge */}
+                  {showResults && (() => {
+                    const gradeInfo = extractGrade(analysis);
+                    return gradeInfo ? (
+                      <div className="flex justify-center mb-4">
+                        <GradeBadge grade={gradeInfo.grade} score={gradeInfo.score} />
+                      </div>
+                    ) : null;
+                  })()}
+
                   <div 
                     className="prose prose-invert max-w-none text-gray-300 text-sm leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: markdownToHtml(analysis) }}
                   />
 
                   {showResults && (
-                    <div className="flex gap-3 pt-4 border-t border-gray-700">
-                      <button
-                        onClick={copyToClipboard}
-                        className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2 text-sm"
-                      >
-                        <span>📋</span>
-                        Copy
-                      </button>
-                      <button
-                        onClick={newReview}
-                        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 text-sm"
-                      >
-                        <span>✨</span>
-                        New Review
-                      </button>
+                    <div className="pt-4 border-t border-gray-700">
+                      <ActionToolbar
+                        output={analysis}
+                        onNew={newReview}
+                        downloadFilename="sail-review"
+                        storageKey={STORAGE_KEY}
+                        onLoadHistory={loadFromHistory}
+                      />
                     </div>
                   )}
                 </div>

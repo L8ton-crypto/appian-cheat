@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import { ActionToolbar, saveToHistory } from "../components/ReviewToolbar";
 
 interface DocGenerationRequest {
   xml: string;
@@ -12,6 +13,7 @@ interface DocGenerationRequest {
 export default function DocGeneratorPage() {
   const [mode, setMode] = useState<"upload" | "paste">("upload");
   const [xml, setXml] = useState("");
+  const [xmlFiles, setXmlFiles] = useState<{ name: string; content: string }[]>([]);
   const [projectName, setProjectName] = useState("");
   const [level, setLevel] = useState<"summary" | "standard" | "comprehensive">("standard");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -21,36 +23,43 @@ export default function DocGeneratorPage() {
 
   const handleFileUpload = useCallback((file: File) => {
     if (file.name.toLowerCase().endsWith('.zip')) {
-      alert("ZIP file parsing is coming soon. For now, please extract individual XML files and paste their content using the 'Paste XML' mode.");
+      alert("ZIP file parsing is coming soon. For now, please extract individual XML files and upload them one at a time.");
       return;
     }
 
     if (!file.name.toLowerCase().endsWith('.xml')) {
-      alert("Please upload an XML file or use ZIP files (coming soon).");
+      alert("Please upload an XML file.");
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      setXml(content);
       
-      // Try to extract project name from XML
-      const projectMatch = content.match(/<package[^>]*name="([^"]+)"/i) || 
-                           content.match(/<name[^>]*>([^<]+)</i);
-      if (projectMatch) {
-        setProjectName(projectMatch[1]);
+      // Add to files list
+      setXmlFiles(prev => [...prev, { name: file.name, content }]);
+      
+      // Combine all XML into the main xml state
+      setXml(prev => prev ? prev + "\n\n<!-- ===== " + file.name + " ===== -->\n\n" + content : content);
+      
+      // Try to extract project name from first file
+      if (!projectName) {
+        const projectMatch = content.match(/<package[^>]*name="([^"]+)"/i) || 
+                             content.match(/<name[^>]*>([^<]+)</i);
+        if (projectMatch) {
+          setProjectName(projectMatch[1]);
+        }
       }
     };
     reader.readAsText(file);
-  }, []);
+  }, [projectName]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFileUpload(files[0]);
+    for (let i = 0; i < files.length; i++) {
+      handleFileUpload(files[i]);
     }
   }, [handleFileUpload]);
 
@@ -66,10 +75,21 @@ export default function DocGeneratorPage() {
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
-      handleFileUpload(files[0]);
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        handleFileUpload(files[i]);
+      }
     }
   }, [handleFileUpload]);
+
+  const removeFile = (index: number) => {
+    setXmlFiles(prev => {
+      const newFiles = prev.filter((_, i) => i !== index);
+      // Rebuild combined XML
+      setXml(newFiles.map(f => "<!-- ===== " + f.name + " ===== -->\n\n" + f.content).join("\n\n"));
+      return newFiles;
+    });
+  };
 
   const generateDocumentation = async () => {
     if (!xml.trim()) return;
@@ -131,18 +151,34 @@ export default function DocGeneratorPage() {
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(output);
-  };
+  const STORAGE_KEY = "appian-cheat-doc-generator";
+
+  // Save to history when generation completes
+  useEffect(() => {
+    if (output && !isGenerating) {
+      saveToHistory(STORAGE_KEY, {
+        label: projectName || xml.slice(0, 60).replace(/\n/g, " ") + "...",
+        input: xml,
+        output: output,
+      });
+    }
+  }, [isGenerating, output, xml, projectName]);
 
   const newDocument = () => {
     setXml("");
+    setXmlFiles([]);
     setProjectName("");
     setOutput("");
     setMode("upload");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const loadFromHistory = (entry: { input: string; output: string }) => {
+    setXml(entry.input);
+    setOutput(entry.output);
+    setIsGenerating(false);
   };
 
   // Simple markdown to HTML converter
@@ -240,9 +276,44 @@ export default function DocGeneratorPage() {
                     ref={fileInputRef}
                     type="file"
                     accept=".xml,.zip"
+                    multiple
                     onChange={handleFileSelect}
                     className="hidden"
                   />
+                </div>
+              )}
+
+              {/* Uploaded files list */}
+              {xmlFiles.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-300">
+                      {xmlFiles.length} file{xmlFiles.length > 1 ? "s" : ""} loaded
+                    </p>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-sm text-orange-400 hover:text-orange-300 transition-colors"
+                    >
+                      + Add another file
+                    </button>
+                  </div>
+                  {xmlFiles.map((file, i) => (
+                    <div key={i} className="flex items-center justify-between bg-gray-800 rounded-lg px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">📄</span>
+                        <span className="text-sm text-gray-300">{file.name}</span>
+                        <span className="text-[10px] text-gray-500">
+                          ({(file.content.length / 1024).toFixed(1)}KB)
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => removeFile(i)}
+                        className="text-gray-500 hover:text-red-400 transition-colors text-sm"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -319,23 +390,19 @@ export default function DocGeneratorPage() {
           <div className="bg-gray-800 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-200">Generated Documentation</h3>
-              {output && !isGenerating && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={copyToClipboard}
-                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded text-sm transition-colors"
-                  >
-                    Copy
-                  </button>
-                  <button
-                    onClick={newDocument}
-                    className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded text-sm transition-colors"
-                  >
-                    New Document
-                  </button>
-                </div>
-              )}
             </div>
+
+            {output && !isGenerating && (
+              <div className="mb-4">
+                <ActionToolbar
+                  output={output}
+                  onNew={newDocument}
+                  downloadFilename={projectName || "solution-doc"}
+                  storageKey={STORAGE_KEY}
+                  onLoadHistory={loadFromHistory}
+                />
+              </div>
+            )}
 
             {output ? (
               <div 
