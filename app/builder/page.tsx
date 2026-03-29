@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import Navbar from "../components/Navbar";
 
 const EXAMPLES = [
   {
@@ -309,34 +310,13 @@ export default function BuilderPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
-      <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-lg font-bold">
-                  ⚡
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-white tracking-tight">
-                    AI Interface Builder
-                  </h1>
-                  <p className="text-[11px] text-gray-500">
-                    Describe or sketch - get production SAIL code
-                  </p>
-                </div>
-              </a>
-            </div>
-            <a
-              href="/"
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 border border-gray-700 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
-            >
-              ← Back to Cheat Sheet
-            </a>
-          </div>
-        </div>
-      </header>
+      <Navbar />
+      
+      {/* Page Header */}
+      <div className="max-w-7xl mx-auto px-4 pt-6 pb-2">
+        <h2 className="text-xl font-bold text-white tracking-tight">🏗️ AI Interface Builder</h2>
+        <p className="text-sm text-gray-500">Describe or sketch - get production SAIL code</p>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

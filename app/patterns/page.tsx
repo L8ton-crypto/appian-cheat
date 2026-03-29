@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { designPatterns, designPatternCategories, DesignPattern, CodeExample } from "@/lib/design-patterns";
+import Navbar from "../components/Navbar";
 
 interface PatternCardProps {
   pattern: DesignPattern;
@@ -269,30 +270,20 @@ export default function PatternsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
-      <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-xl sticky top-0 z-40">
+      <Navbar />
+      
+      {/* Search Header */}
+      <header className="border-b border-gray-800 bg-gray-950/60">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-lg font-bold">
-                ⚡
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white tracking-tight">Design Pattern Library</h1>
-                <p className="text-[11px] text-gray-500">Architectural patterns & best practices for Appian 25.4</p>
-              </div>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h2 className="text-xl font-bold text-white tracking-tight">📐 Design Pattern Library</h2>
+              <p className="text-sm text-gray-500">Architectural patterns & best practices for Appian 25.4</p>
             </div>
-            
-            <a
-              href="/"
-              className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors"
-            >
-              ← Back to Cheat Sheet
-            </a>
           </div>
           
           {/* Search */}
-          <div className="mt-4">
+          <div>
             <input
               type="text"
               value={search}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Navbar from "../components/Navbar";
 
 // Helper function for time formatting
 function timeAgo(dateStr: string): string {
@@ -321,42 +322,33 @@ export default function CommunityPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
-      <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-lg font-bold">
-                  ⚡
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-white tracking-tight">AppianCheat</h1>
-                  <p className="text-[11px] text-gray-500">Community Hub</p>
-                </div>
-              </Link>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setModalOpen(true)}
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-400 hover:to-red-500 transition-all"
-              >
-                New Question
-              </button>
-              
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden p-2 rounded-lg bg-gray-800/60 border border-gray-700/50 text-gray-400 hover:text-white"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
+      <Navbar />
+      
+      {/* Sub-header */}
+      <div className="border-b border-gray-800 bg-gray-950/60">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white tracking-tight">💬 Community Hub</h2>
+            <p className="text-sm text-gray-500">Ask questions, share knowledge</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-400 hover:to-red-500 transition-all"
+            >
+              New Question
+            </button>
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden p-2 rounded-lg bg-gray-800/60 border border-gray-700/50 text-gray-400 hover:text-white"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-6">
