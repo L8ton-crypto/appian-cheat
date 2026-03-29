@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef } from "react";
 import { functions, recipes, queryRecipesRecords, queryRecipesEntity, connectedSystems, categories, FunctionItem, ConnectedSystem } from "@/lib/data";
 import { patterns, patternCategories, PatternItem } from "@/lib/patterns";
 import { errors, errorCategories, ErrorItem } from "@/lib/errors";
+import Navbar from "./components/Navbar";
 // Embedding generation now happens server-side in /api/search
 
 interface SemanticResult {
@@ -488,44 +489,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
-      <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-xl sticky top-0 z-40">
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Search & Tabs Header */}
+      <header className="border-b border-gray-800 bg-gray-950/60 sticky top-[57px] z-40">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-lg font-bold">
-                ⚡
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white tracking-tight">AppianCheat</h1>
-                <p className="text-[11px] text-gray-500">Quick reference for Appian 25.4</p>
-              </div>
-              <a
-                href="/builder"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-400 hover:to-orange-500 transition-all"
-              >
-                🏗️ AI Builder
-              </a>
-              <a
-                href="/patterns"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-400 hover:to-red-500 transition-all"
-              >
-                📐 Design Patterns
-              </a>
-              <a
-                href="/data-fabric"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-400 hover:to-teal-500 transition-all"
-              >
-                🧩 Data Fabric
-              </a>
-              <a
-                href="/process-optimizer"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-400 hover:to-indigo-500 transition-all"
-              >
-                🔍 Process Optimizer
-              </a>
-            </div>
-            
             {/* Search */}
             <div className="flex items-center gap-2 flex-1 max-w-lg">
               <div className="relative flex-1">

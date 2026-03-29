@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Navbar from "../components/Navbar";
 
 type InputType = "description" | "xml";
 
@@ -260,27 +261,7 @@ export default function ProcessOptimizer() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-200">
-      {/* Header */}
-      <div className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-sm font-bold">
-                ⚡
-              </div>
-              <span className="text-lg font-bold text-white">AppianCheat</span>
-            </a>
-            <span className="text-gray-600">|</span>
-            <h2 className="text-sm font-medium text-orange-400">Process Optimizer</h2>
-          </div>
-          <a
-            href="/"
-            className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
-          >
-            ← Back to Cheat Sheet
-          </a>
-        </div>
-      </div>
+      <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Hero */}

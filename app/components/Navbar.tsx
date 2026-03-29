@@ -8,6 +8,7 @@ const AI_TOOLS = [
   { href: "/sail-reviewer", label: "SAIL Reviewer", icon: "🔍", desc: "Code review against best practices" },
   { href: "/process-optimizer", label: "Process Optimizer", icon: "⚡", desc: "Analyse & optimize process models" },
   { href: "/doc-generator", label: "Doc Generator", icon: "📄", desc: "Generate solution docs from XML" },
+  { href: "/data-fabric", label: "Data Fabric Wizard", icon: "🧩", desc: "Generate data architecture from scenarios" },
 ];
 
 export default function Navbar() {
@@ -111,16 +112,7 @@ export default function Navbar() {
             📐 Patterns
           </a>
 
-          <a
-            href="/community"
-            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              pathname === "/community"
-                ? "bg-blue-600 text-white"
-                : "text-gray-400 hover:text-white hover:bg-gray-800"
-            }`}
-          >
-            💬 Community
-          </a>
+
         </div>
       </div>
     </nav>
