@@ -112,6 +112,16 @@ export default function Navbar() {
             📐 Patterns
           </a>
 
+          <a
+            href="/design-review"
+            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+              pathname === "/design-review"
+                ? "bg-emerald-600 text-white"
+                : "text-gray-400 hover:text-white hover:bg-gray-800"
+            }`}
+          >
+            ✅ Review
+          </a>
 
         </div>
       </div>

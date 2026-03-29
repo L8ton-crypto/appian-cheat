@@ -496,6 +496,7 @@ export default function Home() {
       <header className="border-b border-gray-800 bg-gray-950/60 sticky top-[57px] z-40">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
+
             {/* Search */}
             <div className="flex items-center gap-2 flex-1 max-w-lg">
               <div className="relative flex-1">
