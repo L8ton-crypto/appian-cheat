@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import JSZip from "jszip";
 import Navbar from "../components/Navbar";
-import { ActionToolbar, saveToHistory } from "../components/ReviewToolbar";
+import { ActionToolbar, saveToHistory, downloadAsMarkdown, downloadAsHtml } from "../components/ReviewToolbar";
 import { parseAppianExport, inventoryToPrompt, type AppianInventory } from "./appian-parser";
 
 interface DocGenerationRequest {
@@ -636,13 +636,25 @@ export default function DocGeneratorPage() {
 
             {output && !isGenerating && (
               <div className="mb-4">
-                <ActionToolbar
-                  output={output}
-                  onNew={newDocument}
-                  downloadFilename={projectName || "solution-doc"}
-                  storageKey={STORAGE_KEY}
-                  onLoadHistory={loadFromHistory}
-                />
+                <div className="flex items-center gap-2 flex-wrap">
+                  <ActionToolbar
+                    output={output}
+                    onNew={newDocument}
+                    downloadFilename={projectName || "solution-doc"}
+                    storageKey={STORAGE_KEY}
+                    onLoadHistory={loadFromHistory}
+                  />
+                  <button
+                    onClick={() => {
+                      const date = new Date().toISOString().split("T")[0];
+                      const name = projectName || "solution-doc";
+                      downloadAsHtml(output, name + "-" + date + ".html", name + " - Solution Document");
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-sm bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700 transition-colors"
+                  >
+                    📄 Export HTML
+                  </button>
+                </div>
               </div>
             )}
 
