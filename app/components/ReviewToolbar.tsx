@@ -115,29 +115,51 @@ export function downloadAsMarkdown(content: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-// Download as self-contained HTML with Mermaid rendering
+/**
+ * Download as self-contained HTML with diagrams baked in as static SVGs.
+ * Captures already-rendered mermaid SVGs from the page DOM so there's
+ * zero dependency on mermaid.js in the exported file.
+ */
 export function downloadAsHtml(markdown: string, filename: string, title?: string) {
   const docTitle = title || filename.replace(/\.html$/, "");
-  
-  // Convert markdown to HTML (same logic as page but for export)
+
+  // Grab rendered SVGs from the page before we touch the markdown
+  const renderedSvgs: string[] = [];
+  const containers = document.querySelectorAll(".mermaid-container[data-rendered='true']");
+  containers.forEach(el => {
+    const svg = el.querySelector("svg");
+    if (svg) {
+      // Clone and make self-contained
+      const clone = svg.cloneNode(true) as SVGElement;
+      clone.setAttribute("width", "100%");
+      clone.removeAttribute("height");
+      clone.style.maxWidth = "800px";
+      renderedSvgs.push(clone.outerHTML);
+    }
+  });
+
+  let svgIndex = 0;
+
+  // Convert markdown to HTML, replacing mermaid blocks with captured SVGs
   let body = markdown
-    // Fenced code blocks - mermaid gets a special class
-    .replace(/```mermaid\n([\s\S]*?)```/g, (_m, code) => {
-      return `<pre class="mermaid">${code.trim()}</pre>`;
+    .replace(/```mermaid\n([\s\S]*?)```/g, () => {
+      if (svgIndex < renderedSvgs.length) {
+        const svg = renderedSvgs[svgIndex++];
+        return '<div class="diagram">' + svg + '</div>';
+      }
+      // No rendered SVG available - skip the diagram
+      return '<div class="diagram diagram-unavailable"><p><em>Diagram not available in export</em></p></div>';
     })
     .replace(/```(\w*)\n([\s\S]*?)```/g, (_m, _lang, code) => {
-      return `<pre class="code-block"><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`;
+      return '<pre class="code-block"><code>' + code.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</code></pre>';
     })
-    // Headers
     .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
     .replace(/^### (.*$)/gm, '<h3>$1</h3>')
     .replace(/^## (.*$)/gm, '<h2>$1</h2>')
     .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-    // Inline
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
-    // Tables
     .replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)*)/gm, (_m, header, tbody) => {
       const headers = header.split('|').map((h: string) => h.trim()).filter(Boolean);
       const rows = tbody.trim().split('\n').map((row: string) =>
@@ -153,58 +175,58 @@ export function downloadAsHtml(markdown: string, filename: string, title?: strin
       });
       return table + '</tbody></table>';
     })
-    // Lists
     .replace(/^- (.*$)/gm, '<li>$1</li>')
     .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
-    // Paragraphs
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>');
 
   body = '<p>' + body + '</p>';
 
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${docTitle}</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"><\/script>
-<style>
-  :root { --bg: #f8f9fa; --text: #1a1a2e; --heading: #16213e; --accent: #e67e22; --code-bg: #2d2d2d; --code-text: #f8f8f2; --border: #dee2e6; --table-stripe: #f1f3f5; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #0f172a; --text: #e2e8f0; --heading: #f59e0b; --accent: #f59e0b; --code-bg: #1e293b; --code-text: #e2e8f0; --border: #334155; --table-stripe: #1e293b; } }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; max-width: 900px; margin: 0 auto; padding: 40px 24px; }
-  h1 { font-size: 2em; color: var(--heading); margin: 1.5em 0 0.5em; border-bottom: 2px solid var(--accent); padding-bottom: 0.3em; }
-  h2 { font-size: 1.5em; color: var(--heading); margin: 1.5em 0 0.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
-  h3 { font-size: 1.2em; color: var(--heading); margin: 1.2em 0 0.4em; }
-  h4 { font-size: 1.05em; color: var(--heading); margin: 1em 0 0.3em; }
-  p { margin: 0.5em 0; }
-  strong { color: var(--heading); }
-  li { margin: 0.3em 0 0.3em 1.5em; }
-  .inline-code { background: var(--code-bg); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'Fira Code', 'Consolas', monospace; }
-  .code-block { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; margin: 1em 0; font-size: 0.85em; font-family: 'Fira Code', 'Consolas', monospace; }
-  .mermaid { background: var(--code-bg); border-radius: 8px; padding: 16px; margin: 1em 0; text-align: center; }
-  table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }
-  th { background: var(--accent); color: white; text-align: left; padding: 10px 12px; font-weight: 600; }
-  td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
-  tr:nth-child(even) { background: var(--table-stripe); }
-  .doc-header { text-align: center; margin-bottom: 2em; padding-bottom: 1em; border-bottom: 3px solid var(--accent); }
-  .doc-header h1 { border: none; margin: 0; }
-  .doc-header .meta { color: #888; font-size: 0.9em; margin-top: 0.5em; }
-  @media print { body { max-width: 100%; padding: 20px; } .mermaid svg { max-width: 100%; } }
-</style>
-</head>
-<body>
-<div class="doc-header">
-  <h1>📄 ${docTitle}</h1>
-  <div class="meta">Generated on ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-</div>
-${body}
-<script>
-  mermaid.initialize({ startOnLoad: true, theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default', securityLevel: 'loose' });
-<\/script>
-</body>
-</html>`;
+  const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const html = [
+    '<!DOCTYPE html>',
+    '<html lang="en">',
+    '<head>',
+    '<meta charset="UTF-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+    '<title>' + docTitle + '</title>',
+    '<style>',
+    '  :root { --bg: #ffffff; --text: #1a1a2e; --heading: #16213e; --accent: #e67e22; --code-bg: #f5f5f5; --code-text: #333; --border: #dee2e6; --table-stripe: #f9f9f9; }',
+    '  @media (prefers-color-scheme: dark) { :root { --bg: #0f172a; --text: #e2e8f0; --heading: #f59e0b; --accent: #f59e0b; --code-bg: #1e293b; --code-text: #e2e8f0; --border: #334155; --table-stripe: #1e293b; } }',
+    '  * { margin: 0; padding: 0; box-sizing: border-box; }',
+    '  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; max-width: 900px; margin: 0 auto; padding: 40px 24px; }',
+    '  h1 { font-size: 2em; color: var(--heading); margin: 1.5em 0 0.5em; border-bottom: 2px solid var(--accent); padding-bottom: 0.3em; }',
+    '  h2 { font-size: 1.5em; color: var(--heading); margin: 1.5em 0 0.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }',
+    '  h3 { font-size: 1.2em; color: var(--heading); margin: 1.2em 0 0.4em; }',
+    '  h4 { font-size: 1.05em; color: var(--heading); margin: 1em 0 0.3em; }',
+    '  p { margin: 0.5em 0; }',
+    '  strong { color: var(--heading); }',
+    '  li { margin: 0.3em 0 0.3em 1.5em; }',
+    '  .inline-code { background: var(--code-bg); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: "Fira Code", Consolas, monospace; }',
+    '  .code-block { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; margin: 1em 0; font-size: 0.85em; font-family: "Fira Code", Consolas, monospace; }',
+    '  .diagram { background: var(--code-bg); border-radius: 8px; padding: 16px; margin: 1em 0; text-align: center; overflow-x: auto; }',
+    '  .diagram svg { max-width: 100%; height: auto; }',
+    '  .diagram-unavailable { color: #888; font-style: italic; padding: 2em; }',
+    '  table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.9em; }',
+    '  th { background: var(--accent); color: white; text-align: left; padding: 10px 12px; font-weight: 600; }',
+    '  td { padding: 8px 12px; border-bottom: 1px solid var(--border); }',
+    '  tr:nth-child(even) { background: var(--table-stripe); }',
+    '  .doc-header { text-align: center; margin-bottom: 2em; padding-bottom: 1em; border-bottom: 3px solid var(--accent); }',
+    '  .doc-header h1 { border: none; margin: 0; }',
+    '  .doc-header .meta { color: #888; font-size: 0.9em; margin-top: 0.5em; }',
+    '  @media print { body { max-width: 100%; padding: 20px; } .diagram svg { max-width: 100%; } }',
+    '</style>',
+    '</head>',
+    '<body>',
+    '<div class="doc-header">',
+    '  <h1>' + docTitle + '</h1>',
+    '  <div class="meta">Generated on ' + dateStr + '</div>',
+    '</div>',
+    body,
+    '</body>',
+    '</html>'
+  ].join('\n');
 
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
