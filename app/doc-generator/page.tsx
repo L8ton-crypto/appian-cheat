@@ -20,33 +20,28 @@ export default function DocGeneratorPage() {
   const [level, setLevel] = useState<"summary" | "standard" | "comprehensive">("standard");
   const [isGenerating, setIsGenerating] = useState(false);
   const [output, setOutput] = useState("");
+  const [wasTruncated, setWasTruncated] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [inventory, setInventory] = useState<AppianInventory | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isExtracting, setIsExtracting] = useState(false);
 
-  const rebuildInventory = useCallback((files: { name: string; content: string }[], pName?: string) => {
-    if (files.length === 0) {
-      setInventory(null);
-      return;
-    }
-    const inv = parseAppianExport(files, pName);
-    setInventory(inv);
-    if (inv.projectName && inv.projectName !== "Appian Application") {
-      setProjectName(prev => prev || inv.projectName);
-    }
-  }, []);
-
   const addXmlContent = useCallback((name: string, content: string) => {
     setXmlFiles(prev => {
       const updated = [...prev, { name, content }];
-      // Also set xml for paste mode compatibility
       setXml(updated.map(f => f.content).join("\n"));
-      rebuildInventory(updated, projectName);
+      
+      // Parse inventory inline to avoid stale closure issues
+      const inv = parseAppianExport(updated);
+      setInventory(inv);
+      if (inv.projectName && inv.projectName !== "Appian Application") {
+        setProjectName(prev => prev || inv.projectName);
+      }
+      
       return updated;
     });
-  }, [projectName, rebuildInventory]);
+  }, []);
 
   const handleFileUpload = useCallback(async (file: File) => {
     const name = file.name.toLowerCase();
@@ -132,7 +127,12 @@ export default function DocGeneratorPage() {
     setXmlFiles(prev => {
       const newFiles = prev.filter((_, i) => i !== index);
       setXml(newFiles.map(f => f.content).join("\n"));
-      rebuildInventory(newFiles, projectName);
+      if (newFiles.length === 0) {
+        setInventory(null);
+      } else {
+        const inv = parseAppianExport(newFiles);
+        setInventory(inv);
+      }
       return newFiles;
     });
   };
@@ -144,6 +144,7 @@ export default function DocGeneratorPage() {
 
     setIsGenerating(true);
     setOutput("");
+    setWasTruncated(false);
 
     try {
       // If we have an inventory, send the compact prompt. Otherwise fall back to raw XML.
@@ -199,6 +200,9 @@ export default function DocGeneratorPage() {
               if (parsed.type === "content" && parsed.text) {
                 setOutput((prev) => prev + parsed.text);
               } else if (parsed.type === "done") {
+                if (parsed.truncated) {
+                  setWasTruncated(true);
+                }
                 setIsGenerating(false);
                 return;
               }
@@ -234,6 +238,7 @@ export default function DocGeneratorPage() {
     setXmlFiles([]);
     setProjectName("");
     setOutput("");
+    setWasTruncated(false);
     setInventory(null);
     setMode("upload");
     if (fileInputRef.current) {
@@ -621,6 +626,12 @@ export default function DocGeneratorPage() {
                   storageKey={STORAGE_KEY}
                   onLoadHistory={loadFromHistory}
                 />
+              </div>
+            )}
+
+            {wasTruncated && (
+              <div className="mb-3 bg-amber-900/30 border border-amber-600/50 rounded-lg px-4 py-2 text-sm text-amber-300">
+                ⚠️ Output was truncated (hit token limit). Try &quot;Summary&quot; level for large apps, or split into smaller exports.
               </div>
             )}
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 
@@ -264,6 +264,18 @@ export async function POST(req: NextRequest) {
         const reader = response.body!.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
+        let doneSent = false;
+
+        const sendDone = (stopReason?: string) => {
+          if (doneSent) return;
+          doneSent = true;
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ 
+              type: "done",
+              ...(stopReason === "max_tokens" ? { truncated: true } : {})
+            })}\n\n`)
+          );
+        };
 
         try {
           while (true) {
@@ -276,16 +288,16 @@ export async function POST(req: NextRequest) {
 
             for (const line of lines) {
               if (line.startsWith("data: ")) {
-                const data = line.slice(6);
+                const data = line.slice(6).trim();
                 if (data === "[DONE]") {
-                  controller.enqueue(
-                    encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
-                  );
+                  sendDone();
                   continue;
                 }
 
                 try {
                   const parsed = JSON.parse(data);
+
+                  // Content deltas
                   if (
                     parsed.type === "content_block_delta" &&
                     parsed.delta?.type === "text_delta" &&
@@ -300,9 +312,18 @@ export async function POST(req: NextRequest) {
                       )
                     );
                   }
-                } catch (parseError) {
+
+                  // Anthropic sends message_delta with stop_reason at the end
+                  if (parsed.type === "message_delta" && parsed.delta?.stop_reason) {
+                    sendDone(parsed.delta.stop_reason);
+                  }
+
+                  // message_stop is the final event
+                  if (parsed.type === "message_stop") {
+                    sendDone();
+                  }
+                } catch {
                   // Skip unparseable chunks
-                  console.warn("Failed to parse SSE data:", data);
                 }
               }
             }
@@ -316,9 +337,7 @@ export async function POST(req: NextRequest) {
             })}\n\n`)
           );
         } finally {
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
-          );
+          sendDone();
           controller.close();
         }
       },
