@@ -4,9 +4,10 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import JSZip from "jszip";
 import Navbar from "../components/Navbar";
 import { ActionToolbar, saveToHistory } from "../components/ReviewToolbar";
+import { parseAppianExport, inventoryToPrompt, type AppianInventory } from "./appian-parser";
 
 interface DocGenerationRequest {
-  xml: string;
+  inventory: string;
   projectName?: string;
   level: "summary" | "standard" | "comprehensive";
 }
@@ -20,21 +21,32 @@ export default function DocGeneratorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [output, setOutput] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [inventory, setInventory] = useState<AppianInventory | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isExtracting, setIsExtracting] = useState(false);
 
-  const addXmlContent = useCallback((name: string, content: string) => {
-    setXmlFiles(prev => [...prev, { name, content }]);
-    setXml(prev => prev ? prev + "\n\n<!-- ===== " + name + " ===== -->\n\n" + content : content);
-    
-    setProjectName(prev => {
-      if (prev) return prev;
-      const projectMatch = content.match(/<package[^>]*name="([^"]+)"/i) || 
-                           content.match(/<name[^>]*>([^<]+)</i);
-      return projectMatch ? projectMatch[1] : "";
-    });
+  const rebuildInventory = useCallback((files: { name: string; content: string }[], pName?: string) => {
+    if (files.length === 0) {
+      setInventory(null);
+      return;
+    }
+    const inv = parseAppianExport(files, pName);
+    setInventory(inv);
+    if (inv.projectName && inv.projectName !== "Appian Application") {
+      setProjectName(prev => prev || inv.projectName);
+    }
   }, []);
+
+  const addXmlContent = useCallback((name: string, content: string) => {
+    setXmlFiles(prev => {
+      const updated = [...prev, { name, content }];
+      // Also set xml for paste mode compatibility
+      setXml(updated.map(f => f.content).join("\n"));
+      rebuildInventory(updated, projectName);
+      return updated;
+    });
+  }, [projectName, rebuildInventory]);
 
   const handleFileUpload = useCallback(async (file: File) => {
     const name = file.name.toLowerCase();
@@ -119,27 +131,46 @@ export default function DocGeneratorPage() {
   const removeFile = (index: number) => {
     setXmlFiles(prev => {
       const newFiles = prev.filter((_, i) => i !== index);
-      // Rebuild combined XML
-      setXml(newFiles.map(f => "<!-- ===== " + f.name + " ===== -->\n\n" + f.content).join("\n\n"));
+      setXml(newFiles.map(f => f.content).join("\n"));
+      rebuildInventory(newFiles, projectName);
       return newFiles;
     });
   };
 
   const generateDocumentation = async () => {
-    if (!xml.trim()) return;
+    // Need either parsed inventory or raw XML (paste mode)
+    const hasContent = inventory || xml.trim();
+    if (!hasContent) return;
 
     setIsGenerating(true);
     setOutput("");
 
     try {
+      // If we have an inventory, send the compact prompt. Otherwise fall back to raw XML.
+      let payload: Record<string, unknown>;
+      if (inventory) {
+        const prompt = inventoryToPrompt(inventory);
+        payload = {
+          inventory: prompt,
+          projectName: projectName || inventory.projectName,
+          level,
+        };
+      } else {
+        // Paste mode - parse on the fly
+        const pastedFiles = [{ name: "pasted.xml", content: xml }];
+        const inv = parseAppianExport(pastedFiles, projectName);
+        const prompt = inventoryToPrompt(inv);
+        payload = {
+          inventory: prompt,
+          projectName: projectName || inv.projectName,
+          level,
+        };
+      }
+
       const response = await fetch("/api/doc-generator/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          xml,
-          projectName: projectName || undefined,
-          level,
-        } as DocGenerationRequest),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -203,6 +234,7 @@ export default function DocGeneratorPage() {
     setXmlFiles([]);
     setProjectName("");
     setOutput("");
+    setInventory(null);
     setMode("upload");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -335,7 +367,7 @@ export default function DocGeneratorPage() {
     return result;
   };
 
-  const canGenerate = xml.trim() && !isGenerating;
+  const canGenerate = (inventory || xml.trim()) && !isGenerating;
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
@@ -458,6 +490,50 @@ export default function DocGeneratorPage() {
                       </button>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Inventory Summary */}
+              {inventory && inventory.objectCount > 0 && (
+                <div className="mt-4 bg-gray-900 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-orange-300">
+                      📊 Parsed: {inventory.objectCount} objects
+                    </h4>
+                    <span className="text-xs text-gray-500">
+                      {(() => {
+                        const prompt = inventoryToPrompt(inventory);
+                        const approxTokens = Math.round(prompt.length / 4);
+                        return `~${approxTokens.toLocaleString()} tokens (${Math.round(prompt.length / 1024)}KB)`;
+                      })()}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      ["Process Models", inventory.summary.processModels],
+                      ["Expression Rules", inventory.summary.expressionRules],
+                      ["Interfaces", inventory.summary.interfaces],
+                      ["Record Types", inventory.summary.recordTypes],
+                      ["CDTs", inventory.summary.cdts],
+                      ["Constants", inventory.summary.constants],
+                      ["Integrations", inventory.summary.integrations],
+                      ["Connected Systems", inventory.summary.connectedSystems],
+                      ["Groups", inventory.summary.groups],
+                      ["Web APIs", inventory.summary.webApis],
+                      ["Decisions", inventory.summary.decisions],
+                      ["Sites", inventory.summary.sites],
+                    ].filter(([, count]) => (count as number) > 0).map(([label, count]) => (
+                      <div key={label as string} className="flex items-center justify-between bg-gray-800 rounded px-2 py-1.5">
+                        <span className="text-xs text-gray-400">{label}</span>
+                        <span className="text-xs font-mono text-orange-400">{count as number}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {inventory.crossReferences.length > 0 && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      {inventory.crossReferences.length} cross-references detected
+                    </p>
+                  )}
                 </div>
               )}
 

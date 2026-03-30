@@ -5,7 +5,8 @@ export const maxDuration = 60;
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 
 interface DocumentationRequest {
-  xml: string;
+  inventory?: string;  // Pre-parsed structured inventory (preferred)
+  xml?: string;        // Raw XML fallback (legacy/paste mode)
   projectName?: string;
   level: "summary" | "standard" | "comprehensive";
 }
@@ -185,11 +186,13 @@ Generate the documentation now.`;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as DocumentationRequest;
-    const { xml, projectName, level } = body;
+    const { inventory, xml, projectName, level } = body;
+    
+    const content = inventory || xml;
 
-    if (!xml?.trim()) {
+    if (!content?.trim()) {
       return NextResponse.json(
-        { error: "XML content is required" },
+        { error: "Content is required" },
         { status: 400 }
       );
     }
@@ -204,11 +207,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Build the user message
-    let userMessage = `Please generate ${level} documentation for the following Appian exported package XML:
-
-\`\`\`xml
-${xml}
-\`\`\``;
+    let userMessage: string;
+    
+    if (inventory) {
+      // Structured inventory from client-side parser
+      userMessage = `Generate ${level} documentation for this Appian application. The following is a pre-parsed structured inventory extracted from the export XML - object names, types, fields, relationships, expression logic, process flows, and cross-references are all included:\n\n${content}`;
+    } else {
+      // Raw XML fallback
+      userMessage = `Generate ${level} documentation for the following Appian exported package XML:\n\n\`\`\`xml\n${content}\n\`\`\``;
+    }
 
     if (projectName) {
       userMessage = `Project Name: ${projectName}\n\n${userMessage}`;
