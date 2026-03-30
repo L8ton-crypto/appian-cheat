@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 
@@ -151,12 +151,12 @@ DOCUMENTATION LEVEL: SUMMARY
 
     standard: `
 DOCUMENTATION LEVEL: STANDARD
-- Include all sections with moderate detail
-- Mermaid diagrams for architecture, data model, and the 2-3 most complex processes
-- Explain each major process as a narrative walkthrough
-- Group expression rules by area rather than listing every single one
-- Include recommendations section
-- Target 5-10 pages`,
+- Include: Executive Summary, Architecture Overview, Data Model, Business Processes, Interfaces (grouped), Integration Map, Security Model, Recommendations
+- Skip: detailed Object Dependency Map, full Configuration & Deployment checklists, individual expression rule listings
+- Mermaid diagrams for architecture and data model only (skip process flowcharts to save space)
+- Explain each major process as a narrative walkthrough (2-3 sentences each)
+- Group expression rules by area with counts, only detail the most important ones
+- Be concise - target 4-6 pages`,
 
     comprehensive: `
 DOCUMENTATION LEVEL: COMPREHENSIVE
