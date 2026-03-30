@@ -252,7 +252,7 @@ export async function POST(req: NextRequest) {
       });
       
       return NextResponse.json(
-        { error: "AI service temporarily unavailable" },
+        { error: "AI service error: " + response.status + " - " + errorText.slice(0, 200) },
         { status: 502 }
       );
     }

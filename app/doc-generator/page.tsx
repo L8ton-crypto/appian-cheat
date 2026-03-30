@@ -192,7 +192,12 @@ export default function DocGeneratorPage() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        let errMsg = `HTTP ${response.status}`;
+        try {
+          const errBody = await response.json();
+          if (errBody.error) errMsg = errBody.error;
+        } catch { /* ignore */ }
+        throw new Error(errMsg);
       }
 
       const reader = response.body!.getReader();
@@ -231,7 +236,8 @@ export default function DocGeneratorPage() {
       }
     } catch (error) {
       console.error("Generation error:", error);
-      setOutput("Error generating documentation. Please try again.");
+      const msg = error instanceof Error ? error.message : "Unknown error";
+      setOutput("Error generating documentation: " + msg);
     } finally {
       setIsGenerating(false);
     }
