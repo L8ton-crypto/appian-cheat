@@ -215,25 +215,100 @@ export default function DocGeneratorPage() {
     setIsGenerating(false);
   };
 
-  // Simple markdown to HTML converter
+  // Render Mermaid diagrams after output updates
+  useEffect(() => {
+    if (!output || isGenerating) return;
+    
+    const timer = setTimeout(async () => {
+      try {
+        const mermaid = (await import("mermaid")).default;
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: "dark",
+          themeVariables: {
+            primaryColor: "#f59e0b",
+            primaryTextColor: "#f3f4f6",
+            primaryBorderColor: "#d97706",
+            lineColor: "#9ca3af",
+            secondaryColor: "#374151",
+            tertiaryColor: "#1f2937",
+            background: "#111827",
+            mainBkg: "#1f2937",
+            nodeBorder: "#d97706",
+            clusterBkg: "#1f293780",
+            titleColor: "#f3f4f6",
+            edgeLabelBackground: "#1f2937",
+          },
+          flowchart: { curve: "basis" },
+        });
+        
+        const containers = document.querySelectorAll(".mermaid-container");
+        for (let i = 0; i < containers.length; i++) {
+          const el = containers[i] as HTMLElement;
+          if (el.dataset.rendered === "true") continue;
+          const code = el.dataset.mermaidCode;
+          if (!code) continue;
+          try {
+            const { svg } = await mermaid.render(`mermaid-${Date.now()}-${i}`, code);
+            el.innerHTML = svg;
+            el.dataset.rendered = "true";
+          } catch {
+            el.innerHTML = `<pre class="text-gray-400 text-sm p-3">${code}</pre>`;
+            el.dataset.rendered = "true";
+          }
+        }
+      } catch (err) {
+        console.warn("Mermaid render failed:", err);
+      }
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [output, isGenerating]);
+
+  // Markdown to HTML converter with Mermaid support
   const markdownToHtml = (md: string) => {
-    return md
-      .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold text-orange-400 mb-2 mt-4">$1</h3>')
-      .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold text-orange-300 mb-3 mt-6">$1</h2>')
+    // First handle fenced code blocks (mermaid + regular)
+    let result = md.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
+      if (lang === "mermaid") {
+        const escaped = code.trim().replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return `<div class="mermaid-container bg-gray-800/50 rounded-lg p-4 my-4 overflow-x-auto" data-mermaid-code="${escaped}"><pre class="text-gray-400 text-sm">Loading diagram...</pre></div>`;
+      }
+      const escapedCode = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return `<pre class="bg-gray-800 text-gray-300 p-4 rounded-lg my-3 overflow-x-auto"><code>${escapedCode}</code></pre>`;
+    });
+    
+    // Then handle inline elements and structure
+    result = result
+      .replace(/^#### (.*$)/gm, '<h4 class="text-base font-semibold text-orange-400 mb-2 mt-3">$1</h4>')
+      .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold text-orange-400 mb-2 mt-5">$1</h3>')
+      .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold text-orange-300 mb-3 mt-8 pb-2 border-b border-gray-700">$1</h2>')
       .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold text-orange-200 mb-4 mt-8">$1</h1>')
       .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-200">$1</strong>')
       .replace(/\*(.*?)\*/g, '<em class="text-gray-300">$1</em>')
-      .replace(/`([^`]+)`/g, '<code class="bg-gray-800 text-orange-300 px-1 py-0.5 rounded text-sm">$1</code>')
-      .replace(/```[\s\S]*?```/g, (match) => {
-        const code = match.replace(/```\w*\n?/, '').replace(/```$/, '');
-        return `<pre class="bg-gray-800 text-gray-300 p-4 rounded-lg my-3 overflow-x-auto"><code>${code}</code></pre>`;
+      .replace(/`([^`]+)`/g, '<code class="bg-gray-800 text-orange-300 px-1.5 py-0.5 rounded text-sm">$1</code>')
+      // Tables
+      .replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)*)/gm, (_match, header, body) => {
+        const headers = header.split('|').map((h: string) => h.trim()).filter(Boolean);
+        const rows = body.trim().split('\n').map((row: string) => 
+          row.split('|').map((c: string) => c.trim()).filter(Boolean)
+        );
+        let table = '<div class="overflow-x-auto my-4"><table class="w-full text-sm"><thead><tr>';
+        headers.forEach((h: string) => { table += `<th class="text-left px-3 py-2 bg-gray-800 text-orange-300 font-medium border-b border-gray-600">${h}</th>`; });
+        table += '</tr></thead><tbody>';
+        rows.forEach((row: string[]) => {
+          table += '<tr>';
+          row.forEach((cell: string) => { table += `<td class="px-3 py-2 border-b border-gray-700/50 text-gray-300">${cell}</td>`; });
+          table += '</tr>';
+        });
+        table += '</tbody></table></div>';
+        return table;
       })
-      .replace(/^- (.*$)/gm, '<li class="text-gray-300 mb-1">$1</li>')
-      .replace(/(<li[\s\S]*<\/li>)/, '<ul class="list-disc list-inside mb-3">$1</ul>')
-      .replace(/^\d+\. (.*$)/gm, '<li class="text-gray-300 mb-1">$1</li>')
-      .replace(/(<li[\s\S]*<\/li>)/, '<ol class="list-decimal list-inside mb-3">$1</ol>')
-      .replace(/\n\n/g, '<br><br>')
+      .replace(/^- (.*$)/gm, '<li class="text-gray-300 mb-1 ml-4 list-disc">$1</li>')
+      .replace(/^\d+\. (.*$)/gm, '<li class="text-gray-300 mb-1 ml-4 list-decimal">$1</li>')
+      .replace(/\n\n/g, '<div class="mb-3"></div>')
       .replace(/\n/g, '<br>');
+    
+    return result;
   };
 
   const canGenerate = xml.trim() && !isGenerating;

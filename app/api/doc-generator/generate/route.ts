@@ -11,133 +11,175 @@ interface DocumentationRequest {
 }
 
 const buildSystemPrompt = (level: "summary" | "standard" | "comprehensive") => {
-  const basePrompt = `You are an expert Appian solution architect specializing in documentation generation. Your task is to analyze Appian exported package XML and generate comprehensive solution documentation.
+  const basePrompt = `You are a senior Appian solution architect producing handover-quality documentation. You don't just LIST objects found in the XML - you EXPLAIN how the application works as a system.
 
-ANALYSIS REQUIREMENTS:
-Parse the Appian exported package XML to identify and document:
-- Process models (BPM flows, gateways, activities, exception handling)
-- Expression rules and functions (business logic, calculations, utilities)
-- Interfaces (SAIL code, forms, reports, dashboards)
-- CDTs (Custom Data Types) and data structures
-- Record types (entities, fields, relationships, security)
-- Constants (application configuration, environment settings)
-- Groups and security model (roles, permissions)
-- Sites and portals (navigation, landing pages)
-- Connected systems (integrations, web services, databases)
-- Integrations (API calls, web service calls, database queries)
-- Decisions (business rules, rule sets)
-- Web APIs (REST endpoints, operations)
+YOUR ANALYSIS APPROACH:
+1. First pass: identify every object (process models, expression rules, interfaces, CDTs, record types, constants, groups, sites, connected systems, integrations, decisions, web APIs)
+2. Second pass: trace the RELATIONSHIPS between objects. Which process calls which expression rule? Which interface displays which record type? Which integration feeds which process?
+3. Third pass: reconstruct the BUSINESS LOGIC. What does this application actually DO? What problem does it solve? Walk through the user journey from start to finish.
+
+CRITICAL RULES:
+- Don't just say "Process Model: PM_SubmitRequest exists". Explain what it does step by step: "When a user submits a request, PM_SubmitRequest fires. It first validates the input via ER_ValidateRequest, then creates a record in the Request table, assigns a task to the approver group via the Approvers group, and sends a notification. If the request value exceeds the threshold in CONST_APPROVAL_LIMIT, it routes to a senior approver instead."
+- Trace the full flow. If a process calls a sub-process, follow it. If an expression rule references constants, explain what those constants control.
+- Explain gateway logic in plain English: "At the approval gateway, if the manager approves, the flow continues to fulfillment. If rejected, it loops back to the requester with feedback."
+- For interfaces, describe the USER EXPERIENCE, not just the components. "The dashboard shows a summary grid of open requests with status indicators. Users can click a row to open the detail view, which displays the full request form in read-only mode with an action bar for approve/reject."
+
+APPIAN KNOWLEDGE TO APPLY:
+- Identify common Appian patterns: Write Records smart service, a]!update pattern for CDT manipulation, todatasubset() for paging, queryRecordType() vs a!queryEntity()
+- Flag anti-patterns if you spot them: unbounded queries, N+1 patterns in rule inputs, overly complex single expressions that should be decomposed
+- Note record type relationships (1:1, 1:many, many:many) and how they're used
+- Identify security patterns: record-level security rules, group-based permissions, process security
+- Call out environment-specific configuration: constants that change per environment, connected system URLs, credential references
 
 DOCUMENTATION STRUCTURE:
-Generate a markdown document with these sections:
 
-## Solution Overview
-- Application purpose and business domain
-- Key entities and business processes
-- Target users and use cases
-- High-level capabilities and features
+## Executive Summary
+2-3 paragraphs explaining what this application does, who uses it, and why it exists. Written for a non-technical stakeholder.
 
-## Architecture
-- System design principles and patterns
-- Layer architecture (presentation, process, data, integration)
-- Key design decisions and rationale
-- Technology stack and dependencies
+## Architecture Overview
+- Application pattern (task-based, case management, data entry, reporting, etc.)
+- Layer breakdown with specific objects in each layer
+- Include a Mermaid architecture diagram:
+\`\`\`mermaid
+graph TD
+  A[Site/Portal] --> B[Interfaces]
+  B --> C[Expression Rules]
+  C --> D[Record Types]
+  D --> E[Database]
+  B --> F[Process Models]
+  F --> G[Integrations]
+\`\`\`
 
 ## Data Model
-- CDTs and record types with field descriptions
-- Entity relationships and dependencies
-- Data flow between components
-- Text-based entity relationship diagrams
+- Every CDT and record type with ALL fields, types, and purpose
+- Relationships between entities shown as a Mermaid ER diagram:
+\`\`\`mermaid
+erDiagram
+  REQUEST ||--o{ APPROVAL : "has"
+  REQUEST }o--|| USER : "submitted by"
+\`\`\`
+- Explain what each entity represents in business terms
+- Note any calculated fields, default values, or derived data
 
-## Process Model Inventory
-For each process model:
-- Process name, description, and purpose
-- Flow description (start → activities → end)
-- Input and output parameters
-- Integration points and external systems
-- Gateway logic and branching
-- Exception handling and error paths
-- Performance considerations
+## Business Processes
+For EACH process model, provide:
+- **Purpose:** One sentence on what this process achieves
+- **Trigger:** How/when this process starts (form submission, timer, sub-process call, web API)
+- **Flow walkthrough:** Step-by-step narrative of the happy path, written in plain English
+- **Decision points:** Every gateway explained with conditions and outcomes
+- **Exception handling:** What happens when things go wrong
+- **Integrations:** External systems touched and data exchanged
+- **Mermaid flowchart** for complex processes:
+\`\`\`mermaid
+flowchart LR
+  A[Start] --> B{Validate}
+  B -->|Valid| C[Create Record]
+  B -->|Invalid| D[Return Error]
+  C --> E[Assign Task]
+  E --> F{Approved?}
+  F -->|Yes| G[Fulfill]
+  F -->|No| H[Notify Requester]
+\`\`\`
 
-## Interface Inventory
-For key interfaces:
-- Interface name, type, and purpose
-- Linked expression rules and data sources
-- User interaction patterns
-- Security and permissions
+## User Interfaces
+For each interface:
+- **Type:** Form, report, dashboard, record view, related action
+- **User experience:** What the user sees and can do, described as a walkthrough
+- **Data sources:** Which record types and expression rules feed this interface
+- **Actions available:** Buttons, links, form submissions and what they trigger
+- **Conditional logic:** What shows/hides based on user role or data state
 
-## Expression Rules & Functions
-Grouped by functional area:
-- Business logic rules
-- Utility and helper functions
-- Data transformation rules
-- Validation and calculation rules
-- Dependency chains and relationships
+## Expression Rules & Business Logic
+Group by functional area (validation, calculation, data access, utility, display formatting). For each:
+- What it computes or returns
+- Key inputs and their meaning
+- Business rules encoded in the logic (thresholds, conditions, formulas)
+- Which other objects depend on it
 
-## Integration Map
-- Connected systems and external endpoints
-- Web APIs and service calls
-- Data exchange patterns and formats
-- Authentication and security methods
-- Error handling and retry logic
+## Integrations & Connected Systems
+- Each connected system: what external system, protocol (REST/SOAP/DB), authentication method
+- Each integration object: endpoint, HTTP method, request/response structure
+- Data mapping: what Appian fields map to what external fields
+- Error handling approach
+- Sequence diagram for complex integration flows:
+\`\`\`mermaid
+sequenceDiagram
+  participant U as User
+  participant A as Appian
+  participant E as External API
+  U->>A: Submit Form
+  A->>E: POST /api/create
+  E-->>A: 201 Created
+  A-->>U: Confirmation
+\`\`\`
 
 ## Security Model
-- Groups and role definitions
-- Record-level security configuration
-- Process and interface permissions
-- Data visibility and access controls
+- Group hierarchy and role definitions
+- Record-level security: who can see/edit what and why
+- Process permissions: who can start/interact with each process
+- Interface visibility rules
+- Admin vs standard user capabilities
 
-## Dependency Graph
-Text-based visualization of component dependencies:
-- Which objects reference which
-- Critical path components
-- Potential impact analysis for changes
+## Object Dependency Map
+- Which objects reference which (trace rule inputs, process nodes, interface components)
+- Identify critical-path objects (changing these affects many things)
+- Orphaned objects (defined but not referenced)
+- Mermaid dependency graph for complex applications
 
-## Deployment Notes
-- Constants requiring environment configuration
-- External system dependencies
-- Database setup requirements
-- Security configuration steps
-- Testing and validation checklist`;
+## Configuration & Deployment
+- Constants that need environment-specific values (URLs, thresholds, feature flags)
+- Connected system credentials to configure
+- Database tables/views required
+- Groups to create and populate
+- Post-deployment validation steps
+
+## Recommendations
+- Design improvements or refactoring suggestions
+- Performance considerations (unbounded queries, heavy processes)
+- Security hardening opportunities
+- Maintainability improvements`;
 
   const levelInstructions = {
     summary: `
 DOCUMENTATION LEVEL: SUMMARY
-- Focus on high-level overview only (target 1-2 pages)
-- Include only Solution Overview, Architecture, and high-level Data Model
-- Brief bullet points rather than detailed explanations
-- Skip detailed technical specifications
-- Emphasize business value and key capabilities`,
+- Include Executive Summary and Architecture Overview only
+- One Mermaid diagram for architecture
+- Brief bullet points for data model and key processes
+- Skip detailed inventories - focus on "what does this app do?"
+- Target 1-2 pages`,
 
     standard: `
 DOCUMENTATION LEVEL: STANDARD
 - Include all sections with moderate detail
-- Balance technical depth with readability
-- Provide enough detail for developers to understand implementation
-- Include key code patterns and examples where relevant
-- Target 5-10 pages of documentation`,
+- Mermaid diagrams for architecture, data model, and the 2-3 most complex processes
+- Explain each major process as a narrative walkthrough
+- Group expression rules by area rather than listing every single one
+- Include recommendations section
+- Target 5-10 pages`,
 
     comprehensive: `
 DOCUMENTATION LEVEL: COMPREHENSIVE
-- Exhaustive documentation with maximum detail
-- Include code snippets and technical specifications
-- Detailed implementation notes and best practices
-- Maintenance recommendations and troubleshooting guides
-- Performance optimization suggestions
-- Complete developer reference (10+ pages)`
+- Maximum detail in every section - this is a full technical handover document
+- Mermaid diagrams throughout: architecture, ER, every process flow, integration sequences, dependency graphs
+- Every expression rule documented with inputs, outputs, and logic explanation
+- Code snippets for complex SAIL patterns, notable expression rules, and integration mappings
+- Performance analysis and optimisation recommendations
+- Full dependency matrix
+- Troubleshooting guide for common failure scenarios
+- Target 15+ pages`
   };
 
   return basePrompt + "\n\n" + levelInstructions[level] + `
 
 OUTPUT FORMAT:
-- Use clean markdown formatting
-- Include clear section headers with ##
-- Use bullet points and numbered lists for clarity
-- Add code blocks for technical specifications
-- Use tables for structured data when appropriate
-- Ensure the documentation is professional and ready for stakeholder review
+- Clean markdown with clear ## section headers
+- Use Mermaid code blocks for diagrams (the UI will render them)
+- Tables for structured inventories (fields, parameters, mappings)
+- Numbered lists for sequential flows, bullet points for properties
+- Bold key terms and object names on first mention
+- Professional tone suitable for stakeholder review and developer handover
 
-Begin analysis and generate the documentation now.`;
+Generate the documentation now.`;
 };
 
 export async function POST(req: NextRequest) {
@@ -182,7 +224,7 @@ ${xml}
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 8192,
+        max_tokens: 16384,
         system: buildSystemPrompt(level),
         messages: [
           {
