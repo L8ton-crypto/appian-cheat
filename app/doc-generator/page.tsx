@@ -215,6 +215,9 @@ export default function DocGeneratorPage() {
     setIsGenerating(false);
   };
 
+  // Store mermaid code blocks separately (avoids HTML attribute escaping issues)
+  const mermaidCodesRef = useRef<Map<string, string>>(new Map());
+
   // Render Mermaid diagrams after output updates
   useEffect(() => {
     if (!output || isGenerating) return;
@@ -225,6 +228,7 @@ export default function DocGeneratorPage() {
         mermaid.initialize({
           startOnLoad: false,
           theme: "dark",
+          securityLevel: "loose",
           themeVariables: {
             primaryColor: "#f59e0b",
             primaryTextColor: "#f3f4f6",
@@ -246,32 +250,52 @@ export default function DocGeneratorPage() {
         for (let i = 0; i < containers.length; i++) {
           const el = containers[i] as HTMLElement;
           if (el.dataset.rendered === "true") continue;
-          const code = el.dataset.mermaidCode;
+          const id = el.dataset.mermaidId;
+          if (!id) continue;
+          const code = mermaidCodesRef.current.get(id);
           if (!code) continue;
+
+          // Sanitize common LLM quirks that break mermaid v11
+          let sanitized = code
+            .replace(/\r\n/g, "\n")
+            .replace(/[""]/g, '"')           // curly quotes
+            .replace(/['']/g, "'")           // curly apostrophes
+            .replace(/—/g, "--")             // em dashes in labels
+            .replace(/–/g, "--")             // en dashes
+            .replace(/\u00A0/g, " ")         // non-breaking spaces
+            .replace(/^\s*\n/, "")           // leading blank line
+            .replace(/\n\s*$/, "");          // trailing blank line
+
           try {
-            const { svg } = await mermaid.render(`mermaid-${Date.now()}-${i}`, code);
+            const { svg } = await mermaid.render(`mermaid-svg-${Date.now()}-${i}`, sanitized);
             el.innerHTML = svg;
             el.dataset.rendered = "true";
-          } catch {
-            el.innerHTML = `<pre class="text-gray-400 text-sm p-3">${code}</pre>`;
+          } catch (err) {
+            console.warn("Mermaid parse error for block:", id, err);
+            el.innerHTML = `<pre class="text-gray-500 text-xs p-3 bg-gray-800 rounded overflow-x-auto"><code>${sanitized.replace(/</g, "&lt;")}</code></pre>`;
             el.dataset.rendered = "true";
           }
         }
       } catch (err) {
-        console.warn("Mermaid render failed:", err);
+        console.warn("Mermaid load failed:", err);
       }
-    }, 300);
+    }, 500);
     
     return () => clearTimeout(timer);
   }, [output, isGenerating]);
 
   // Markdown to HTML converter with Mermaid support
   const markdownToHtml = (md: string) => {
+    // Reset mermaid codes for fresh render
+    mermaidCodesRef.current.clear();
+    let mermaidIndex = 0;
+
     // First handle fenced code blocks (mermaid + regular)
     let result = md.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
       if (lang === "mermaid") {
-        const escaped = code.trim().replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        return `<div class="mermaid-container bg-gray-800/50 rounded-lg p-4 my-4 overflow-x-auto" data-mermaid-code="${escaped}"><pre class="text-gray-400 text-sm">Loading diagram...</pre></div>`;
+        const id = `mmd-${mermaidIndex++}`;
+        mermaidCodesRef.current.set(id, code.trim());
+        return `<div class="mermaid-container bg-gray-800/50 rounded-lg p-4 my-4 overflow-x-auto" data-mermaid-id="${id}"><div class="flex items-center gap-2 text-gray-400 text-sm"><div class="w-4 h-4 border-2 border-gray-500/30 border-t-gray-400 rounded-full animate-spin"></div>Rendering diagram...</div></div>`;
       }
       const escapedCode = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
       return `<pre class="bg-gray-800 text-gray-300 p-4 rounded-lg my-3 overflow-x-auto"><code>${escapedCode}</code></pre>`;
