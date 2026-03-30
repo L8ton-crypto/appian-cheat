@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import JSZip from "jszip";
 import Navbar from "../components/Navbar";
 import { ActionToolbar, saveToHistory } from "../components/ReviewToolbar";
 
@@ -21,38 +22,71 @@ export default function DocGeneratorPage() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = useCallback((file: File) => {
-    if (file.name.toLowerCase().endsWith('.zip')) {
-      alert("ZIP file parsing is coming soon. For now, please extract individual XML files and upload them one at a time.");
+  const [isExtracting, setIsExtracting] = useState(false);
+
+  const addXmlContent = useCallback((name: string, content: string) => {
+    setXmlFiles(prev => [...prev, { name, content }]);
+    setXml(prev => prev ? prev + "\n\n<!-- ===== " + name + " ===== -->\n\n" + content : content);
+    
+    setProjectName(prev => {
+      if (prev) return prev;
+      const projectMatch = content.match(/<package[^>]*name="([^"]+)"/i) || 
+                           content.match(/<name[^>]*>([^<]+)</i);
+      return projectMatch ? projectMatch[1] : "";
+    });
+  }, []);
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    const name = file.name.toLowerCase();
+
+    if (name.endsWith('.zip')) {
+      setIsExtracting(true);
+      try {
+        const zip = await JSZip.loadAsync(file);
+        let extracted = 0;
+
+        const entries = Object.entries(zip.files).filter(
+          ([path, entry]) => !entry.dir && path.toLowerCase().endsWith('.xml')
+        );
+
+        if (entries.length === 0) {
+          alert("No XML files found inside the ZIP. Make sure this is an Appian exported package.");
+          return;
+        }
+
+        for (const [path, entry] of entries) {
+          const content = await entry.async("string");
+          if (content.trim()) {
+            const shortName = path.includes('/') ? path.split('/').pop()! : path;
+            addXmlContent(shortName, content);
+            extracted++;
+          }
+        }
+
+        if (extracted === 0) {
+          alert("ZIP contained XML files but they were all empty.");
+        }
+      } catch (err) {
+        console.error("ZIP extraction error:", err);
+        alert("Failed to read the ZIP file. It may be corrupted or in an unsupported format.");
+      } finally {
+        setIsExtracting(false);
+      }
       return;
     }
 
-    if (!file.name.toLowerCase().endsWith('.xml')) {
-      alert("Please upload an XML file.");
+    if (!name.endsWith('.xml')) {
+      alert("Please upload an XML or ZIP file.");
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      
-      // Add to files list
-      setXmlFiles(prev => [...prev, { name: file.name, content }]);
-      
-      // Combine all XML into the main xml state
-      setXml(prev => prev ? prev + "\n\n<!-- ===== " + file.name + " ===== -->\n\n" + content : content);
-      
-      // Try to extract project name from first file
-      if (!projectName) {
-        const projectMatch = content.match(/<package[^>]*name="([^"]+)"/i) || 
-                             content.match(/<name[^>]*>([^<]+)</i);
-        if (projectMatch) {
-          setProjectName(projectMatch[1]);
-        }
-      }
+      addXmlContent(file.name, content);
     };
     reader.readAsText(file);
-  }, [projectName]);
+  }, [addXmlContent]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -253,25 +287,36 @@ export default function DocGeneratorPage() {
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                    isDragging
-                      ? "border-orange-400 bg-orange-400/10"
-                      : "border-gray-600 hover:border-gray-500"
+                  onClick={() => !isExtracting && fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                    isExtracting
+                      ? "border-orange-400 bg-orange-400/10 cursor-wait"
+                      : isDragging
+                        ? "border-orange-400 bg-orange-400/10 cursor-pointer"
+                        : "border-gray-600 hover:border-gray-500 cursor-pointer"
                   }`}
                 >
-                  <div className="mb-4">
-                    <div className="text-4xl mb-2">📁</div>
-                    <p className="text-lg font-medium text-gray-200">
-                      Drag & drop your XML or ZIP file
-                    </p>
-                    <p className="text-sm text-gray-400 mt-1">
-                      Or click to browse and select a file
-                    </p>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Supports .xml and .zip files from Appian package exports
-                  </p>
+                  {isExtracting ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-8 h-8 border-2 border-orange-300/30 border-t-orange-300 rounded-full animate-spin"></div>
+                      <p className="text-lg font-medium text-gray-200">Extracting XML from ZIP...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mb-4">
+                        <div className="text-4xl mb-2">📁</div>
+                        <p className="text-lg font-medium text-gray-200">
+                          Drag & drop your exported project
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Or click to browse and select a file
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Supports .zip (Appian package exports) and individual .xml files
+                      </p>
+                    </>
+                  )}
                   <input
                     ref={fileInputRef}
                     type="file"
