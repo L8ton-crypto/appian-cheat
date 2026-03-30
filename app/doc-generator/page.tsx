@@ -50,7 +50,6 @@ export default function DocGeneratorPage() {
       setIsExtracting(true);
       try {
         const zip = await JSZip.loadAsync(file);
-        let extracted = 0;
 
         const entries = Object.entries(zip.files).filter(
           ([path, entry]) => !entry.dir && path.toLowerCase().endsWith('.xml')
@@ -61,17 +60,35 @@ export default function DocGeneratorPage() {
           return;
         }
 
+        // Use ZIP filename as project name hint
+        const zipName = file.name.replace(/\.zip$/i, "").replace(/[-_]/g, " ").trim();
+        if (zipName) {
+          setProjectName(prev => prev || zipName);
+        }
+
+        const newFiles: { name: string; content: string }[] = [];
         for (const [path, entry] of entries) {
           const content = await entry.async("string");
           if (content.trim()) {
             const shortName = path.includes('/') ? path.split('/').pop()! : path;
-            addXmlContent(shortName, content);
-            extracted++;
+            newFiles.push({ name: shortName, content });
           }
         }
 
-        if (extracted === 0) {
+        if (newFiles.length === 0) {
           alert("ZIP contained XML files but they were all empty.");
+        } else {
+          // Batch add all files at once instead of one-by-one
+          setXmlFiles(prev => {
+            const updated = [...prev, ...newFiles];
+            setXml(updated.map(f => f.content).join("\n"));
+            const inv = parseAppianExport(updated, zipName);
+            setInventory(inv);
+            if (inv.projectName && inv.projectName !== "Appian Application") {
+              setProjectName(prev => prev || inv.projectName);
+            }
+            return updated;
+          });
         }
       } catch (err) {
         console.error("ZIP extraction error:", err);

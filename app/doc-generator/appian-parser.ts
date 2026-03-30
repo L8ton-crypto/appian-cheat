@@ -605,14 +605,35 @@ export function parseAppianExport(
   // Count by type
   const count = (type: string) => deduped.filter(o => o.type === type).length;
 
-  // Detect project name
+  // Detect project name - try multiple strategies
   let detectedName = projectName || "";
   if (!detectedName) {
-    // Try from package or application elements
     for (const file of xmlFiles) {
-      const match = file.content.match(/<(?:package|application)[^>]*name="([^"]+)"/i) ||
-                    file.content.match(/<applicationName[^>]*>([^<]+)</i);
-      if (match) { detectedName = match[1]; break; }
+      const c = file.content;
+      // Strategy 1: package/application attributes
+      const m1 = c.match(/<(?:package|application|app)[^>]*name="([^"]+)"/i);
+      if (m1) { detectedName = m1[1]; break; }
+      // Strategy 2: applicationName element
+      const m2 = c.match(/<applicationName[^>]*>([^<]+)<\/applicationName>/i);
+      if (m2) { detectedName = m2[1]; break; }
+      // Strategy 3: Appian export header - look for application/project name in common wrapper elements
+      const m3 = c.match(/<(?:a:)?application[^>]*>\s*<(?:a:)?name[^>]*>([^<]+)/i);
+      if (m3) { detectedName = m3[1]; break; }
+      // Strategy 4: project or appName elements
+      const m4 = c.match(/<(?:projectName|appName|displayName)[^>]*>([^<]+)/i);
+      if (m4) { detectedName = m4[1]; break; }
+      // Strategy 5: UUID-named wrapper with displayLabel 
+      const m5 = c.match(/<displayLabel[^>]*>([^<]+)/i);
+      if (m5) { detectedName = m5[1]; break; }
+    }
+  }
+  // Strategy 6: derive from zip/file name (strip extension, clean up)
+  if (!detectedName) {
+    const firstFile = xmlFiles[0]?.name || "";
+    // If it looks like a meaningful name (not just a UUID), use it
+    const cleaned = firstFile.replace(/\.xml$/i, "").replace(/[-_]/g, " ").trim();
+    if (cleaned && !cleaned.match(/^[a-f0-9-]{30,}$/i)) {
+      detectedName = cleaned;
     }
   }
   if (!detectedName) detectedName = "Appian Application";
